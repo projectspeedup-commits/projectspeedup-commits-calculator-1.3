@@ -1,0 +1,95 @@
+{
+  "entities": {
+    "AppSettings": {
+      "title": "Application Settings",
+      "description": "Global settings for prices, scrap, and economy items",
+      "type": "object",
+      "properties": {
+        "rawPrices": {
+          "type": "object",
+          "description": "Prices per steel grade. Keys are sanitized grade names."
+        },
+        "rawPricesV2": {
+          "type": "object",
+          "description": "Prices per steel grade v2. Keys are sanitized grade names."
+        },
+        "scrapPrice": {
+          "type": "string",
+          "description": "Global scrap price"
+        },
+        "remnantPrice": {
+          "type": "string",
+          "description": "Global remnant price"
+        },
+        "customGrades": {
+          "type": "array",
+          "description": "List of custom steel grades added by admin"
+        },
+        "deletedGrades": {
+          "type": "array",
+          "description": "List of custom steel grades deleted by admin"
+        },
+        "remnantPricing": {
+          "type": "object",
+          "description": "Pricing types for remnants per grade and profile"
+        },
+        "economyItems": {
+          "type": "array",
+          "description": "List of economy items for calculations"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update timestamp"
+        }
+      }
+    },
+    "Calculation": {
+      "title": "Calculation Record",
+      "description": "A saved calculation",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "profileType": { "type": "string" },
+        "steelGrade": { "type": "string" },
+        "selectedTarget": { "type": "string" },
+        "selectedRaw": { "type": "string" },
+        "orderWeight": { "type": "string" },
+        "orderedLength": { "type": "string" },
+        "lengthInputValue": { "type": "string" },
+        "lengthInputSource": { "type": "string" },
+        "frontCoef": { "type": "string" },
+        "backCoef": { "type": "string" },
+        "usefulLength": { "type": "number" },
+        "sellPrice": { "type": "string" },
+        "rawPriceUsed": { "type": "string" },
+        "scrapPriceUsed": { "type": "string" },
+        "remnantPriceUsed": { "type": "string" },
+        "label": { "type": "string" }
+      },
+      "required": ["userId", "createdAt"]
+    },
+    "AdminConfig": {
+      "title": "Admin Config",
+      "description": "Admins",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "/settings/prices": {
+      "schema": "AppSettings",
+      "description": "Single document holding all global application settings"
+    },
+    "/calculations/{calcId}": {
+      "schema": "Calculation",
+      "description": "User's saved calculations"
+    },
+    "/admins/{userId}": {
+      "schema": "AdminConfig",
+      "description": "User IDs that correspond to admins"
+    }
+  }
+}
