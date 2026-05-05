@@ -1,5 +1,5 @@
 import { DEFAULT_STEEL_GRADES, formatCurrency, formatInputValue, getGostForGrade, getLengthLabel, getProfileGost, handleNumericInput, HEX_DATA, ROUND_DATA, TECH_COEFS_ROUND, EconomyItem, DEFAULT_ECONOMY_ITEMS } from "../lib/constants";
-import { AlertTriangle, ArrowRight, Briefcase, Calculator, Check, Circle, Copy, Hexagon, History, Info, Key, LogOut, Moon, Package, Printer, RotateCcw, Ruler, Save, Scale, Sun, Trash2, Wallet, TrendingUp, BarChart3, PieChart, Plus, Minus, BookOpen } from "lucide-react";
+import { AlertTriangle, ArrowRight, Briefcase, Calculator, Check, Circle, Copy, Hexagon, History, Info, Key, LogOut, Moon, Package, Printer, RotateCcw, Ruler, Save, Scale, Sun, Trash2, Wallet, TrendingUp, BarChart3, PieChart, Plus, Minus, BookOpen, CheckCircle2, HelpCircle } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { PrintTemplate } from "./PrintTemplate";
 import { db } from "../lib/firebase";
@@ -1355,23 +1355,35 @@ export function CalculatorApp({
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-3">
                         {optimalLengths.map((opt, i) => (
-                          <button
-                            key={i}
-                            onClick={() => setOrderedLength(opt.length.toString())}
-                            className="bg-white dark:bg-[#1A1C19] hover:bg-slate-50 dark:hover:bg-slate-800 border border-[#CAC4D0] dark:border-slate-700 text-left p-3 rounded-xl transition-colors group flex items-center justify-between shadow-sm focus:outline-none"
-                          >
-                            <div>
-                              <div className="font-semibold text-[#1D192B] dark:text-white text-sm">{opt.length} мм</div>
-                              <div className="text-[10px] text-[#49454F] dark:text-slate-400 font-medium">
-                                На {opt.pieces} {opt.pieces === 1 ? "часть" : opt.pieces > 1 && opt.pieces < 5 ? "части" : "частей"}
+                          <div key={i} className="relative group/chip">
+                            <button
+                              onClick={() => setOrderedLength(opt.length.toString())}
+                              className="w-full bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 border border-emerald-200 dark:border-emerald-800/50 text-left p-3 rounded-xl transition-all duration-300 group flex items-center justify-between shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:-translate-y-[3px] focus:outline-none relative overflow-hidden"
+                            >
+                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-300/20 to-transparent -translate-x-full group-hover:animate-[shimmer_2s_infinite] pointer-events-none"></div>
+                              <style>{`
+                                @keyframes shimmer {
+                                  100% { transform: translateX(100%); }
+                                }
+                              `}</style>
+                              <div className="relative z-10">
+                                <div className="font-bold text-emerald-800 dark:text-emerald-300 text-sm whitespace-nowrap">{opt.length} мм</div>
+                                <div className="text-[10px] text-emerald-600 dark:text-emerald-500/80 font-semibold uppercase tracking-wider">
+                                  На {opt.pieces} {opt.pieces === 1 ? "часть" : opt.pieces > 1 && opt.pieces < 5 ? "части" : "частей"}
+                                </div>
                               </div>
+                              <div className="w-8 h-8 rounded-full bg-emerald-200/50 dark:bg-emerald-800/50 flex items-center justify-center relative z-10 group-hover:scale-110 transition-transform shrink-0">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                              </div>
+                            </button>
+                            {/* Tooltip */}
+                            <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-emerald-900 text-emerald-50 text-xs font-bold px-4 py-2 rounded-lg shadow-xl whitespace-nowrap opacity-0 group-hover/chip:opacity-100 transition-opacity pointer-events-none z-50">
+                              Волшебный чип: щелкните по зеленой фигуре, чтобы в один клик подставить безотходный размер прутка!
+                              <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-emerald-900 rotate-45"></div>
                             </div>
-                            <div className="w-6 h-6 rounded-full bg-[#6750A4]/5 dark:bg-white/5 flex items-center justify-center group-hover:bg-[#6750A4]/10 dark:group-hover:bg-white/10 transition-colors shrink-0">
-                              <ArrowRight className="w-3 h-3 text-[#6750A4] dark:text-slate-400" />
-                            </div>
-                          </button>
+                          </div>
                         ))}
                     </div>
                   </div>
@@ -1619,14 +1631,38 @@ export function CalculatorApp({
                       )}
 
                       <div className="pt-5 mt-2 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-2">
-                        <span className="font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-[9px]">Валовая прибыль (Маржа):</span>
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                          <span className={`font-bold tracking-tight text-2xl leading-none whitespace-nowrap ${commercialStats.isPositive ? "text-[#0D652D] dark:text-green-400" : "text-[#BA1A1A] dark:text-red-400"}`}>
+                        <div className="flex items-center gap-1.5 group/margin cursor-help">
+                          <span className="font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-[9px]">Валовая прибыль (Маржа):</span>
+                          <HelpCircle className="w-3.5 h-3.5 text-slate-400 group-hover/margin:text-sky-500 transition-colors" />
+                          
+                          {/* Tooltip */}
+                          <div className="absolute z-50 bottom-full left-0 mb-2 invisible opacity-0 group-hover/margin:visible group-hover/margin:opacity-100 transition-all bg-slate-800 text-white text-xs p-3 rounded-xl shadow-xl w-64 translate-y-2 group-hover/margin:translate-y-0 pointer-events-none">
+                            <strong>Внимание на цвет!</strong><br />
+                            <span className="text-emerald-400">Зеленый</span> — отличная маржа.<br />
+                            <span className="text-amber-400">Желтый</span> — повышенный риск.<br />
+                            <span className="text-rose-400">Красный</span> — сделка убыточна (меньше норматива).
+                            <div className="absolute -bottom-1.5 left-6 w-3 h-3 bg-slate-800 rotate-45"></div>
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 group/profit">
+                          <span className={`font-bold tracking-tight text-2xl leading-none whitespace-nowrap group-hover/profit:animate-[color-cycle_3s_ease-in-out_infinite] ${commercialStats.isPositive ? "text-[#0D652D] dark:text-green-400" : "text-[#BA1A1A] dark:text-red-400"}`}>
                             {commercialStats.isPositive ? "+" : ""}{formatCurrency(commercialStats.profitPerTon)} <span className="text-sm font-medium">руб.</span>
                           </span>
-                          <span className={`text-[10px] font-black px-2 py-0.5 rounded-md border shadow-sm ${commercialStats.isPositive ? "bg-[#E6F4EA] dark:bg-green-900/40 border-[#CEEAD6] dark:border-green-900/50 text-[#0D652D] dark:text-green-400" : "bg-[#FFDAD6] dark:bg-red-900/40 border-[#FFB4AB] dark:border-red-900/50 text-[#BA1A1A] dark:text-red-400"}`}>
+                          <span className={`text-[10px] font-black px-2 py-0.5 rounded-md border shadow-sm group-hover/profit:animate-[color-cycle-bg_3s_ease-in-out_infinite] ${commercialStats.isPositive ? "bg-[#E6F4EA] dark:bg-green-900/40 border-[#CEEAD6] dark:border-green-900/50 text-[#0D652D] dark:text-green-400" : "bg-[#FFDAD6] dark:bg-red-900/40 border-[#FFB4AB] dark:border-red-900/50 text-[#BA1A1A] dark:text-red-400"}`}>
                             {commercialStats.isPositive ? "+" : ""}{commercialStats.marginPercent.toFixed(1)}%
                           </span>
+                          <style>{`
+                            @keyframes color-cycle {
+                              0% { color: #f87171; } /* red-400 */
+                              50% { color: #fbbf24; } /* amber-400 */
+                              100% { color: #4ade80; } /* green-400 */
+                            }
+                            @keyframes color-cycle-bg {
+                              0% { background-color: rgba(153, 27, 27, 0.4); border-color: rgba(153, 27, 27, 0.5); color: #f87171; }
+                              50% { background-color: rgba(146, 64, 14, 0.4); border-color: rgba(146, 64, 14, 0.5); color: #fbbf24; }
+                              100% { background-color: rgba(20, 83, 45, 0.4); border-color: rgba(20, 83, 45, 0.5); color: #4ade80; }
+                            }
+                          `}</style>
                         </div>
                       </div>
                     </div>

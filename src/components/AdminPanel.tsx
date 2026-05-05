@@ -1,5 +1,5 @@
 import { DEFAULT_STEEL_GRADES, formatInputValue, handleNumericInput, DEFAULT_ECONOMY_ITEMS, EconomyItem, ROUND_DATA, HEX_DATA, getGostForGrade } from "../lib/constants";
-import { Activity, LogOut, Plus, Trash2, Settings, Moon, Sun, Info, TrendingUp, Calculator, Wallet, Layers, Package, Upload, FileText, X, BookOpen, ChevronLeft, Download, Copy, Check, ShoppingCart, Factory, Truck, Search, Filter, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Activity, LogOut, Plus, Trash2, Settings, Moon, Sun, Info, TrendingUp, Calculator, Wallet, Layers, Package, Upload, FileText, X, BookOpen, ChevronLeft, Download, Copy, Check, ShoppingCart, Factory, Truck, Search, Filter, AlertCircle, CheckCircle2, FolderSearch, ArrowRight, ClipboardList, HelpCircle } from "lucide-react";
 import { useEffect, useState, useRef, ChangeEvent, MouseEvent, useMemo, Fragment } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import * as XLSX from "xlsx-js-style";
@@ -148,6 +148,7 @@ export function AdminPanel({
 
   // Supply Calculation Logic & Mock Data Extraction
   const [isProcessing, setIsProcessing] = useState(false);
+  const [parsingProgress, setParsingProgress] = useState({ active: false, current: 0, total: 0, message: "" });
   const [isProcessingStock, setIsProcessingStock] = useState(false);
   const [calculationResults, setCalculationResults] = useState<CalculationResult[]>(() => {
     if (typeof window !== "undefined") {
@@ -982,6 +983,11 @@ export function AdminPanel({
           }
           
           for (let i = startRow; i < jsonData.length; i++) {
+            if (i % 25 === 0) {
+              setParsingProgress({ active: true, current: i, total: jsonData.length, message: `Файл планов: Обрабатывается строка ${i} из ${jsonData.length}...` });
+              await new Promise(resolve => setTimeout(resolve, 0));
+            }
+
             const row = jsonData[i] || [];
             
             if (row.length === 0 || row.every((c: any) => !c || String(c).trim() === '')) continue;
@@ -1245,6 +1251,7 @@ export function AdminPanel({
       console.error("Error processing files:", err);
     } finally {
       setIsProcessing(false);
+      setParsingProgress({ active: false, current: 0, total: 0, message: "" });
     }
   };
 
@@ -1302,6 +1309,11 @@ export function AdminPanel({
           }
           
           for (let i = startRow; i < jsonData.length; i++) {
+            if (i % 25 === 0) {
+              setParsingProgress({ active: true, current: i, total: jsonData.length, message: `Файл поставок: Обрабатывается строка ${i} из ${jsonData.length}...` });
+              await new Promise(resolve => setTimeout(resolve, 0));
+            }
+
             const row = jsonData[i] || [];
             if (!row[cols.profile] && !row[cols.grade]) continue;
             
@@ -1338,6 +1350,7 @@ export function AdminPanel({
       console.error("Error processing supply plans files:", err);
     } finally {
       setIsProcessingSupplyPlans(false);
+      setParsingProgress({ active: false, current: 0, total: 0, message: "" });
     }
   };
 
@@ -1381,6 +1394,11 @@ export function AdminPanel({
           }
           
           for (let i = startRow; i < jsonData.length; i++) {
+            if (i % 25 === 0) {
+              setParsingProgress({ active: true, current: i, total: jsonData.length, message: `Файл склада: Обрабатывается строка ${i} из ${jsonData.length}...` });
+              await new Promise(resolve => setTimeout(resolve, 0));
+            }
+
             const row = jsonData[i] || [];
             if (!row[nomCol]) continue;
             
@@ -1452,6 +1470,7 @@ export function AdminPanel({
       console.error("Error processing stock files:", err);
     } finally {
       setIsProcessingStock(false);
+      setParsingProgress({ active: false, current: 0, total: 0, message: "" });
     }
   };
 
@@ -1928,7 +1947,7 @@ export function AdminPanel({
                     <h3 className="text-lg font-medium text-slate-900 dark:text-white">Планы производства</h3>
                   </div>
                   
-                  <div className="relative">
+                  <div className="relative group/dropzone">
                     <div 
                       onClick={() => fileInputRef.current?.click()}
                       onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
@@ -1941,7 +1960,7 @@ export function AdminPanel({
                           handleFileUpload(event);
                         }
                       }}
-                      className="bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed border-slate-200 dark:border-slate-800 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-center sm:justify-start text-center sm:text-left gap-4 sm:gap-6 group cursor-pointer hover:border-slate-400 dark:hover:border-slate-600 transition-all shadow-sm"
+                      className={`relative bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed ${planFiles.length === 0 ? 'border-blue-400 dark:border-blue-500 animate-pulse-border shadow-[0_0_15px_rgba(59,130,246,0.5)]' : 'border-slate-200 dark:border-slate-800'} p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-center sm:justify-start text-center sm:text-left gap-4 sm:gap-6 group cursor-pointer hover:border-slate-400 dark:hover:border-slate-600 transition-all z-10`}
                     >
                       <input 
                         type="file" 
@@ -1951,14 +1970,24 @@ export function AdminPanel({
                         multiple
                         accept=".pdf,.xlsx,.csv,.txt,.docx"
                       />
-                      <div className="w-14 h-14 bg-slate-50 dark:bg-slate-800 rounded-2xl shrink-0 flex items-center justify-center text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">
+                      <div className="relative w-14 h-14 bg-slate-50 dark:bg-slate-800 rounded-2xl shrink-0 flex items-center justify-center text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">
                         <Upload className="w-6 h-6" />
+                        {planFiles.length === 0 && (
+                          <div className="absolute inset-0 rounded-2xl border-2 border-blue-400 animate-ping opacity-75"></div>
+                        )}
                       </div>
                       <div>
                         <p className="text-base font-bold text-slate-900 dark:text-white">Нажмите или перетащите файл</p>
                         <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Excel или CSV файлы планов</p>
                       </div>
                     </div>
+                    {/* Tooltip */}
+                    {planFiles.length === 0 && (
+                      <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-lg whitespace-nowrap opacity-0 group-hover/dropzone:opacity-100 transition-opacity pointer-events-none z-20">
+                        Загрузите выгрузку из 1С в формате Excel (.xlsx). Важен столбец «Остаток к выполнению» или «Количество».
+                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-blue-600 rotate-45"></div>
+                      </div>
+                    )}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -1980,7 +2009,7 @@ export function AdminPanel({
                           {isProcessing && (
                             <div className="text-[10px] text-slate-500 flex items-center gap-2 font-medium">
                               <div className="w-3 h-3 border-2 border-sky-500/20 border-t-sky-500 rounded-full animate-spin" />
-                              Расчет...
+                              {parsingProgress.active ? parsingProgress.message : "Расчет..."}
                             </div>
                           )}
                           {!isProcessing && calculationResults.length > 0 && (
@@ -2095,7 +2124,7 @@ export function AdminPanel({
                           {isProcessingStock && (
                             <div className="text-[10px] text-slate-500 flex items-center gap-2 font-medium">
                               <div className="w-3 h-3 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
-                              Обработка...
+                              {parsingProgress.active ? parsingProgress.message : "Обработка..."}
                             </div>
                           )}
 
@@ -2195,7 +2224,7 @@ export function AdminPanel({
                           {isProcessingSupplyPlans && (
                             <div className="text-[10px] text-slate-500 flex items-center gap-2 font-medium">
                               <div className="w-3 h-3 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
-                              Обработка...
+                              {parsingProgress.active ? parsingProgress.message : "Обработка..."}
                             </div>
                           )}
 
@@ -2387,16 +2416,31 @@ export function AdminPanel({
                   >
                     Наличие
                   </button>
-                  <button
-                    onClick={() => setSupplySection("calc-stock")}
-                    className={`whitespace-nowrap px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all border border-transparent ${
-                      supplySection === "calc-stock" 
-                        ? "bg-sky-50 dark:bg-sky-900/20 text-sky-600 dark:text-sky-400 border-sky-200/50 dark:border-sky-800/50" 
-                        : "text-slate-500 hover:text-sky-600 dark:text-slate-400 dark:hover:text-sky-400 hover:bg-sky-50/50 dark:hover:bg-sky-900/10"
-                    }`}
-                  >
-                    Расчет с учетом наличия
-                  </button>
+                  <div className="relative group/calc-stock">
+                    <button
+                      onClick={() => setSupplySection("calc-stock")}
+                      className={`relative whitespace-nowrap px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all border border-transparent ${
+                        supplySection === "calc-stock" 
+                          ? "bg-sky-50 dark:bg-sky-900/20 text-sky-600 dark:text-sky-400 border-sky-200/50 dark:border-sky-800/50" 
+                          : "text-slate-500 hover:text-sky-600 dark:text-slate-400 dark:hover:text-sky-400 hover:bg-sky-50/50 dark:hover:bg-sky-900/10"
+                      }`}
+                    >
+                      Расчет с учетом наличия
+                      {planFiles.length > 0 && stockFiles.length > 0 && supplySection !== "calc-stock" && (
+                        <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-3 w-3 bg-orange-500 border-2 border-white dark:border-[#1A1C19]"></span>
+                        </span>
+                      )}
+                    </button>
+                    {/* Tooltip */}
+                    {planFiles.length > 0 && stockFiles.length > 0 && supplySection !== "calc-stock" && (
+                      <div className="absolute -bottom-14 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs font-medium px-3 py-2 rounded-lg shadow-xl w-64 text-center opacity-0 group-hover/calc-stock:opacity-100 transition-opacity z-50 pointer-events-none">
+                        Кликните сюда: система сопоставит ваши заказы со складом и покажет итоговый Дефицит (объем к закупке).
+                        <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 rotate-45"></div>
+                      </div>
+                    )}
+                  </div>
                   <button
                     onClick={() => setSupplySection("free-stock")}
                     className={`whitespace-nowrap px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all border border-transparent ${
@@ -2602,8 +2646,8 @@ export function AdminPanel({
                         onMouseMove={handleMouseMove}
                         className={`overflow-auto custom-scrollbar max-h-[calc(100vh-300px)] min-h-[400px] relative ${isStockDragging ? 'select-none cursor-grabbing' : 'cursor-grab'}`}
                       >
-                        <table className="w-full text-left border-separate border-spacing-0">
-                          <thead className="text-[10px] uppercase font-black tracking-widest text-slate-400 dark:text-slate-500 sticky top-0 z-10 shadow-sm">
+                        <table className="w-full text-left border-separate border-spacing-0 block md:table">
+                          <thead className="text-[10px] uppercase font-black tracking-widest text-slate-400 dark:text-slate-500 sticky top-0 z-10 shadow-sm hidden md:table-header-group">
                             <tr>
                               <th className="px-8 py-5 bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Номенклатура</th>
                               <th className="px-6 py-5 bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Профиль</th>
@@ -2613,29 +2657,39 @@ export function AdminPanel({
                               <th className="px-8 py-5 text-right bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Тн.</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50 text-[11px] font-medium text-slate-600 dark:text-slate-300">
+                          <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50 text-[11px] font-medium text-slate-600 dark:text-slate-300 block md:table-row-group">
                             {processedStock.map((row, i) => (
-                              <tr key={i} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group">
-                                <td className="px-8 py-4 text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
-                                  <div className="max-w-[300px] truncate font-mono text-[10px]" title={row["Исходная Номенклатура"]}>
+                              <tr key={i} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group block md:table-row mb-4 md:mb-0 border border-slate-200 dark:border-slate-800 md:border-none rounded-xl md:rounded-none bg-white dark:bg-[#1A1C19] p-2 md:p-0 md:bg-transparent">
+                                <td className="px-4 md:px-8 py-3 md:py-4 text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Номенклатура</span>
+                                  <div className="max-w-[200px] md:max-w-[300px] truncate font-mono text-[10px] text-right md:text-left" title={row["Исходная Номенклатура"]}>
                                     {row["Исходная Номенклатура"]}
                                   </div>
                                 </td>
-                                <td className="px-6 py-4">
-                                  <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">{row["Профиль"]}</span>
+                                <td className="px-4 md:px-6 py-3 md:py-4 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Профиль</span>
+                                  <span className="inline-flex items-center px-3 py-1.5 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">{row["Профиль"]}</span>
                                 </td>
-                                <td className="px-6 py-4 text-center font-bold text-slate-700 dark:text-slate-200">{row["Марка стали"]}</td>
-                                <td className="px-6 py-4 text-center">
-                                   <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded">
+                                <td className="px-4 md:px-6 py-3 md:py-4 text-right md:text-center font-bold text-slate-700 dark:text-slate-200 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Сталь</span>
+                                  <span>{row["Марка стали"]}</span>
+                                </td>
+                                <td className="px-4 md:px-6 py-3 md:py-4 text-right md:text-center flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Размер</span>
+                                   <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 rounded">
                                      {row["Размер"]}
                                    </span>
                                 </td>
-                                <td className="px-6 py-4 text-center">
-                                   <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${row["Длина"] === "НД" ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10' : 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'}`}>{row["Длина"]}</span>
+                                <td className="px-4 md:px-6 py-3 md:py-4 text-right md:text-center flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Длина</span>
+                                   <span className={`inline-flex items-center px-3 py-1.5 rounded-md text-[10px] font-bold ${row["Длина"] === "НД" ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10' : 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'}`}>{row["Длина"]}</span>
                                 </td>
-                                <td className="px-8 py-4 text-right">
-                                   <span className="text-slate-900 dark:text-white font-black text-xs">{row["Конечный остаток тн."]}</span>
-                                   <span className="ml-1 text-[10px] text-slate-400 font-bold">тн</span>
+                                <td className="px-4 md:px-8 py-3 md:py-4 text-right flex justify-between items-center md:table-cell min-h-[44px]">
+                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Тн.</span>
+                                  <div>
+                                     <span className="text-slate-900 dark:text-white font-black text-xs">{row["Конечный остаток тн."]}</span>
+                                     <span className="ml-1 text-[10px] text-slate-400 font-bold">тн</span>
+                                  </div>
                                 </td>
                               </tr>
                             ))}
@@ -2654,14 +2708,25 @@ export function AdminPanel({
                     className="flex flex-col gap-8"
                   >
                     {calculationResults.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center py-20 bg-white/50 dark:bg-[#1A1C19]/40 rounded-[40px] border border-slate-100 dark:border-slate-800/50">
-                        <div className="w-20 h-20 bg-sky-50 dark:bg-sky-900/20 rounded-[30px] flex items-center justify-center text-sky-500 mb-6">
-                          <Calculator className="w-10 h-10" />
+                      <div className="flex flex-col items-center justify-center py-24 bg-white/50 dark:bg-[#1A1C19]/40 rounded-[40px] border border-slate-100 dark:border-slate-800/50">
+                        <div className="relative w-24 h-24 mb-6">
+                          <div className="absolute inset-0 bg-slate-100 dark:bg-slate-800 rounded-3xl rotate-6 mix-blend-multiply opacity-50"></div>
+                          <div className="absolute inset-0 bg-slate-50 dark:bg-slate-900 rounded-3xl -rotate-3 border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-sm">
+                            <FolderSearch className="w-10 h-10 text-slate-400 dark:text-slate-500" />
+                          </div>
                         </div>
-                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">Нет данных</h3>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 text-center max-w-sm px-6 leading-relaxed">
-                          Загрузите планы производства во вкладке «Файлы». Система автоматически выполнит расчет потребностей.
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Здесь пока пусто</h3>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 text-center max-w-sm px-6 leading-relaxed mb-8">
+                          Мы не можем представить образец, пока вы не откорректируете список заказов. Загрузите файл с заказами клиентов, чтобы начать работу.
                         </p>
+                        
+                        <button 
+                          onClick={() => setActiveTab("files")} 
+                          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-[0_4px_20px_rgba(37,99,235,0.2)] hover:shadow-[0_4px_24px_rgba(37,99,235,0.3)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center gap-2"
+                        >
+                          Перейти к загрузке файлов
+                          <ArrowRight className="w-4 h-4 ml-1" />
+                        </button>
                         
                         {isProcessing && (
                           <div className="mt-8 flex items-center gap-3 h-12 px-8 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-2xl font-bold text-sm shadow-sm border border-slate-200 dark:border-slate-700">
@@ -3080,8 +3145,8 @@ export function AdminPanel({
                             onMouseMove={handleMouseMove}
                             className={`overflow-auto max-h-[60vh] custom-scrollbar relative ${isDragging ? 'select-none cursor-grabbing' : 'cursor-grab'}`}
                           >
-                            <table className="w-full border-separate border-spacing-0 pointer-events-auto">
-                              <thead className="sticky top-0 z-20">
+                            <table className="w-full border-separate border-spacing-0 pointer-events-auto block md:table">
+                              <thead className="sticky top-0 z-20 hidden md:table-header-group">
                                 <tr className="bg-slate-50/95 dark:bg-[#1A1C19]/95 backdrop-blur-sm shadow-[0_1px_0_rgba(241,245,249,1)] dark:shadow-[0_1px_0_rgba(30,41,59,1)]">
                                   <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest w-20">Внутренняя нумерация</th>
                                   <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest w-16">Дата отгрузки</th>
@@ -3121,77 +3186,104 @@ export function AdminPanel({
                                   )}
                                 </tr>
                               </thead>
-                              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-[11px]">
+                              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-[11px] block md:table-row-group">
                                 {calculationResults.map(res => (
-                                  <tr key={res.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
-                                    <td className="px-5 py-3 whitespace-nowrap text-center text-slate-600 dark:text-slate-400">
-                                      {res.internalNo}
+                                  <tr key={res.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors block md:table-row mb-4 md:mb-0 border border-slate-200 dark:border-slate-800 md:border-none p-2 md:p-0 rounded-xl md:rounded-none bg-white dark:bg-[#1A1C19] md:bg-transparent">
+                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Внутр. нум.</span>
+                                      <div className="text-right md:text-center text-slate-600 dark:text-slate-400 whitespace-nowrap">{res.internalNo}</div>
                                     </td>
-                                    <td className="px-5 py-3 whitespace-nowrap text-center text-slate-600 dark:text-slate-400">
-                                      {res.shippingDate}
+                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Дата отгр.</span>
+                                      <div className="text-right md:text-center text-slate-600 dark:text-slate-400 whitespace-nowrap">{res.shippingDate}</div>
                                     </td>
-                                    <td className="px-5 py-3 whitespace-nowrap text-center font-bold text-slate-600 dark:text-slate-400">
-                                      {res.orderNo}
+                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">№ Заказа</span>
+                                      <div className="text-right md:text-center font-bold text-slate-600 dark:text-slate-400 whitespace-nowrap">{res.orderNo}</div>
                                     </td>
-                                    <td className="px-5 py-3 text-center font-medium text-slate-800 dark:text-slate-200 whitespace-nowrap">
-                                      {res.client}
+                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Клиент</span>
+                                      <div className="text-right md:text-center font-medium text-slate-800 dark:text-slate-200 whitespace-nowrap">{res.client}</div>
                                     </td>
-                                    <td className="px-5 py-3 text-center max-w-[200px]">
-                                      <div className="max-w-[150px] mx-auto truncate font-mono text-[10px] text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors" title={res.nomenclature}>
+                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px] md:max-w-[200px]">
+                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px] shrink-0 mr-2">Номенклатура</span>
+                                      <div className="max-w-[150px] md:mx-auto truncate font-mono text-[10px] text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors text-right md:text-center" title={res.nomenclature}>
                                         {res.nomenclature}
                                       </div>
                                     </td>
-                                    <td className="px-5 py-3 whitespace-nowrap text-center">
-                                      <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Профиль</span>
+                                      <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 ml-auto md:ml-0 md:mx-auto">
                                         {res.type}
                                       </span>
                                     </td>
-                                    <td className="px-5 py-3 whitespace-nowrap text-center font-bold text-slate-700 dark:text-slate-200">
-                                      {res.grade}
+                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Марка</span>
+                                      <div className="text-right md:text-center font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap">{res.grade}</div>
                                     </td>
-                                    <td className="px-5 py-3 whitespace-nowrap text-center">
-                                      <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded">
+                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Размер мм.</span>
+                                      <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded ml-auto md:ml-0 md:mx-auto">
                                         {parseFloat(res.diameter.toFixed(2))}
                                       </span>
                                     </td>
-                                    <td className="px-5 py-3 whitespace-nowrap text-center">
-                                      <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType === "НД" ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10' : 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'}`}>
+                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Длина</span>
+                                      <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType === "НД" ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10' : 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'} ml-auto md:ml-0 md:mx-auto`}>
                                         {res.lengthType === "НД" ? "НД" : `МД ${res.length}`}
                                       </span>
                                     </td>
-                                    <td className={`px-5 py-3 whitespace-nowrap text-center font-black text-slate-900 dark:text-white`}>
-                                      {res.weightTons.toFixed(3)}
+                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Кол-во тн</span>
+                                      <div className="text-right md:text-center font-black text-slate-900 dark:text-white whitespace-nowrap">{res.weightTons.toFixed(3)}</div>
                                     </td>
-                                    <td className={`px-5 py-3 whitespace-nowrap text-center font-bold text-sky-600 dark:text-sky-400`}>
-                                      {res.remainingToProcess.toFixed(3)}
+                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-sky-100 dark:border-sky-900/50 md:border-0 min-h-[44px] bg-sky-50/50 dark:bg-sky-900/10">
+                                      <span className="md:hidden font-bold text-sky-600 dark:text-sky-400 uppercase text-[10px]">ИТОГО ост.</span>
+                                      <div className="text-right md:text-center font-bold text-sky-600 dark:text-sky-400 whitespace-nowrap">{res.remainingToProcess.toFixed(3)}</div>
                                     </td>
-                                    <td className="px-5 py-3 align-middle whitespace-nowrap text-center text-slate-500">
-                                      <div className="max-w-[150px] mx-auto truncate font-medium text-[10px] text-slate-500" title={`Круг ${getGostForGrade(res.grade)}/ГОСТ 2590-2006`}>
+                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Номенклатура заг.</span>
+                                      <div className="max-w-[150px] md:mx-auto truncate font-medium text-[10px] text-slate-500 text-right md:text-center" title={`Круг ${getGostForGrade(res.grade)}/ГОСТ 2590-2006`}>
                                         Круг {getGostForGrade(res.grade)}/ГОСТ 2590-2006
                                       </div>
                                     </td>
-                                    <td className="px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-slate-700 dark:text-slate-200">{res.grade}</td>
-                                    <td className="px-5 py-3 align-middle whitespace-nowrap text-center">
-                                      <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded">
+                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Марка заг.</span>
+                                      <div className="text-right md:text-center font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap">{res.grade}</div>
+                                    </td>
+                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Размер мм.</span>
+                                      <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded ml-auto md:ml-0 md:mx-auto">
                                         {parseFloat(res.billetDia.toFixed(2))}
                                       </span>
                                     </td>
-                                    <td className="px-5 py-3 align-middle whitespace-nowrap text-center font-black text-emerald-600 dark:text-emerald-400">{res.totalWeight.toFixed(3)}</td>
-                                    <td className="px-5 py-3 align-middle whitespace-nowrap text-center">
-                                      <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType === "НД" ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10' : 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'}`}>
+                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                      <span className="md:hidden font-bold text-emerald-600 dark:text-emerald-400 uppercase text-[10px]">Кол-во тн заг.</span>
+                                      <div className="text-right md:text-center font-black text-emerald-600 dark:text-emerald-400 whitespace-nowrap">{res.totalWeight.toFixed(3)}</div>
+                                    </td>
+                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Длина мм.</span>
+                                      <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType === "НД" ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10' : 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'} ml-auto md:ml-0 md:mx-auto`}>
                                         {res.lengthType === "НД" ? "НД" : `МД ${res.billetLength}`}
                                       </span>
                                     </td>
-                                    <td className="px-5 py-3 whitespace-nowrap text-center">
-                                      <span className={`font-bold text-red-500/80 block`}>{res.drawLength > 0 ? ((res.techEnds / res.drawLength) * res.totalWeight).toFixed(3) : 0} тн</span>
-                                      <span className={`text-[9px] text-slate-400 block`}>{res.drawLength > 0 ? (((res.techEnds / res.drawLength) * res.totalWeight / res.totalWeight) * 100).toFixed(1) : 0}%</span>
+                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                      <span className="md:hidden font-bold text-amber-500/80 uppercase text-[10px]">Тех. Отходы</span>
+                                      <div className="text-right md:text-center whitespace-nowrap">
+                                        <span className={`font-bold text-red-500/80 block`}>{res.drawLength > 0 ? ((res.techEnds / res.drawLength) * res.totalWeight).toFixed(3) : 0} тн</span>
+                                        <span className={`text-[9px] text-slate-400 block`}>{res.drawLength > 0 ? (((res.techEnds / res.drawLength) * res.totalWeight / res.totalWeight) * 100).toFixed(1) : 0}%</span>
+                                      </div>
                                     </td>
-                                    <td className="px-5 py-3 whitespace-nowrap text-center">
-                                      <span className={`font-bold text-sky-500/80 block`}>{(res.lengthType === "НД" || res.drawLength <= 0 ? 0 : ((res.usefulLength - (res.pcsPerBillet * res.length)) / res.drawLength * res.totalWeight)).toFixed(3)} тн</span>
-                                      <span className={`text-[9px] text-slate-400 block`}>{(res.lengthType === "НД" || res.drawLength <= 0 ? 0 : (((res.usefulLength - (res.pcsPerBillet * res.length)) / res.drawLength * res.totalWeight / res.totalWeight) * 100)).toFixed(1)}%</span>
+                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                      <span className="md:hidden font-bold text-amber-500/80 uppercase text-[10px]">Делов. Остаток</span>
+                                      <div className="text-right md:text-center whitespace-nowrap">
+                                        <span className={`font-bold text-sky-500/80 block`}>{(res.lengthType === "НД" || res.drawLength <= 0 ? 0 : ((res.usefulLength - (res.pcsPerBillet * res.length)) / res.drawLength * res.totalWeight)).toFixed(3)} тн</span>
+                                        <span className={`text-[9px] text-slate-400 block`}>{(res.lengthType === "НД" || res.drawLength <= 0 ? 0 : (((res.usefulLength - (res.pcsPerBillet * res.length)) / res.drawLength * res.totalWeight / res.totalWeight) * 100)).toFixed(1)}%</span>
+                                      </div>
                                     </td>
-                                    <td className="px-5 py-3 whitespace-nowrap text-center">
-                                      <div className={`flex flex-col items-center gap-1`}>
+                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                      <span className="md:hidden font-bold text-amber-500 uppercase text-[10px]">КИМ / Совет</span>
+                                      <div className={`flex flex-col items-end md:items-center gap-1`}>
                                         <span className={`font-black text-[10px] ${res.remainingToProcess / res.totalWeight < 0.92 ? 'text-red-500' : 'text-amber-600'}`}>
                                           {(res.remainingToProcess / res.totalWeight).toFixed(3)}
                                         </span>
@@ -3256,11 +3348,17 @@ export function AdminPanel({
                                     </td>
                                     {!isPurchasingMode && (
                                       <>
-                                        <td className={`px-5 py-3 whitespace-nowrap text-center font-medium text-slate-600 dark:text-slate-400`}>
-                                          {res.price ? formatCurrency(res.price) : "—"}
+                                        <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                          <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Цена за 1т</span>
+                                          <div className={`text-right md:text-center font-medium text-slate-600 dark:text-slate-400 whitespace-nowrap`}>
+                                            {res.price ? formatCurrency(res.price) : "—"}
+                                          </div>
                                         </td>
-                                        <td className={`px-5 py-3 whitespace-nowrap text-center font-bold text-slate-900 dark:text-white`}>
-                                          {res.totalCost ? formatCurrency(res.totalCost) : "—"}
+                                        <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                          <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Сумма</span>
+                                          <div className={`text-right md:text-center font-bold text-slate-900 dark:text-white whitespace-nowrap`}>
+                                            {res.totalCost ? formatCurrency(res.totalCost) : "—"}
+                                          </div>
                                         </td>
                                       </>
                                     )}
@@ -3283,14 +3381,43 @@ export function AdminPanel({
                     className={`flex flex-col gap-8`}
                   >
                     {matchedDemand.length === 0 ? (
-                      <div className={`bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-[32px] p-12 flex flex-col items-center justify-center min-h-[400px]`}>
-                        <div className={`w-20 h-20 bg-sky-50 dark:bg-sky-900/20 rounded-[30px] flex items-center justify-center text-sky-500 mb-6`}>
-                          <Activity className={`w-10 h-10`} />
+                      <div className="bg-white/50 dark:bg-[#1A1C19]/40 border border-slate-200 dark:border-slate-800 rounded-[40px] p-12 flex flex-col items-center justify-center min-h-[500px]">
+                        <div className="flex items-center gap-4 sm:gap-8 mb-8 relative">
+                          <div className="relative">
+                            <div className="w-20 h-20 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center border border-blue-100 dark:border-blue-800/30 z-10 relative">
+                              <ClipboardList className="w-10 h-10 text-blue-500" />
+                            </div>
+                            <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-bold text-slate-500">Заказы</span>
+                          </div>
+                          
+                          <div className="flex items-center w-24 sm:w-32">
+                             <div className="w-full h-[2px] bg-gradient-to-r from-blue-300 via-slate-300 to-emerald-300 dark:from-blue-600 dark:via-slate-600 dark:to-emerald-600 border border-dashed border-transparent [background-clip:padding-box]" style={{ backgroundImage: 'linear-gradient(90deg, transparent 50%, rgba(148, 163, 184, 0.5) 50%)', backgroundSize: '16px 2px' }}></div>
+                          </div>
+
+                          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white dark:bg-slate-800 rounded-full border-2 border-slate-100 dark:border-slate-700 flex items-center justify-center shadow-lg transform -translate-y-6">
+                             <HelpCircle className="w-6 h-6 text-slate-400" />
+                          </div>
+                          
+                          <div className="relative">
+                            <div className="w-20 h-20 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center border border-emerald-100 dark:border-emerald-800/30 z-10 relative">
+                              <Package className="w-10 h-10 text-emerald-500" />
+                            </div>
+                            <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-bold text-slate-500">Склад</span>
+                          </div>
                         </div>
-                        <h3 className={`text-xl font-bold text-slate-900 dark:text-white`}>Нет данных</h3>
-                        <p className={`text-sm text-slate-500 dark:text-slate-400 mt-2 text-center max-w-sm px-6 leading-relaxed`}>
-                          Сначала выполните расчет потребности и загрузите остатки.
+                        
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-4 mb-2">Сравнивать пока нечего</h3>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 text-center max-w-sm px-6 leading-relaxed mb-8">
+                          Чтобы найти дефицит металла, нам нужно вычесть складские остатки из вашей потребности. Нужно загрузить сразу два файла!
                         </p>
+                        
+                        <button 
+                          onClick={() => setActiveTab("files")} 
+                          className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center gap-2"
+                        >
+                          <Upload className="w-4 h-4" />
+                          Загрузить файлы для сравнения
+                        </button>
                       </div>
                     ) : (
                       <>
@@ -3878,8 +4005,8 @@ export function AdminPanel({
                          onMouseMove={handleMouseMove}
                          className={`overflow-auto custom-scrollbar max-h-[calc(100vh-300px)] min-h-[400px] relative ${isFreeStockDragging ? 'select-none cursor-grabbing' : 'cursor-grab'}`}
                        >
-                        <table className="w-full text-left border-separate border-spacing-0">
-                          <thead className="text-[10px] uppercase font-black tracking-widest text-slate-400 dark:text-slate-500 sticky top-0 z-10 shadow-sm">
+                        <table className="w-full text-left border-separate border-spacing-0 block md:table">
+                          <thead className="text-[10px] uppercase font-black tracking-widest text-slate-400 dark:text-slate-500 sticky top-0 z-10 shadow-sm hidden md:table-header-group">
                             <tr>
                               <th className="px-8 py-5 bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Номенклатура</th>
                               <th className="px-6 py-5 bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Профиль</th>
@@ -3889,29 +4016,39 @@ export function AdminPanel({
                               <th className="px-8 py-5 text-right bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Остаток тн.</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50 text-[11px] font-medium text-slate-600 dark:text-slate-300">
+                          <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50 text-[11px] font-medium text-slate-600 dark:text-slate-300 block md:table-row-group">
                             {freeStock.map((row, i) => (
-                              <tr key={i} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group">
-                                <td className="px-8 py-4 text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
-                                  <div className="max-w-[300px] truncate font-mono text-[10px]" title={row["Исходная Номенклатура"]}>
+                              <tr key={i} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group block md:table-row mb-4 md:mb-0 border border-slate-200 dark:border-slate-800 md:border-none rounded-xl md:rounded-none bg-white dark:bg-[#1A1C19] p-2 md:p-0 md:bg-transparent">
+                                <td className="px-4 md:px-8 py-3 md:py-4 text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Номенклатура</span>
+                                  <div className="max-w-[200px] md:max-w-[300px] truncate font-mono text-[10px] text-right md:text-left" title={row["Исходная Номенклатура"]}>
                                     {row["Исходная Номенклатура"]}
                                   </div>
                                 </td>
-                                <td className="px-6 py-4">
-                                  <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">{row["Профиль"]}</span>
+                                <td className="px-4 md:px-6 py-3 md:py-4 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Профиль</span>
+                                  <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 ml-auto md:ml-0 md:mx-auto">{row["Профиль"]}</span>
                                 </td>
-                                <td className="px-6 py-4 text-center font-bold text-slate-700 dark:text-slate-200">{row["Марка стали"]}</td>
-                                <td className="px-6 py-4 text-center">
-                                   <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded">
+                                <td className="px-4 md:px-6 py-3 md:py-4 text-right md:text-center font-bold text-slate-700 dark:text-slate-200 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Сталь</span>
+                                  <span>{row["Марка стали"]}</span>
+                                </td>
+                                <td className="px-4 md:px-6 py-3 md:py-4 text-right md:text-center flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Размер</span>
+                                   <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded ml-auto md:ml-0 md:mx-auto">
                                      {row["Размер"]}
                                    </span>
                                 </td>
-                                <td className="px-6 py-4 text-center">
-                                   <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${row["Длина"] === "НД" ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10' : 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'}`}>{row["Длина"]}</span>
+                                <td className="px-4 md:px-6 py-3 md:py-4 text-right md:text-center flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
+                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Длина</span>
+                                   <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${row["Длина"] === "НД" ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10' : 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'} ml-auto md:ml-0 md:mx-auto`}>{row["Длина"]}</span>
                                 </td>
-                                <td className="px-8 py-4 text-right">
-                                   <span className="text-slate-900 dark:text-white font-black text-xs">{row.remainingStock.toFixed(3)}</span>
-                                   <span className="ml-1 text-[10px] text-slate-400 font-bold">тн</span>
+                                <td className="px-4 md:px-8 py-3 md:py-4 text-right flex justify-between items-center md:table-cell min-h-[44px]">
+                                   <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Остаток тн.</span>
+                                   <div>
+                                     <span className="text-slate-900 dark:text-white font-black text-xs">{row.remainingStock.toFixed(3)}</span>
+                                     <span className="ml-1 text-[10px] text-slate-400 font-bold">тн</span>
+                                   </div>
                                 </td>
                               </tr>
                             ))}
@@ -4623,9 +4760,34 @@ export function AdminPanel({
                     <div className="flex flex-col md:grid md:grid-cols-12 gap-6 w-full">
                       {/* Main settings column */}
                       <div className="col-span-12 flex flex-col gap-6">
+
+                        {/* Empty Economy Warning Badge */}
+                        {allGrades.every(g => !rawPrices[g]?.md || Number(rawPrices[g].md) === 0) && (
+                          <div className="bg-gradient-to-r from-amber-50 to-amber-100/50 dark:from-amber-900/10 dark:to-orange-900/10 border border-amber-200 dark:border-amber-800/30 rounded-[28px] p-8 flex flex-col sm:flex-row items-center gap-6 shadow-sm">
+                            <div className="relative w-20 h-20 shrink-0 flex items-center justify-center">
+                              <div className="absolute inset-0 bg-white dark:bg-slate-800 rounded-3xl rotate-6 shadow-sm border border-slate-200 dark:border-slate-700"></div>
+                              <div className="absolute inset-0 bg-amber-100 dark:bg-amber-900/40 rounded-3xl -rotate-6"></div>
+                              <div className="font-black text-3xl text-amber-500/80 dark:text-amber-500/50 z-10 font-sans leading-none tracking-tighter">₽</div>
+                            </div>
+                            <div className="flex-1 text-center sm:text-left">
+                              <h3 className="text-xl font-bold text-amber-900 dark:text-amber-500 mb-2">
+                                Экономика не настроена!
+                              </h3>
+                              <p className="text-sm text-amber-800 dark:text-amber-400/80 leading-relaxed max-w-xl">
+                                Укажите маржинальную стоимость закупки, исходя из желаемой цены продажи, иначе калькулятор не сможет рассчитать рентабельность ваших сделок.
+                              </p>
+                            </div>
+                            <button 
+                              onClick={() => document.getElementById('price-table')?.scrollIntoView({ behavior: 'smooth' })}
+                              className="px-6 py-3 bg-white dark:bg-amber-500/10 hover:bg-amber-50 dark:hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-700/50 font-bold rounded-xl whitespace-nowrap transition-all shadow-sm active:mt-[1px]"
+                            >
+                              Настроить ценообразование
+                            </button>
+                          </div>
+                        )}
                         
                         {/* Pricing table */}
-                        <div className="bg-white dark:bg-[#1A1C19] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col transition-colors">
+                        <div id="price-table" className="bg-white dark:bg-[#1A1C19] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col transition-colors">
                           <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
                             <h3 className="text-base font-medium text-[#1A1C19] dark:text-white">
                               Цены заготовки
@@ -5002,76 +5164,47 @@ export function AdminPanel({
 
                 {/* Workflow Algorithm */}
                 <div className="bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm flex flex-col gap-4 md:col-span-2 mt-2">
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <Activity className="w-5 h-5 text-indigo-500" />
-                    Подробный алгоритм работы: Как получить результат от программы?
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
+                    <Activity className="w-6 h-6 text-indigo-500" />
+                    Инструкция: "Быстрый старт" (От 0 к первому расчету снабжения)
                   </h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-2 leading-relaxed">
-                    Следуйте этим 5 простым шагам, и вы научитесь быстро анализировать, какой металл нужно докупать, а какой возьмется со склада. Система всё рассчитает за пару кликов.
-                  </p>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2 relative">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
                     {/* Step 1 */}
-                    <div className="flex gap-4 relative z-10 bg-slate-50 dark:bg-slate-800/30 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 hover:-translate-y-1 transition-transform">
-                      <div className="w-10 h-10 shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-black text-slate-900 dark:text-white text-lg shadow-sm">
+                    <div className="flex flex-col gap-4 relative z-10 bg-slate-50 dark:bg-slate-800/30 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 hover:-translate-y-1 transition-transform">
+                      <div className="w-12 h-12 shrink-0 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center font-black text-indigo-600 dark:text-indigo-400 text-xl shadow-sm">
                         1
                       </div>
                       <div className="flex flex-col gap-2">
-                        <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">Подготовка документов</h4>
-                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                          Выгрузите из вашей учетной системы (1C, ERP) два файла в формате Excel или CSV. Один файл (Документ 1) должен содержать текущие активные <b>Заказы</b>, второй файл (Документ 2) — свободные <b>Остатки на складе</b>.
+                        <h4 className="font-bold text-base text-slate-800 dark:text-slate-200">Подготовка и Загрузка Данных</h4>
+                        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                          Зайдите в раздел <span className="font-bold text-slate-800 dark:text-slate-200">Снабжение -&gt; Файлы</span>. Перетащите скачанные из вашей системы 1С/ERP два файла в формате Excel: сначала список текущих заказов (Потребности), затем запишите оставшиеся элементы на складе (Склад).
                         </p>
                       </div>
                     </div>
 
                     {/* Step 2 */}
-                    <div className="flex gap-4 relative z-10 bg-slate-50 dark:bg-slate-800/30 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 hover:-translate-y-1 transition-transform">
-                      <div className="w-10 h-10 shrink-0 rounded-full bg-sky-100 dark:bg-sky-900/40 flex items-center justify-center font-black text-sky-600 dark:text-sky-400 text-lg shadow-sm">
+                    <div className="flex flex-col gap-4 relative z-10 bg-slate-50 dark:bg-slate-800/30 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 hover:-translate-y-1 transition-transform">
+                      <div className="w-12 h-12 shrink-0 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center font-black text-blue-600 dark:text-blue-400 text-xl shadow-sm">
                         2
                       </div>
                       <div className="flex flex-col gap-2">
-                        <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">Загрузка файлов в Систему</h4>
-                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                          В верхнем меню перейдите на вкладку <b>«Файлы»</b>. В верхней карточке загрузите ваш файл с Заказами. В нижней — ваш файл со Складом. Нажмите кнопку "Загрузить".
+                        <h4 className="font-bold text-base text-slate-800 dark:text-slate-200">Анализ потребностей в вакууме</h4>
+                        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                          Перейдите во вступление <span className="font-bold text-slate-800 dark:text-slate-200">Потребность</span>. Программа уже зачитала ваш файл: она сама нашла марку стали, профиль, размер и вычислила, сколько тонн металла необходимо закупить с учетом технологических припусков (КИМ).
                         </p>
                       </div>
                     </div>
 
                     {/* Step 3 */}
-                    <div className="flex gap-4 relative z-10 bg-slate-50 dark:bg-slate-800/30 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 hover:-translate-y-1 transition-transform">
-                      <div className="w-10 h-10 shrink-0 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center font-black text-indigo-600 dark:text-indigo-400 text-lg shadow-sm">
+                    <div className="flex flex-col gap-4 relative z-10 bg-slate-50 dark:bg-slate-800/30 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 hover:-translate-y-1 transition-transform">
+                      <div className="w-12 h-12 shrink-0 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center font-black text-emerald-600 dark:text-emerald-400 text-xl shadow-sm">
                         3
                       </div>
                       <div className="flex flex-col gap-2">
-                        <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">Анализ потребностей без учета склада</h4>
-                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                          Откройте вкладку <b>«Потребность»</b>. Вы увидите список ваших заказов. Программа уже распознала нужные профили, марки и рассчитала КИМ (коэффициент технологического отхода), чтобы выявить сколько тонн сырья потребуется "в вакууме".
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Step 4 */}
-                    <div className="flex gap-4 relative z-10 bg-slate-50 dark:bg-slate-800/30 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 hover:-translate-y-1 transition-transform">
-                      <div className="w-10 h-10 shrink-0 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center font-black text-emerald-600 dark:text-emerald-400 text-lg shadow-sm">
-                        4
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">Расчет с учетом наличия на складе</h4>
-                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                          Откройте вкладку <b>«Расчет с учетом наличия»</b>. Произойдет магия: система сама сопоставит заказы со складом (по Марке, Профилю и Размеру). Нажмите на зеленую или красную строку заказа, чтобы раскрыть детали и увидеть, сколько тонн перекрыто со склада, а сколько нужно срочно докупать — это ваш Дефицит.
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Step 5 */}
-                    <div className="flex gap-4 relative z-10 bg-slate-50 dark:bg-slate-800/30 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 hover:-translate-y-1 transition-transform md:col-span-2">
-                      <div className="w-10 h-10 shrink-0 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center font-black text-amber-600 dark:text-amber-400 text-lg shadow-sm">
-                        5
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">Действие: Экспорт результатов дефицита и остатков</h4>
-                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                          Когда результаты вас устраивают, в разделе <b>«Расчет с учетом наличия»</b> воспользуйтесь кнопкой <span className="font-bold bg-white dark:bg-slate-900 px-1 py-0.5 rounded border border-slate-200 dark:border-slate-700 mx-1">Скопировать Плановое Поступление</span>, чтобы отправить итоговый план снабжения вашему руководству или коллегам. Кнопка формирует готовую таблицу для вставки в Google Карты или Excel. Вы также можете выгружать полные отчеты в формате XLSX.
+                        <h4 className="font-bold text-base text-slate-800 dark:text-slate-200">Сопоставление со складом (Найти дефицит)</h4>
+                        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                          Откройте раздел <span className="font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-1 py-0.5 rounded">Расчет с учетом наличия</span>. Нажмите на это место — и система автоматически вычтет складские запасы из ваших потребностей, оставив только чистый Дефицит (объем, который нужно заказать).
                         </p>
                       </div>
                     </div>
