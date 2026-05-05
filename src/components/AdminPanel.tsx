@@ -553,6 +553,7 @@ export function AdminPanel({
       let combinedTechWaste = 0;
       let combinedUsefulRem = 0;
       let combinedFinishedWeight = 0;
+      let baseTotalWeight = 0;
 
       matchedStockItems.forEach((stock: any) => {
         const sLen = getStockBilletLength(stock);
@@ -560,14 +561,10 @@ export function AdminPanel({
         combinedTechWaste += m.twRate * stock.allocatedAmount;
         combinedUsefulRem += m.urRate * stock.allocatedAmount;
         combinedFinishedWeight += m.kim * stock.allocatedAmount;
+        baseTotalWeight += stock.allocatedAmount;
       });
 
-      const deficitMetrics = calculateMetrics(d, d.billetLength);
-      combinedTechWaste += deficitMetrics.twRate * shortageStock;
-      combinedUsefulRem += deficitMetrics.urRate * shortageStock;
-      combinedFinishedWeight += deficitMetrics.kim * shortageStock;
-
-      const combinedKim = d.totalWeight > 0 ? combinedFinishedWeight / d.totalWeight : 0;
+      const combinedKim = baseTotalWeight > 0 ? combinedFinishedWeight / baseTotalWeight : 0;
 
       return {
         ...d,
@@ -583,11 +580,12 @@ export function AdminPanel({
     const totalRemaining = availableStock.reduce((sum, item) => sum + item.remainingStock, 0);
     const sumTarget = matchedDemand.reduce((sum, res) => sum + (res.remainingToProcess || 0), 0);
     const sumTotalWeight = matchedDemand.reduce((sum, res) => sum + (res.totalWeight || 0), 0);
-    const averageKim = matchedDemand.length > 0 
-      ? matchedDemand.reduce((sum, res) => sum + res.combinedKim, 0) / matchedDemand.length 
+    const validDemandsForKim = matchedDemand.filter(res => res.allocatedStock > 0);
+    const averageKim = validDemandsForKim.length > 0 
+      ? validDemandsForKim.reduce((sum, res) => sum + res.combinedKim, 0) / validDemandsForKim.length 
       : 0;
-    const totalTechWaste2 = matchedDemand.reduce((sum, res) => sum + (res.allocatedStock > 0 && res.combinedTechWaste > 0 ? res.combinedTechWaste : 0), 0);
-    const totalUsefulRem2 = matchedDemand.reduce((sum, res) => sum + (res.allocatedStock > 0 && res.combinedUsefulRem > 0 ? res.combinedUsefulRem : 0), 0);
+    const totalTechWaste2 = matchedDemand.reduce((sum, res) => sum + res.combinedTechWaste, 0);
+    const totalUsefulRem2 = matchedDemand.reduce((sum, res) => sum + res.combinedUsefulRem, 0);
 
     return { 
       matchedDemand, 
@@ -712,6 +710,7 @@ export function AdminPanel({
       let combinedTechWaste2 = 0;
       let combinedUsefulRem2 = 0;
       let combinedFinishedWeight2 = 0;
+      let stockBaseTotalWeight = 0;
 
       stockItems.forEach((stock: any) => {
         const sLen = getStockBilletLength(stock);
@@ -719,17 +718,16 @@ export function AdminPanel({
         combinedTechWaste2 += m.twRate * stock.allocatedAmount;
         combinedUsefulRem2 += m.urRate * stock.allocatedAmount;
         combinedFinishedWeight2 += m.kim * stock.allocatedAmount;
+        stockBaseTotalWeight += stock.allocatedAmount;
       });
 
       const deficitMetrics = calculateMetrics(d, d.billetLength);
-      combinedTechWaste2 += deficitMetrics.twRate * shortageAfterStock;
-      combinedUsefulRem2 += deficitMetrics.urRate * shortageAfterStock;
-      combinedFinishedWeight2 += deficitMetrics.kim * shortageAfterStock;
-      const combinedKim2 = d.totalWeight > 0 ? combinedFinishedWeight2 / d.totalWeight : 0;
+      const combinedKim2 = stockBaseTotalWeight > 0 ? combinedFinishedWeight2 / stockBaseTotalWeight : 0;
 
       let combinedTechWaste3 = 0;
       let combinedUsefulRem3 = 0;
       let combinedFinishedWeight3 = 0;
+      let supplyTotalBase = 0;
 
       supplyItems.forEach((supply: any) => {
         const sLen = getStockBilletLength(supply);
@@ -737,12 +735,9 @@ export function AdminPanel({
         combinedTechWaste3 += m.twRate * supply.allocatedAmount;
         combinedUsefulRem3 += m.urRate * supply.allocatedAmount;
         combinedFinishedWeight3 += m.kim * supply.allocatedAmount;
+        supplyTotalBase += supply.allocatedAmount;
       });
 
-      combinedTechWaste3 += deficitMetrics.twRate * finalShortage;
-      combinedUsefulRem3 += deficitMetrics.urRate * finalShortage;
-      combinedFinishedWeight3 += deficitMetrics.kim * finalShortage;
-      const supplyTotalBase = shortageAfterStock;
       const combinedKim3 = supplyTotalBase > 0 ? combinedFinishedWeight3 / supplyTotalBase : 0;
 
       totalAllocated += allocatedFromSupply;
@@ -766,11 +761,12 @@ export function AdminPanel({
     });
 
     const totalRemaining = availableSupply.reduce((sum, item) => sum + item.remainingStock, 0);
-    const averageKim3 = matchedDemand.length > 0 
-      ? matchedDemand.reduce((sum, res) => sum + res.combinedKim3, 0) / matchedDemand.length 
+    const validDemandsForKim3 = matchedDemand.filter(res => res.allocatedFromSupply > 0);
+    const averageKim3 = validDemandsForKim3.length > 0 
+      ? validDemandsForKim3.reduce((sum, res) => sum + res.combinedKim3, 0) / validDemandsForKim3.length 
       : 0;
-    const totalTechWaste3 = matchedDemand.reduce((sum, res) => sum + (res.allocatedFromSupply > 0 && res.combinedTechWaste3 > 0 ? res.combinedTechWaste3 : 0), 0);
-    const totalUsefulRem3 = matchedDemand.reduce((sum, res) => sum + (res.allocatedFromSupply > 0 && res.combinedUsefulRem3 > 0 ? res.combinedUsefulRem3 : 0), 0);
+    const totalTechWaste3 = matchedDemand.reduce((sum, res) => sum + res.combinedTechWaste3, 0);
+    const totalUsefulRem3 = matchedDemand.reduce((sum, res) => sum + res.combinedUsefulRem3, 0);
 
     return { 
       matchedDemand, 
