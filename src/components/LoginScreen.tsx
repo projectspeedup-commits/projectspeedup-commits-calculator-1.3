@@ -56,6 +56,11 @@ export function LoginScreen({
         alert("Пожалуйста, разрешите всплывающие окна для входа.");
         return;
       }
+      if (e.code === 'auth/unauthorized-domain') {
+        alert("Ошибка: этот домен не авторизован в Firebase. Пожалуйста, зайдите в Firebase Console -> Authentication -> Settings -> Authorized domains и добавьте адрес вашего сайта (например, github.io).");
+        return;
+      }
+      alert(`Ошибка авторизации Firebase: ${e.message || e.code}`);
       console.error("Firebase Login Error:", e);
     } finally {
       setIsLoggingIn(false);
