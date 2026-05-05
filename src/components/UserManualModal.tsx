@@ -10,23 +10,23 @@ interface UserManualModalProps {
 export function UserManualModal({ isOpen, onClose }: UserManualModalProps) {
   const steps = [
     {
-      title: "Выбор параметров стали",
-      description: "Начните с выбора типа профиля (Круг/Шестигранник) и марки стали. Это определит базовые коэффициенты и ГОСТы.",
+      title: "1. Выбор параметров заготовки (Марка и Профиль)",
+      description: "Начните с выбора типа профиля (например, Круг или Шестигранник) и нужной марки стали. Это очень важный шаг, так как он определяет базовые коэффициенты плотности и привязывает расчет к нужным ГОСТам.",
       icon: <Lightbulb className="w-5 h-5 text-amber-500" />
     },
     {
-      title: "Настройка размеров",
-      description: "Укажите целевой размер (который нужен клиенту) и выберите размер доступной заготовки. Чем ближе размеры, тем выше выход годного.",
+      title: "2. Настройка размеров и габаритов",
+      description: "Укажите 'Целевой размер' — это то, что просит клиент. Затем выберите 'Размер заготовки' — это металл, из которого будет производиться деталь. Чем точнее совпадают эти размеры, тем меньше металла уйдет в стружку и тем выше будет Выход годного.",
       icon: <Info className="w-5 h-5 text-blue-500" />
     },
     {
-      title: "Оптимизация раскроя",
-      description: "Используйте блок 'Безотходный раскрой'. Выберите одну из предложенных длин, чтобы минимизировать остатки и увеличить прибыль.",
+      title: "3. Оптимизация раскроя",
+      description: "Обратите внимание на блок 'Безотходный раскрой'. Программа сама высчитывает идеальную длину прутка. Просто кликните на одну из предложенных зеленых фишек с длиной, чтобы применить её и минимизировать некратные остатки (обрезки).",
       icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" />
     },
     {
-      title: "Коммерческий расчет",
-      description: "Введите цену продажи за 1 тонну. Калькулятор мгновенно рассчитает маржу, прибыль и предупредит о возможных убытках.",
+      title: "4. Коммерческий расчет и выгода",
+      description: "Самый важный этап: введите цену продажи за 1 тонну и стоимость закупки. Калькулятор мгновенно рассчитает вашу чистую маржу с учетом всех производственных отходов. Если сделка убыточна, цифры станут красными — это сигнал быть осторожным!",
       icon: <ChevronRight className="w-5 h-5 text-indigo-500" />
     }
   ];
@@ -100,37 +100,37 @@ export function UserManualModal({ isOpen, onClose }: UserManualModalProps) {
               <div className="bg-slate-900 dark:bg-slate-800 rounded-[24px] p-6 text-white shadow-xl">
                 <h4 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider mb-4 text-slate-400">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                  Горячие клавиши и советы
+                  Горячие клавиши и хитрости для ускорения работы
                 </h4>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
                     <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
-                      <strong className="text-white">Копирование:</strong> Кнопка "Копировать" формирует полный текстовый отчет со всеми деталями, включая экономику.
+                      <strong className="text-white">Кнопка "Копировать":</strong> Сразу формирует красивый текстовый отчет со всеми деталями (вес, отходы, экономика), который можно отправить клиенту или руководству в мессенджер.
                     </p>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
-                      <strong className="text-white">Предупреждения:</strong> Если маржа ниже 10 000 руб/т или сделка убыточна, калькулятор подсветит результат красным или желтым.
+                      <strong className="text-white">Светофор рентабельности:</strong> Если маржа ниже 10 000 руб/т, калькулятор зажжет желтое предупреждение. Если сделка приносит убыток — загорится красная тревога.
                     </p>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
-                      <strong className="text-white">Реком. заготовка:</strong> Нажмите на чип в блоке "Раскрой и остатки", чтобы мгновенно применить оптимальную длину заготовки для текущего заказа.
+                      <strong className="text-white">Волшебный чип (Реком. заготовка):</strong> Нажмите на зеленый чип в блоке "Размеры и Раскрой", чтобы в один клик применить оптимальную длину заготовки, при которой вообще не будет некратных обрезков.
                     </p>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
-                      <strong className="text-white">Прутков в 1 тн:</strong> Это расчетное количество готовой продукции заданной вами длины, которое составляет 1 тонну веса.
+                      <strong className="text-white">Что такое "Прутков в 1 тн":</strong> Это справочный расчет: сколько целых прутков готовой длины содержится в 1 тонне физического веса металла.
                     </p>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
-                      <strong className="text-white">Печать:</strong> Вы можете сразу отправить расчет в PDF для клиента, нажав на иконку принтера.
+                      <strong className="text-white">Мгновенная печать:</strong> Вы можете сразу распечатать коммерческое предложение или отправить его в PDF, нажав на иконку принтера в правом верхнем углу.
                     </p>
                   </li>
                 </ul>

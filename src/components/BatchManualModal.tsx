@@ -10,23 +10,23 @@ interface BatchManualModalProps {
 export function BatchManualModal({ isOpen, onClose }: BatchManualModalProps) {
   const steps = [
     {
-      title: "Подготовка источника",
-      description: "Скачайте производственный план из вашей системы (например, из Google Таблиц 'План продаж') в формате Excel (.xlsx) или CSV.",
+      title: "1. Подготовка документа (План продаж / Заказы)",
+      description: "Выгрузите из вашей ERP-системы или таблицы план текущих потребностей в производстве (формат .xlsx, .xls или .csv).",
       icon: <FileSpreadsheet className="w-5 h-5 text-green-500" />
     },
     {
-      title: "Важные столбцы",
-      description: "Убедитесь, что в файле присутствуют следующие столбцы (система распознает их по частичному совпадению): 'Внутренняя нумерация' (или №), 'Марка', 'Размер', 'Номенклатура', 'Профиль', и 'Остаток к выполнению' (или 'Кол-во').",
+      title: "2. Требования к заголовкам",
+      description: "В файле обязательно должен быть столбец с остатком к выполнению (система ищет по словам 'Остаток к выполнению' или 'Кол-во') и 'Номенклатура детали'.",
       icon: <Info className="w-5 h-5 text-blue-500" />
     },
     {
-      title: "Загрузка файла",
-      description: "Перетащите подготовленный файл в область загрузки или нажмите на нее, чтобы выбрать файл на компьютере.",
+      title: "3. Загрузка файла",
+      description: "Просто перетащите документ в окно загрузки или выберите его, кликнув на иконку области загрузки.",
       icon: <Upload className="w-5 h-5 text-indigo-500" />
     },
     {
-      title: "Результат расчета",
-      description: "Система автоматически рассчитает оптимальную заготовку для каждой позиции плана, подберет нужную длину и массу. Скачайте 'Заявку на сырье.xlsx' (для закупки) или 'Сводка_заготовка.xlsx' (для производства).",
+      title: "4. Автоматическая обработка",
+      description: "Система автоматически распознает марки стали, профиль, размеры и длину. Вам останется лишь скачать готовые результаты: 'Заявку на сырье' или 'Сводку для производства'.",
       icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" />
     }
   ];
@@ -47,7 +47,7 @@ export function BatchManualModal({ isOpen, onClose }: BatchManualModalProps) {
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative w-full max-w-2xl bg-white dark:bg-[#1A1C19] sm:rounded-[32px] shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh] overflow-hidden"
+            className="relative w-full max-w-3xl bg-white dark:bg-[#1A1C19] sm:rounded-[32px] shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh] overflow-hidden"
           >
             {/* Header */}
             <div className="p-6 sm:p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-white/5">
@@ -57,10 +57,10 @@ export function BatchManualModal({ isOpen, onClose }: BatchManualModalProps) {
                 </div>
                 <div>
                   <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1A1C19] dark:text-white leading-tight">
-                    Инструкция по расчетам 
+                    Инструкция: Заказы (Потребности)
                   </h2>
                   <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mt-1">
-                    Как рассчитывать планы производства (Excel/CSV)
+                    Подробное руководство по загрузке плана производства (Excel/CSV)
                   </p>
                 </div>
               </div>
@@ -74,22 +74,19 @@ export function BatchManualModal({ isOpen, onClose }: BatchManualModalProps) {
 
             {/* Content */}
             <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-8 scrollbar-hide">
-              <div className="grid grid-cols-1 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {steps.map((step, idx) => (
-                  <div key={idx} className="flex gap-4 sm:gap-6 group">
-                    <div className="flex flex-col items-center">
-                      <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                  <div key={idx} className="flex gap-4 sm:gap-4 group bg-slate-50 dark:bg-slate-800/30 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 hover:-translate-y-1 transition-transform">
+                    <div className="flex flex-col items-center shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-sm">
                         {step.icon}
                       </div>
-                      {idx !== steps.length - 1 && (
-                        <div className="w-0.5 flex-1 bg-slate-100 dark:bg-slate-800 mt-2 rounded-full" />
-                      )}
                     </div>
-                    <div className="pt-1 pb-4">
-                      <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2 tracking-tight group-hover:translate-x-1 transition-transform">
+                    <div className="pt-1">
+                       <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1.5 tracking-tight group-hover:translate-x-1 transition-transform">
                         {step.title}
                       </h3>
-                      <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                      <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
                         {step.description}
                       </p>
                     </div>
@@ -100,34 +97,40 @@ export function BatchManualModal({ isOpen, onClose }: BatchManualModalProps) {
               <div className="bg-slate-900 dark:bg-slate-800 rounded-[24px] p-6 text-white shadow-xl">
                 <h4 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider mb-4 text-slate-400">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                  Подробнее о столбцах
+                  Обязательные колонки (Заголовки в Excel)
                 </h4>
-                <ul className="space-y-4">
-                  <li className="flex items-start gap-3">
-                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
-                    <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
-                      <strong className="text-white">Остаток к выполнению:</strong> Главный показатель необходимого объема. Должен быть без формул, в числовом формате (в тоннах). Если значение меньше 0.001 (т.е. 0,000), строка будет автоматически пропущена.
-                    </p>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
-                    <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
-                      <strong className="text-white">Марка стали:</strong> Используется для определения коэффициентов или ГОСТов (например 'ст.45', 'ст.40Х'). Система автоматически применяет ГОСТ к марке.
-                    </p>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
-                    <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
-                      <strong className="text-white">Размер (мм):</strong> Размер желаемого профиля. Система подберет нужный размер заготовки по таблице (например, для круга 22мм нужна заготовка 24мм).
-                    </p>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
-                    <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
-                      <strong className="text-white">Длина:</strong> Опционально. Если указана длина конечной детали (например 3000-6000), система вычислит идеальную длину заготовки, чтобы минимизировать остатки.
-                    </p>
-                  </li>
-                </ul>
+                <p className="text-xs text-slate-400 mb-4 font-medium leading-relaxed">
+                  Система ищет нужные колонки по частичному совпадению. Порядок столбцов абсолютно не важен. Остальные колонки в вашем файле будут просто проигнорированы.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                   <div className="bg-white/5 p-3 rounded-xl border border-white/10 hover:border-blue-400/50 transition-colors">
+                     <span className="text-xs font-bold text-white block mb-1">Остаток к выполнению (вес)</span>
+                     <span className="text-[10px] text-slate-400 font-mono">Примеры заголовков: Остаток к выполнению, Количество, Кол-во</span>
+                     <p className="text-[10px] text-slate-500 mt-1">Обязательное числовое поле. Если пусто или меньше 0.001 - строка игнорируется.</p>
+                   </div>
+                   <div className="bg-white/5 p-3 rounded-xl border border-white/10 hover:border-blue-400/50 transition-colors">
+                     <span className="text-xs font-bold text-white block mb-1">Номенклатура детали</span>
+                     <span className="text-[10px] text-slate-400 font-mono">Примеры: Номенклатура</span>
+                   </div>
+                   <div className="bg-white/5 p-3 rounded-xl border border-white/10 hover:border-blue-400/50 transition-colors">
+                     <span className="text-xs font-bold text-white block mb-1">Марка стали</span>
+                     <span className="text-[10px] text-slate-400 font-mono">Примеры: Марка</span>
+                   </div>
+                   <div className="bg-white/5 p-3 rounded-xl border border-white/10 hover:border-blue-400/50 transition-colors">
+                     <span className="text-xs font-bold text-white block mb-1">Размер</span>
+                     <span className="text-[10px] text-slate-400 font-mono">Примеры: Размер, Диаметр</span>
+                     <p className="text-[10px] text-slate-500 mt-1">Если указано, система подберет заготовку по таблице припусков.</p>
+                   </div>
+                   <div className="bg-white/5 p-3 rounded-xl border border-white/10 hover:border-blue-400/50 transition-colors">
+                     <span className="text-xs font-bold text-white block mb-1">Профиль</span>
+                     <span className="text-[10px] text-slate-400 font-mono">Примеры: Профиль, Тип</span>
+                   </div>
+                   <div className="bg-white/5 p-3 rounded-xl border border-white/10 hover:border-blue-400/50 transition-colors">
+                     <span className="text-xs font-bold text-white block mb-1">Длина готовой продукции</span>
+                     <span className="text-[10px] text-slate-400 font-mono">Пример: Длина конечной продукции</span>
+                     <p className="text-[10px] text-slate-500 mt-1">Опционально. Нужна для расчета безотходного прутка.</p>
+                   </div>
+                </div>
               </div>
 
               <div className="bg-slate-900 dark:bg-slate-800 rounded-[24px] p-6 text-white shadow-xl mt-6">

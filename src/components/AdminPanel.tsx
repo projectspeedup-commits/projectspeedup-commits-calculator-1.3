@@ -4898,7 +4898,7 @@ export function AdminPanel({
                   </h3>
                   <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                     Данный программный комплекс предназначен для автоматизации процессов снабжения, расчетов потребности в заготовке и оценки экономической рентабельности.
-                    Система объединяет данные о заказах покупателей (потребностях) и складских остатках, позволяя быстро и точно вычислять дефицит сырья.
+                    Система объединяет данные о заказах покупателей (Потребностях) и складских остатках, позволяя быстро и точно вычислять дефицит сырья.
                   </p>
                   
                   <div className="mt-4">
@@ -4924,96 +4924,160 @@ export function AdminPanel({
                   </div>
                 </div>
 
-                {/* File Formats */}
+                {/* File Formats Detailed */}
                 <div className="bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm flex flex-col gap-4">
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <FileText className="w-5 h-5 text-amber-500" />
-                    Требования к файлам
+                    Какие Документы Загружать и Правила Загрузки (Подробно)
                   </h3>
                   <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                    Для корректной работы системы, загружаемые Excel файлы должны содержать определенные столбцы. Порядок столбцов не важен, главное точное совпадение названий.
+                    Для корректной работы системы, загружаемые Excel файлы (.xlsx, .xls) или CSV файлы должны содержать определенные заголовки столбцов. Порядок столбцов абсолютно не важен, программа ориентируется строго по названиям шапок. Вы можете добавлять в ваш рабочий файл любые другие столбцы, они будут просто проигнорированы.
                   </p>
                   
                   <div className="mt-4 space-y-6">
                     <div>
-                      <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 mb-2 uppercase tracking-wider bg-slate-100 dark:bg-slate-800 w-fit px-3 py-1 rounded-lg">Файл: Потребности (Заказы)</h4>
-                      <p className="text-xs text-slate-500 mb-2">Убедитесь, что в файле присутствуют следующие столбцы (система ищет по частичному совпадению, можно использовать вариации):</p>
-                      <div className="flex flex-wrap gap-2">
-                        {["Номенклатура", "Марка", "Клиент / Контрагент", "№ заказа / Документ", "Профиль / Тип", "Размер / Диаметр", "Кол-во / Количество", "Остаток к выполнению", "Длина конечной продукции", "Дата отгрузки", "Внутренняя нумерация"].map(col => (
-                          <span key={col} className="px-2 py-1 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded text-xs font-mono text-slate-600 dark:text-slate-400">
-                            {col}
-                          </span>
-                        ))}
+                      <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-2 uppercase tracking-wider bg-slate-100 dark:bg-slate-800 w-fit px-3 py-1 rounded-lg">Документ 1: Файл Потребностей (Заказы Покупателей)</h4>
+                      <p className="text-xs text-slate-500 mb-3 leading-relaxed">
+                        Этот документ формируется из вашей учетной системы как список текущих заказов к выполнению. Обратите внимание, что система умеет распознавать несколько вариаций названий заголовков для одного и того же логического поля.
+                      </p>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-amber-300 transition-colors">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block mb-1">Номенклатура детали</span>
+                          <span className="text-[10px] text-slate-500 font-mono">Пример заголовка: Номенклатура</span>
+                        </div>
+                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-amber-300 transition-colors">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block mb-1">Остаток к выполнению (вес)</span>
+                          <span className="text-[10px] text-slate-500 font-mono">Примеры заголовков: Остаток к выполнению, Количество, Кол-во</span>
+                        </div>
+                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-amber-300 transition-colors">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block mb-1">Марка стали</span>
+                          <span className="text-[10px] text-slate-500 font-mono">Пример заголовка: Марка</span>
+                        </div>
+                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-amber-300 transition-colors">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block mb-1">Клиент</span>
+                          <span className="text-[10px] text-slate-500 font-mono">Примеры: Клиент, Контрагент, Заказчик</span>
+                        </div>
+                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-amber-300 transition-colors">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block mb-1">Номер заказа</span>
+                          <span className="text-[10px] text-slate-500 font-mono">Примеры: № заказа, Заказ, Документ</span>
+                        </div>
+                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-amber-300 transition-colors">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block mb-1">Размер</span>
+                          <span className="text-[10px] text-slate-500 font-mono">Примеры: Размер, Диаметр</span>
+                        </div>
+                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-amber-300 transition-colors">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block mb-1">Профиль</span>
+                          <span className="text-[10px] text-slate-500 font-mono">Примеры: Профиль, Тип</span>
+                        </div>
+                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-amber-300 transition-colors">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block mb-1">Длина готовой продукции</span>
+                          <span className="text-[10px] text-slate-500 font-mono">Пример: Длина конечной продукции</span>
+                        </div>
                       </div>
                     </div>
 
                     <div>
-                      <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 mb-2 uppercase tracking-wider bg-slate-100 dark:bg-slate-800 w-fit px-3 py-1 rounded-lg">Файл: Складские Остатки</h4>
-                      <p className="text-xs text-slate-500 mb-2">Обязательные колонки (система сама распознает марку, профиль, размер и длину из наименования):</p>
-                      <div className="flex flex-wrap gap-2">
-                        {["Номенклатура / Наименование", "Конечный остаток / Остаток / Кол-во"].map(col => (
-                          <span key={col} className="px-2 py-1 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded text-xs font-mono text-slate-600 dark:text-slate-400">
-                            {col}
-                          </span>
-                        ))}
+                      <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-2 uppercase tracking-wider bg-slate-100 dark:bg-slate-800 w-fit px-3 py-1 rounded-lg">Документ 2: Файл Складские Остатки (Наличие сырья)</h4>
+                      <p className="text-xs text-slate-500 mb-3 leading-relaxed">
+                        Этот документ отвечает за свободные остатки сырья в тоннах. <b>ВАЖНОЕ ПРАВИЛО:</b> Система сама анализирует общий столбец с Наименованием позиции на складе, чтобы автоматически выделить из него Профиль, Марку стали, Размер и Длину! Вам не нужно заводить для этих параметров отдельные колонки.
+                      </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-sky-300 transition-colors">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block mb-1">Наименование заготовки на складе</span>
+                          <span className="text-[10px] text-slate-500 font-mono">Варианты заголовков: Номенклатура, Наименование</span>
+                          <ul className="text-[10px] text-slate-400 mt-2 list-disc ml-3 space-y-1">
+                            <li>Пример: "Круг ст.35 12x2000"</li>
+                            <li>Пример: "Шестигранник 45Х 14 МД 6000"</li>
+                          </ul>
+                        </div>
+                        <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-sky-300 transition-colors">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block mb-1">Количество или Вес на складе (в тоннах)</span>
+                          <span className="text-[10px] text-slate-500 font-mono">Варианты заголовков: Конечный остаток, Остаток, Кол-во</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Workflow Algorithm */}
-                <div className="bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm flex flex-col gap-4 md:col-span-2">
+                <div className="bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm flex flex-col gap-4 md:col-span-2 mt-2">
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <Activity className="w-5 h-5 text-indigo-500" />
-                    Алгоритм работы для начинающих
+                    Подробный алгоритм работы: Как получить результат от программы?
                   </h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-2 leading-relaxed">
+                    Следуйте этим 5 простым шагам, и вы научитесь быстро анализировать, какой металл нужно докупать, а какой возьмется со склада. Система всё рассчитает за пару кликов.
+                  </p>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mt-4 relative">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2 relative">
                     {/* Step 1 */}
-                    <div className="flex flex-col gap-3 relative z-10">
-                      <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-black text-slate-900 dark:text-white text-lg border-2 border-white dark:border-[#1A1C19] shadow-sm">
+                    <div className="flex gap-4 relative z-10 bg-slate-50 dark:bg-slate-800/30 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 hover:-translate-y-1 transition-transform">
+                      <div className="w-10 h-10 shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-black text-slate-900 dark:text-white text-lg shadow-sm">
                         1
                       </div>
-                      <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">Подготовка данных</h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Выгрузите из учетной системы (например, 1C) файлы с текущими заказами и складскими остатками в формате Excel (.xlsx, .xls) или CSV.
-                      </p>
+                      <div className="flex flex-col gap-2">
+                        <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">Подготовка документов</h4>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                          Выгрузите из вашей учетной системы (1C, ERP) два файла в формате Excel или CSV. Один файл (Документ 1) должен содержать текущие активные <b>Заказы</b>, второй файл (Документ 2) — свободные <b>Остатки на складе</b>.
+                        </p>
+                      </div>
                     </div>
 
                     {/* Step 2 */}
-                    <div className="flex flex-col gap-3 relative z-10">
-                      <div className="w-10 h-10 rounded-full bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center font-black text-sky-600 dark:text-sky-400 text-lg border-2 border-white dark:border-[#1A1C19] shadow-sm">
+                    <div className="flex gap-4 relative z-10 bg-slate-50 dark:bg-slate-800/30 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 hover:-translate-y-1 transition-transform">
+                      <div className="w-10 h-10 shrink-0 rounded-full bg-sky-100 dark:bg-sky-900/40 flex items-center justify-center font-black text-sky-600 dark:text-sky-400 text-lg shadow-sm">
                         2
                       </div>
-                      <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">Загрузка файлов</h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Перейдите на вкладку <b>«Снабжение»</b> -&gt; <b>«Файлы»</b>. Перетащите скачанные файлы в соответствующие зоны загрузки или кликните для выбора.
-                      </p>
+                      <div className="flex flex-col gap-2">
+                        <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">Загрузка файлов в Систему</h4>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                          В верхнем меню перейдите на вкладку <b>«Файлы»</b>. В верхней карточке загрузите ваш файл с Заказами. В нижней — ваш файл со Складом. Нажмите кнопку "Загрузить".
+                        </p>
+                      </div>
                     </div>
 
                     {/* Step 3 */}
-                    <div className="flex flex-col gap-3 relative z-10">
-                      <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center font-black text-indigo-600 dark:text-indigo-400 text-lg border-2 border-white dark:border-[#1A1C19] shadow-sm">
+                    <div className="flex gap-4 relative z-10 bg-slate-50 dark:bg-slate-800/30 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 hover:-translate-y-1 transition-transform">
+                      <div className="w-10 h-10 shrink-0 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center font-black text-indigo-600 dark:text-indigo-400 text-lg shadow-sm">
                         3
                       </div>
-                      <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">Анализ потребностей</h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        В разделе <b>«Потребность»</b> комплекс автоматически распознает профили, марки стали и размеры. Здесь можно оценить общий дефицит заготовки для выполнения всех заказов без учета наличия.
-                      </p>
+                      <div className="flex flex-col gap-2">
+                        <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">Анализ потребностей без учета склада</h4>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                          Откройте вкладку <b>«Потребность»</b>. Вы увидите список ваших заказов. Программа уже распознала нужные профили, марки и рассчитала КИМ (коэффициент технологического отхода), чтобы выявить сколько тонн сырья потребуется "в вакууме".
+                        </p>
+                      </div>
                     </div>
 
                     {/* Step 4 */}
-                    <div className="flex flex-col gap-3 relative z-10">
-                      <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center font-black text-emerald-600 dark:text-emerald-400 text-lg border-2 border-white dark:border-[#1A1C19] shadow-sm">
+                    <div className="flex gap-4 relative z-10 bg-slate-50 dark:bg-slate-800/30 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 hover:-translate-y-1 transition-transform">
+                      <div className="w-10 h-10 shrink-0 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center font-black text-emerald-600 dark:text-emerald-400 text-lg shadow-sm">
                         4
                       </div>
-                      <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">Расчет с учетом склада</h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        В разделе <b>«Расчет с учетом наличия»</b> программа сопоставит потребность с текущими остатками (раздел <b>«Наличие»</b>), вычтет имеющийся объем и покажет реальный дефицит к закупке.
-                      </p>
+                      <div className="flex flex-col gap-2">
+                        <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">Расчет с учетом наличия на складе</h4>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                          Откройте вкладку <b>«Расчет с учетом наличия»</b>. Произойдет магия: система сама сопоставит заказы со складом (по Марке, Профилю и Размеру). Нажмите на зеленую или красную строку заказа, чтобы раскрыть детали и увидеть, сколько тонн перекрыто со склада, а сколько нужно срочно докупать — это ваш Дефицит.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Step 5 */}
+                    <div className="flex gap-4 relative z-10 bg-slate-50 dark:bg-slate-800/30 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 hover:-translate-y-1 transition-transform md:col-span-2">
+                      <div className="w-10 h-10 shrink-0 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center font-black text-amber-600 dark:text-amber-400 text-lg shadow-sm">
+                        5
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">Действие: Экспорт результатов дефицита и остатков</h4>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                          Когда результаты вас устраивают, в разделе <b>«Расчет с учетом наличия»</b> воспользуйтесь кнопкой <span className="font-bold bg-white dark:bg-slate-900 px-1 py-0.5 rounded border border-slate-200 dark:border-slate-700 mx-1">Скопировать Плановое Поступление</span>, чтобы отправить итоговый план снабжения вашему руководству или коллегам. Кнопка формирует готовую таблицу для вставки в Google Карты или Excel. Вы также можете выгружать полные отчеты в формате XLSX.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
+
               </div>
             </motion.div>
           )}

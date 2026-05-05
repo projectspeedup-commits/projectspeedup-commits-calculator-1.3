@@ -10,23 +10,23 @@ interface StockManualModalProps {
 export function StockManualModal({ isOpen, onClose }: StockManualModalProps) {
   const steps = [
     {
-      title: "Подготовка источника",
-      description: "Скачайте реестр наличия заготовки (г/к проката) из вашей учетной системы, базы данных или Excel-файла склада.",
+      title: "1. Подготовка документа (Реестр склада)",
+      description: "Выгрузите из системы или подготовьте Excel-файл со списком ваших текущих свободных остатков заготовки на складе.",
       icon: <FileSpreadsheet className="w-5 h-5 text-sky-500" />
     },
     {
-      title: "Важные столбцы",
-      description: "Для корректной работы в файле обязательно должны присутствовать столбцы 'Номенклатура' (или 'Наименование') и 'Конечный остаток' (Или 'Кол-во', 'Остаток'). Система распознает названия столбцов по частичному совпадению. Остальные данные (профиль, марка, размер, длина) извлекутся из названия номенклатуры автоматически.",
+      title: "2. Требования к заголовкам",
+      description: "Системе нужны всего два столбца: 'Конечный остаток' (или 'Кол-во') и 'Наименование/Номенклатура'.",
       icon: <Info className="w-5 h-5 text-blue-500" />
     },
     {
-      title: "Загрузка файла",
-      description: "Перетащите подготовленный файл в область загрузки или нажмите на нее, чтобы выбрать файл на компьютере.",
+      title: "3. Загрузка файла",
+      description: "Перетащите файл в зону загрузки или кликните по ней, чтобы выбрать нужный документ на вашем ПК.",
       icon: <Upload className="w-5 h-5 text-indigo-500" />
     },
     {
-      title: "Что получаем",
-      description: "Система автоматически прочитает и разнесет данные из 'Номенклатуры'. Вы получите структурированную таблицу прямо в интерфейсе для дальнейшего расчета потребностей.",
+      title: "4. Авто-распознавание (Умный парсер)",
+      description: "Программа сама прочитает каждую строку и выделит из общего текста 'Наименования' нужную Марку стали, Профиль, Размер и Длину.",
       icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" />
     }
   ];
@@ -47,7 +47,7 @@ export function StockManualModal({ isOpen, onClose }: StockManualModalProps) {
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative w-full max-w-2xl bg-white dark:bg-[#1A1C19] sm:rounded-[32px] shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh] overflow-hidden"
+            className="relative w-full max-w-3xl bg-white dark:bg-[#1A1C19] sm:rounded-[32px] shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh] overflow-hidden"
           >
             {/* Header */}
             <div className="p-6 sm:p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-white/5">
@@ -57,10 +57,10 @@ export function StockManualModal({ isOpen, onClose }: StockManualModalProps) {
                 </div>
                 <div>
                   <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1A1C19] dark:text-white leading-tight">
-                    Инструкция по складу 
+                    Инструкция: Склад (Наличие сырья)
                   </h2>
                   <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mt-1">
-                    Как загружать и обрабатывать наличие заготовки
+                    Как загружать и обрабатывать свободные остатки
                   </p>
                 </div>
               </div>
@@ -74,22 +74,19 @@ export function StockManualModal({ isOpen, onClose }: StockManualModalProps) {
 
             {/* Content */}
             <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-8 scrollbar-hide">
-              <div className="grid grid-cols-1 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {steps.map((step, idx) => (
-                  <div key={idx} className="flex gap-4 sm:gap-6 group">
-                    <div className="flex flex-col items-center">
-                      <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                  <div key={idx} className="flex gap-4 sm:gap-4 group bg-slate-50 dark:bg-slate-800/30 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 hover:-translate-y-1 transition-transform">
+                    <div className="flex flex-col items-center shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-sm">
                         {step.icon}
                       </div>
-                      {idx !== steps.length - 1 && (
-                        <div className="w-0.5 flex-1 bg-slate-100 dark:bg-slate-800 mt-2 rounded-full" />
-                      )}
                     </div>
-                    <div className="pt-1 pb-4">
-                      <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2 tracking-tight group-hover:translate-x-1 transition-transform">
+                    <div className="pt-1">
+                       <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1.5 tracking-tight group-hover:translate-x-1 transition-transform">
                         {step.title}
                       </h3>
-                      <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                      <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
                         {step.description}
                       </p>
                     </div>
@@ -98,6 +95,30 @@ export function StockManualModal({ isOpen, onClose }: StockManualModalProps) {
               </div>
 
               <div className="bg-slate-900 dark:bg-slate-800 rounded-[24px] p-6 text-white shadow-xl">
+                <h4 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider mb-4 text-sky-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
+                  Обязательные колонки (Заголовки в Excel)
+                </h4>
+                <p className="text-xs text-slate-400 mb-4 font-medium leading-relaxed">
+                  Вам не нужно разбивать складские позиции на много разных колонок! Приложение умеет анализировать сплошной текст и само вытаскивать из него параметры. Достаточно загрузить всего 2 столбца.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                   <div className="bg-white/5 p-4 rounded-xl border border-white/10 hover:border-sky-400/50 transition-colors">
+                     <span className="text-xs font-bold text-white block mb-1">Количество или Вес на складе (т)</span>
+                     <span className="text-[10px] text-slate-400 font-mono">Варианты заголовков: Конечный остаток, Остаток, Кол-во</span>
+                   </div>
+                   <div className="bg-white/5 p-4 rounded-xl border border-white/10 hover:border-sky-400/50 transition-colors">
+                     <span className="text-xs font-bold text-white block mb-1">Наименование позиции</span>
+                     <span className="text-[10px] text-slate-400 font-mono">Варианты заголовков: Номенклатура, Наименование</span>
+                     <ul className="text-[10px] text-slate-500 mt-2 list-disc ml-3 space-y-1">
+                       <li>"Круг ст.35 12x2000"</li>
+                       <li>"Шестигранник 45Х 14 МД 6000"</li>
+                     </ul>
+                   </div>
+                </div>
+              </div>
+
+              <div className="bg-slate-900 dark:bg-slate-800 rounded-[24px] p-6 text-white shadow-xl mt-6">
                 <h4 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider mb-4 text-slate-400">
                   <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
                   Как система разносит Номенклатуру
