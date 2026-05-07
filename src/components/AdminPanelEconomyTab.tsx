@@ -27,7 +27,7 @@ export default function AdminPanelEconomyTab(props: any) {
         </div>
         <div className="flex flex-col gap-1.5">
           <div><span className="text-emerald-400 font-medium">+ МД:</span> Мерная длина (полная стоимость)</div>
-          <div><span className="text-yellow-400 font-medium">+ НД:</span> Немерная длина (скидка {Math.round((1 - Number(remnantPricing.nd.md)) * 100)}%)</div>
+          <div><span className="text-yellow-400 font-medium">+ НД:</span> Немерная длина (по цене НД)</div>
           <div><span className="text-red-400 font-medium">- Короткий:</span> Как деловой отход</div>
         </div>
       </div>

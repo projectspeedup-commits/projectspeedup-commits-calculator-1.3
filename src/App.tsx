@@ -5,7 +5,6 @@ import {
 } from "./lib/constants";
 import { app as firebaseApp, auth, db, appId } from "./lib/firebase";
 import { doc, onSnapshot, setDoc } from "firebase/firestore";
-import { signInAnonymously } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { AdminPanel } from "./components/AdminPanel";
 import { CalculatorApp } from "./components/CalculatorApp";
@@ -77,11 +76,7 @@ export default function App() {
         setUser(firebaseUser);
         setIsCloudActive(true);
       } else {
-        signInAnonymously(auth).catch((error) => {
-          console.error("Anonymous authentication failed:", error);
-          setConnectionError("Ошибка: Включите Анонимный вход в Firebase Authentication");
-          setIsCloudActive(false);
-        });
+        setUser(null);
       }
       setIsConnecting(false);
     });

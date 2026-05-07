@@ -673,6 +673,23 @@ export function CalculatorApp({
   ]);
 
   useEffect(() => {
+    if (!isCloudActive) {
+      if (typeof window !== "undefined") {
+        try {
+          const raw = window.localStorage.getItem("arsenal_offline_calcs");
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            const loaded = parsed.map((c: any) => ({
+              ...c,
+              createdAt: { toDate: () => new Date(c._createdAtMs || Date.now()) }
+            }));
+            setSavedCalculations(loaded);
+          }
+        } catch (e) {}
+      }
+      return;
+    }
+
     if (!db || !user) return;
 
     const q = query(
@@ -693,12 +710,14 @@ export function CalculatorApp({
         setSavedCalculations(calcs);
       },
       (error) => {
-        handleFirestoreError(error, OperationType.GET, "calculations");
+        try {
+          handleFirestoreError(error, OperationType.GET, "calculations");
+        } catch (e) {}
       },
     );
 
     return () => unsubscribe();
-  }, [user]);
+  }, [user, isCloudActive]);
 
   const showNotify = (
     message: string,
@@ -709,13 +728,6 @@ export function CalculatorApp({
   };
 
   const handleSave = async () => {
-    if (!db || !user) {
-      showNotify(
-        "Функция сохранения недоступна (нет подключения к БД).",
-        "error",
-      );
-      return;
-    }
     if (!steelGrade || !selectedTarget || !selectedRaw) {
       showNotify("Заполните основные поля расчета перед сохранением.", "error");
       return;
@@ -723,9 +735,8 @@ export function CalculatorApp({
 
     setIsSaving(true);
     try {
-      const payload = {
-        userId: user.uid,
-        createdAt: serverTimestamp(),
+      const payload: any = {
+        userId: user?.uid || "offline",
         profileType,
         steelGrade,
         selectedTarget,
@@ -744,11 +755,26 @@ export function CalculatorApp({
         label: `${getProfileGost(profileType)} ${selectedTarget}мм, ${steelGrade}`,
       };
 
-      await addDoc(collection(db, "calculations"), payload);
+      if (isCloudActive && db && user) {
+        payload.createdAt = serverTimestamp();
+        await addDoc(collection(db, "calculations"), payload);
+      } else {
+        payload.id = Date.now().toString();
+        payload.createdAt = { toDate: () => new Date() };
+        const newSaved = [payload, ...savedCalculations];
+        setSavedCalculations(newSaved);
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem("arsenal_offline_calcs", JSON.stringify(newSaved.map(c => ({...c, _createdAtMs: Date.now()}))));
+        }
+      }
       showNotify("Расчет успешно сохранен");
     } catch (err) {
       console.error("Error saving calculation:", err);
-      handleFirestoreError(err, OperationType.CREATE, "calculations");
+      if (isCloudActive) {
+        try {
+          handleFirestoreError(err, OperationType.CREATE, "calculations");
+        } catch (e) {}
+      }
       showNotify("Ошибка при сохранении", "error");
     } finally {
       setIsSaving(false);
@@ -756,26 +782,30 @@ export function CalculatorApp({
   };
 
   const deleteCalculation = async (id: string) => {
-    if (!db) return;
     if (confirm("Удалить этот расчет?")) {
       try {
-        await deleteDoc(doc(db, "calculations", id));
+        if (isCloudActive && db) {
+          await deleteDoc(doc(db, "calculations", id));
+        } else {
+          const newSaved = savedCalculations.filter(c => c.id !== id);
+          setSavedCalculations(newSaved);
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem("arsenal_offline_calcs", JSON.stringify(newSaved.map(c => ({...c, _createdAtMs: c.createdAt?.toDate ? c.createdAt.toDate().getTime() : Date.now()}))));
+          }
+        }
         showNotify("Расчет удален");
       } catch (err) {
-        handleFirestoreError(err, OperationType.DELETE, `calculations/${id}`);
+        if (isCloudActive) {
+          try {
+            handleFirestoreError(err, OperationType.DELETE, `calculations/${id}`);
+          } catch(e) {}
+        }
+        showNotify("Ошибка при удалении", "error");
       }
     }
   };
 
   const clearAllHistory = async () => {
-    if (!db || !user) {
-      showNotify(
-        "Удаление истории недоступно (нет подключения к БД).",
-        "error",
-      );
-      return;
-    }
-
     if (savedCalculations.length === 0) {
       showNotify("История уже пуста");
       return;
@@ -788,25 +818,36 @@ export function CalculatorApp({
     setShowDeleteConfirm(false);
     setIsClearing(true);
     try {
-      const totalDocs = savedCalculations.length;
-      const BATCH_SIZE = 500;
-      let deletedCount = 0;
+      let deletedCount = savedCalculations.length;
+      if (isCloudActive && db) {
+        const totalDocs = savedCalculations.length;
+        const BATCH_SIZE = 500;
+        deletedCount = 0;
 
-      // Split documents into chunks of 500
-      for (let i = 0; i < totalDocs; i += BATCH_SIZE) {
-        const batch = writeBatch(db);
-        const chunk = savedCalculations.slice(i, i + BATCH_SIZE);
-        chunk.forEach((calc) => {
-          batch.delete(doc(db, "calculations", calc.id));
-          deletedCount++;
-        });
-        await batch.commit();
+        for (let i = 0; i < totalDocs; i += BATCH_SIZE) {
+          const batch = writeBatch(db);
+          const chunk = savedCalculations.slice(i, i + BATCH_SIZE);
+          chunk.forEach((calc) => {
+            batch.delete(doc(db, "calculations", calc.id));
+            deletedCount++;
+          });
+          await batch.commit();
+        }
+      } else {
+        setSavedCalculations([]);
+        if (typeof window !== "undefined") {
+          window.localStorage.removeItem("arsenal_offline_calcs");
+        }
       }
 
       showNotify(`История успешно очищена (${deletedCount} записей)`);
     } catch (err) {
       console.error("Error clearing history:", err);
-      handleFirestoreError(err, OperationType.DELETE, "calculations (batch)");
+      if (isCloudActive) {
+        try {
+          handleFirestoreError(err, OperationType.DELETE, "calculations (batch)");
+        } catch(e) {}
+      }
       showNotify(
         "Ошибка при очистке истории: " +
           (err instanceof Error ? err.message : String(err)),
@@ -1299,13 +1340,19 @@ export function CalculatorApp({
                       История пуста
                     </p>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-6 gap-3">
-                      {savedCalculations.map((calc) => (
-                        <div
-                          key={calc.id}
-                          className="group relative bg-[#F8FAFA] dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 transition-all hover:shadow-sm"
-                        >
-                          <div className="flex justify-between items-start mb-2">
+                    <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-6 gap-3">
+                      <AnimatePresence>
+                        {savedCalculations.map((calc, idx) => (
+                          <motion.div
+                            layout
+                            initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: -10 }}
+                            transition={{ duration: 0.2, delay: idx * 0.05 }}
+                            key={calc.id}
+                            className="group relative bg-[#F8FAFA] dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 transition-all hover:shadow-sm"
+                          >
+                            <div className="flex justify-between items-start mb-2">
                             <span className="text-[10px] text-slate-400 font-medium">
                               {calc.createdAt?.toDate
                                 ? calc.createdAt
@@ -1382,9 +1429,10 @@ export function CalculatorApp({
                               </span>
                             </div>
                           </div>
-                        </div>
+                        </motion.div>
                       ))}
-                    </div>
+                      </AnimatePresence>
+                    </motion.div>
                   )}
                 </div>
               )}
