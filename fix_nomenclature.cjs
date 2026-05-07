@@ -1,6 +1,6 @@
-const fs = require('fs');
+const fs = require("fs");
 
-let content = fs.readFileSync('src/components/AdminPanel.tsx', 'utf8');
+let content = fs.readFileSync("src/components/AdminPanel.tsx", "utf8");
 
 const helper = `  // Format supply nomenclature based on profile and marka
   const getSupplyNomenclature = (sp: any) => {
@@ -22,24 +22,24 @@ const helper = `  // Format supply nomenclature based on profile and marka
     return sp["Номенклатура"] || sp["NOMENCLATURE"] || "";
   };`;
 
-if (!content.includes('getSupplyNomenclature')) {
+if (!content.includes("getSupplyNomenclature")) {
   // inject it somewhere appropriate, e.g. before "const formatDate"
   content = content.replace(
     /  \/\/ Helper for date formatting/,
-    helper + '\n\n  // Helper for date formatting'
+    helper + "\n\n  // Helper for date formatting",
   );
 }
 
 // In export (first match)
 content = content.replace(
   /outRow\[29\] = sp\["Номенклатура"\] \|\| sp\["NOMENCLATURE"\] \|\| "";/g,
-  'outRow[29] = getSupplyNomenclature(sp);'
+  "outRow[29] = getSupplyNomenclature(sp);",
 );
 
 // In Export 2 (if any)
 content = content.replace(
   /outRow\[28\] = sp\["Номенклатура"\] \|\| sp\["NOMENCLATURE"\] \|\| "";/g,
-  'outRow[28] = getSupplyNomenclature(sp);'
+  "outRow[28] = getSupplyNomenclature(sp);",
 );
 
 // In UI table
@@ -48,4 +48,4 @@ const newUITable = `{supplyItem ? <div className="max-w-[150px] truncate font-me
 
 content = content.replace(oldUITable, newUITable);
 
-fs.writeFileSync('src/components/AdminPanel.tsx', content);
+fs.writeFileSync("src/components/AdminPanel.tsx", content);

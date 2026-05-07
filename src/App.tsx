@@ -1,4 +1,8 @@
-import { DEFAULT_RAW_PRICES, sanitizeKey, DEFAULT_ECONOMY_ITEMS } from "./lib/constants";
+import {
+  DEFAULT_RAW_PRICES,
+  sanitizeKey,
+  DEFAULT_ECONOMY_ITEMS,
+} from "./lib/constants";
 import { app as firebaseApp, auth, db, appId } from "./lib/firebase";
 import { doc, onSnapshot, setDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
@@ -10,7 +14,9 @@ import { motion, AnimatePresence } from "motion/react";
 import { handleFirestoreError, OperationType } from "./lib/utils";
 
 export default function App() {
-  const [view, setView] = useState<"login" | "manager" | "admin" | "purchasing">("login");
+  const [view, setView] = useState<
+    "login" | "manager" | "admin" | "purchasing"
+  >("login");
   const [user, setUser] = useState<any>(null);
   const [isCloudActive, setIsCloudActive] = useState(false);
   const [isConnecting, setIsConnecting] = useState(true);
@@ -19,7 +25,10 @@ export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== "undefined") {
       const saved = window.localStorage.getItem("arsenal_theme");
-      return saved === "dark" || (!saved && window.matchMedia("(prefers-color-scheme: dark)").matches);
+      return (
+        saved === "dark" ||
+        (!saved && window.matchMedia("(prefers-color-scheme: dark)").matches)
+      );
     }
     return false;
   });
@@ -35,13 +44,18 @@ export default function App() {
   }, [isDarkMode]);
 
   // Global prices
-  const [globalRawPrices, setGlobalRawPrices] = useState<Record<string, { md: string; nd: string }>>(DEFAULT_RAW_PRICES);
+  const [globalRawPrices, setGlobalRawPrices] =
+    useState<Record<string, { md: string; nd: string }>>(DEFAULT_RAW_PRICES);
   const [globalScrapPrice, setGlobalScrapPrice] = useState("20000");
   const [globalRemnantPrice, setGlobalRemnantPrice] = useState("30000");
   const [customGrades, setCustomGrades] = useState<string[]>([]);
   const [deletedGrades, setDeletedGrades] = useState<string[]>([]);
-  const [remnantPricing, setRemnantPricing] = useState<Record<string, { round: string; hex: string }>>({});
-  const [economyItems, setEconomyItems] = useState<any[]>(DEFAULT_ECONOMY_ITEMS);
+  const [remnantPricing, setRemnantPricing] = useState<
+    Record<string, { round: string; hex: string }>
+  >({});
+  const [economyItems, setEconomyItems] = useState<any[]>(
+    DEFAULT_ECONOMY_ITEMS,
+  );
 
   useEffect(() => {
     const handleOnline = () => {
@@ -53,9 +67,9 @@ export default function App() {
       setConnectionError("Нет подключения к интернету");
     };
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-    
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
     // Connect to Firebase Auth
     const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
       if (firebaseUser) {
@@ -68,67 +82,108 @@ export default function App() {
     });
 
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
       unsubscribe();
     };
   }, []);
 
   useEffect(() => {
-    if (!user) return;
     try {
       if (typeof window !== "undefined") {
         const savedRaw = window.localStorage.getItem("arsenal_raw_prices");
         const savedScrap = window.localStorage.getItem("arsenal_scrap_price");
-        const savedRemnant = window.localStorage.getItem("arsenal_remnant_price");
-        const savedCustomGrades = window.localStorage.getItem("arsenal_custom_grades");
-        const savedDeletedGrades = window.localStorage.getItem("arsenal_deleted_grades");
-        const savedRemnantPricing = window.localStorage.getItem("arsenal_remnant_pricing");
-        const savedEconomy = window.localStorage.getItem("arsenal_economy_items");
+        const savedRemnant = window.localStorage.getItem(
+          "arsenal_remnant_price",
+        );
+        const savedCustomGrades = window.localStorage.getItem(
+          "arsenal_custom_grades",
+        );
+        const savedDeletedGrades = window.localStorage.getItem(
+          "arsenal_deleted_grades",
+        );
+        const savedRemnantPricing = window.localStorage.getItem(
+          "arsenal_remnant_pricing",
+        );
+        const savedEconomy = window.localStorage.getItem(
+          "arsenal_economy_items",
+        );
 
         let loadedCustomGrades: string[] = [];
-        if (savedCustomGrades) {
-          loadedCustomGrades = JSON.parse(savedCustomGrades);
-          setCustomGrades(loadedCustomGrades);
+        try {
+          if (savedCustomGrades) {
+            loadedCustomGrades = JSON.parse(savedCustomGrades);
+            setCustomGrades(loadedCustomGrades);
+          }
+        } catch (e) {
+          window.localStorage.removeItem("arsenal_custom_grades");
         }
 
         let loadedDeletedGrades: string[] = [];
-        if (savedDeletedGrades) {
-          loadedDeletedGrades = JSON.parse(savedDeletedGrades);
-          setDeletedGrades(loadedDeletedGrades);
+        try {
+          if (savedDeletedGrades) {
+            loadedDeletedGrades = JSON.parse(savedDeletedGrades);
+            setDeletedGrades(loadedDeletedGrades);
+          }
+        } catch (e) {
+          window.localStorage.removeItem("arsenal_deleted_grades");
         }
 
-        if (savedRemnantPricing) {
-          setRemnantPricing(JSON.parse(savedRemnantPricing));
+        try {
+          if (savedRemnantPricing) {
+            setRemnantPricing(JSON.parse(savedRemnantPricing));
+          }
+        } catch (e) {
+          window.localStorage.removeItem("arsenal_remnant_pricing");
         }
 
-        if (savedEconomy) {
-          const parsed = JSON.parse(savedEconomy);
-          const initialMap = new Map(parsed.map((item: any) => [item.id, item]));
-          setEconomyItems(DEFAULT_ECONOMY_ITEMS.map(defaultItem => initialMap.get(defaultItem.id) || defaultItem));
+        try {
+          if (savedEconomy) {
+            const parsed = JSON.parse(savedEconomy);
+            const initialMap = new Map(
+              parsed.map((item: any) => [item.id, item]),
+            );
+            setEconomyItems(
+              DEFAULT_ECONOMY_ITEMS.map(
+                (defaultItem) => initialMap.get(defaultItem.id) || defaultItem,
+              ),
+            );
+          }
+        } catch (e) {
+          window.localStorage.removeItem("arsenal_economy_items");
         }
 
-        if (savedRaw) {
-          const parsed = JSON.parse(savedRaw);
-          const loadedPrices = { ...DEFAULT_RAW_PRICES };
-          const allG = [...Object.keys(DEFAULT_RAW_PRICES), ...loadedCustomGrades];
-          allG.forEach((grade) => {
-            if (parsed[grade] !== undefined) {
-              if (typeof parsed[grade] === 'string') {
-                loadedPrices[grade] = { md: parsed[grade], nd: parsed[grade] };
-              } else {
-                loadedPrices[grade] = parsed[grade];
+        try {
+          if (savedRaw) {
+            const parsed = JSON.parse(savedRaw);
+            const loadedPrices = { ...DEFAULT_RAW_PRICES };
+            const allG = [
+              ...Object.keys(DEFAULT_RAW_PRICES),
+              ...loadedCustomGrades,
+            ];
+            allG.forEach((grade) => {
+              if (parsed[grade] !== undefined) {
+                if (typeof parsed[grade] === "string") {
+                  loadedPrices[grade] = {
+                    md: parsed[grade],
+                    nd: parsed[grade],
+                  };
+                } else {
+                  loadedPrices[grade] = parsed[grade];
+                }
               }
-            }
-          });
-          setGlobalRawPrices(loadedPrices);
+            });
+            setGlobalRawPrices(loadedPrices);
+          }
+        } catch (e) {
+          window.localStorage.removeItem("arsenal_raw_prices");
         }
         if (savedScrap) setGlobalScrapPrice(savedScrap);
         if (savedRemnant) setGlobalRemnantPrice(savedRemnant);
       }
     } catch (e) {}
 
-    if (db && isCloudActive) {
+    if (db && isCloudActive && user) {
       const pricesDocRef = doc(db, "settings", "prices");
       // Use a ref to hold latest local variables to avoid stale closures in onSnapshot
       const unsubscribe = onSnapshot(
@@ -138,42 +193,65 @@ export default function App() {
             const data = docSnap.data();
 
             setCustomGrades((prevCustomGrades) => {
-              const resultingCustomGrades = data.customGrades || prevCustomGrades;
+              const resultingCustomGrades =
+                data.customGrades || prevCustomGrades;
               if (data.customGrades && typeof window !== "undefined") {
-                 window.localStorage.setItem("arsenal_custom_grades", JSON.stringify(resultingCustomGrades));
+                window.localStorage.setItem(
+                  "arsenal_custom_grades",
+                  JSON.stringify(resultingCustomGrades),
+                );
               }
-              
-              setDeletedGrades((prevDeletedGrades) => {
-                 const resultingDeletedGrades = data.deletedGrades || prevDeletedGrades;
-                 if (data.deletedGrades && typeof window !== "undefined") {
-                   window.localStorage.setItem("arsenal_deleted_grades", JSON.stringify(resultingDeletedGrades));
-                 }
-                 
-                 // Now update raw prices with the correct dependency references
-                 if (data.rawPrices || data.rawPricesV2) {
-                   const loadedPrices = { ...DEFAULT_RAW_PRICES };
-                   const allG = [...Object.keys(DEFAULT_RAW_PRICES), ...resultingCustomGrades];
-                   allG.forEach((grade) => {
-                     const dbKey = sanitizeKey(grade);
-                     const valObj = data.rawPricesV2 ? data.rawPricesV2[dbKey] : undefined;
-                     const valString = data.rawPrices ? data.rawPrices[dbKey] : undefined;
 
-                     if (valObj && valObj.md !== undefined) {
-                       if (typeof valString === 'string' && valString !== valObj.md && valString !== valObj.nd) {
-                         loadedPrices[grade] = { md: valString, nd: valString };
-                       } else {
-                         loadedPrices[grade] = valObj;
-                       }
-                     } else if (typeof valString === 'string') {
-                       loadedPrices[grade] = { md: valString, nd: valString };
-                     } else if (valString && typeof valString === 'object') {
-                       loadedPrices[grade] = valString;
-                     }
-                   });
-                   setGlobalRawPrices(loadedPrices);
-                   if (typeof window !== "undefined") window.localStorage.setItem("arsenal_raw_prices", JSON.stringify(loadedPrices));
-                 }
-                 return resultingDeletedGrades;
+              setDeletedGrades((prevDeletedGrades) => {
+                const resultingDeletedGrades =
+                  data.deletedGrades || prevDeletedGrades;
+                if (data.deletedGrades && typeof window !== "undefined") {
+                  window.localStorage.setItem(
+                    "arsenal_deleted_grades",
+                    JSON.stringify(resultingDeletedGrades),
+                  );
+                }
+
+                // Now update raw prices with the correct dependency references
+                if (data.rawPrices || data.rawPricesV2) {
+                  const loadedPrices = { ...DEFAULT_RAW_PRICES };
+                  const allG = [
+                    ...Object.keys(DEFAULT_RAW_PRICES),
+                    ...resultingCustomGrades,
+                  ];
+                  allG.forEach((grade) => {
+                    const dbKey = sanitizeKey(grade);
+                    const valObj = data.rawPricesV2
+                      ? data.rawPricesV2[dbKey]
+                      : undefined;
+                    const valString = data.rawPrices
+                      ? data.rawPrices[dbKey]
+                      : undefined;
+
+                    if (valObj && valObj.md !== undefined) {
+                      if (
+                        typeof valString === "string" &&
+                        valString !== valObj.md &&
+                        valString !== valObj.nd
+                      ) {
+                        loadedPrices[grade] = { md: valString, nd: valString };
+                      } else {
+                        loadedPrices[grade] = valObj;
+                      }
+                    } else if (typeof valString === "string") {
+                      loadedPrices[grade] = { md: valString, nd: valString };
+                    } else if (valString && typeof valString === "object") {
+                      loadedPrices[grade] = valString;
+                    }
+                  });
+                  setGlobalRawPrices(loadedPrices);
+                  if (typeof window !== "undefined")
+                    window.localStorage.setItem(
+                      "arsenal_raw_prices",
+                      JSON.stringify(loadedPrices),
+                    );
+                }
+                return resultingDeletedGrades;
               });
 
               return resultingCustomGrades;
@@ -181,23 +259,43 @@ export default function App() {
 
             if (data.remnantPricing) {
               setRemnantPricing(data.remnantPricing);
-              if (typeof window !== "undefined") window.localStorage.setItem("arsenal_remnant_pricing", JSON.stringify(data.remnantPricing));
+              if (typeof window !== "undefined")
+                window.localStorage.setItem(
+                  "arsenal_remnant_pricing",
+                  JSON.stringify(data.remnantPricing),
+                );
             }
 
             if (data.economyItems) {
-               const initialMap = new Map(data.economyItems.map((item: any) => [item.id, item]));
-               const merged = DEFAULT_ECONOMY_ITEMS.map(defaultItem => initialMap.get(defaultItem.id) || defaultItem);
-               setEconomyItems(merged);
-               if (typeof window !== "undefined") window.localStorage.setItem("arsenal_economy_items", JSON.stringify(merged));
+              const initialMap = new Map(
+                data.economyItems.map((item: any) => [item.id, item]),
+              );
+              const merged = DEFAULT_ECONOMY_ITEMS.map(
+                (defaultItem) => initialMap.get(defaultItem.id) || defaultItem,
+              );
+              setEconomyItems(merged);
+              if (typeof window !== "undefined")
+                window.localStorage.setItem(
+                  "arsenal_economy_items",
+                  JSON.stringify(merged),
+                );
             }
 
             if (data.scrapPrice !== undefined) {
               setGlobalScrapPrice(data.scrapPrice);
-              if (typeof window !== "undefined") window.localStorage.setItem("arsenal_scrap_price", data.scrapPrice);
+              if (typeof window !== "undefined")
+                window.localStorage.setItem(
+                  "arsenal_scrap_price",
+                  data.scrapPrice,
+                );
             }
             if (data.remnantPrice !== undefined) {
               setGlobalRemnantPrice(data.remnantPrice);
-              if (typeof window !== "undefined") window.localStorage.setItem("arsenal_remnant_price", data.remnantPrice);
+              if (typeof window !== "undefined")
+                window.localStorage.setItem(
+                  "arsenal_remnant_price",
+                  data.remnantPrice,
+                );
             }
           }
         },
@@ -205,7 +303,7 @@ export default function App() {
           console.warn("Облако недоступно, работаем локально:", error);
           handleFirestoreError(error, OperationType.GET, "settings/prices");
           setIsCloudActive(false);
-        }
+        },
       );
       return () => unsubscribe();
     }
@@ -218,7 +316,7 @@ export default function App() {
     cGrades: string[],
     rPricing: Record<string, { round: string; hex: string }>,
     eItems?: any[],
-    dGrades?: string[]
+    dGrades?: string[],
   ) => {
     setGlobalRawPrices(rawPricesObj);
     setGlobalScrapPrice(scrapStr);
@@ -230,20 +328,40 @@ export default function App() {
 
     try {
       if (typeof window !== "undefined") {
-        window.localStorage.setItem("arsenal_raw_prices", JSON.stringify(rawPricesObj));
+        window.localStorage.setItem(
+          "arsenal_raw_prices",
+          JSON.stringify(rawPricesObj),
+        );
         window.localStorage.setItem("arsenal_scrap_price", scrapStr);
         window.localStorage.setItem("arsenal_remnant_price", remnantStr);
-        if (cGrades) window.localStorage.setItem("arsenal_custom_grades", JSON.stringify(cGrades));
-        if (dGrades) window.localStorage.setItem("arsenal_deleted_grades", JSON.stringify(dGrades));
-        if (rPricing) window.localStorage.setItem("arsenal_remnant_pricing", JSON.stringify(rPricing));
-        if (eItems) window.localStorage.setItem("arsenal_economy_items", JSON.stringify(eItems));
+        if (cGrades)
+          window.localStorage.setItem(
+            "arsenal_custom_grades",
+            JSON.stringify(cGrades),
+          );
+        if (dGrades)
+          window.localStorage.setItem(
+            "arsenal_deleted_grades",
+            JSON.stringify(dGrades),
+          );
+        if (rPricing)
+          window.localStorage.setItem(
+            "arsenal_remnant_pricing",
+            JSON.stringify(rPricing),
+          );
+        if (eItems)
+          window.localStorage.setItem(
+            "arsenal_economy_items",
+            JSON.stringify(eItems),
+          );
       }
     } catch (e) {}
 
-    if (db && isCloudActive) {
-      const firestoreRawPricesV2: Record<string, { md: string; nd: string }> = {};
+    if (db && isCloudActive && user) {
+      const firestoreRawPricesV2: Record<string, { md: string; nd: string }> =
+        {};
       const firestoreRawPricesOld: Record<string, string> = {};
-      
+
       for (const [k, v] of Object.entries(rawPricesObj)) {
         const sanitized = sanitizeKey(k);
         firestoreRawPricesV2[sanitized] = v;
@@ -256,7 +374,7 @@ export default function App() {
         rawPricesV2: firestoreRawPricesV2,
         scrapPrice: scrapStr,
         remnantPrice: remnantStr,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
       if (cGrades) payload.customGrades = cGrades;
       if (dGrades) payload.deletedGrades = dGrades;
@@ -272,7 +390,7 @@ export default function App() {
     }
   };
 
-  const toggleTheme = () => setIsDarkMode(prev => !prev);
+  const toggleTheme = () => setIsDarkMode((prev) => !prev);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -281,7 +399,7 @@ export default function App() {
   return (
     <>
       {printData && (
-        <PrintTemplate 
+        <PrintTemplate
           reportData={printData.reportData}
           orderWeight={printData.orderWeight}
           selectedTarget={printData.selectedTarget}
@@ -291,7 +409,7 @@ export default function App() {
       <div className="min-h-screen overflow-x-hidden bg-[#F0F4F4] dark:bg-[#111310] flex flex-col font-sans print:hidden">
         <AnimatePresence mode="wait">
           {view === "login" && (
-            <motion.div 
+            <motion.div
               key="login"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -299,10 +417,10 @@ export default function App() {
               transition={{ duration: 0.3 }}
               className="flex-1 flex flex-col"
             >
-              <LoginScreen 
-                onManagerLogin={() => setView("manager")} 
+              <LoginScreen
+                onManagerLogin={() => setView("manager")}
                 onPurchasingLogin={() => setView("purchasing")}
-                onAdminLogin={() => setView("admin")} 
+                onAdminLogin={() => setView("admin")}
                 user={user}
                 isCloudActive={isCloudActive}
                 isConnecting={isConnecting}
@@ -314,7 +432,7 @@ export default function App() {
           )}
 
           {view === "admin" && (
-            <motion.div 
+            <motion.div
               key="admin"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -342,7 +460,7 @@ export default function App() {
           )}
 
           {view === "purchasing" && (
-            <motion.div 
+            <motion.div
               key="purchasing"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -372,7 +490,7 @@ export default function App() {
           )}
 
           {view === "manager" && (
-            <motion.div 
+            <motion.div
               key="manager"
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}

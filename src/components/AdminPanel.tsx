@@ -1,12 +1,78 @@
-import { DEFAULT_STEEL_GRADES, formatInputValue, handleNumericInput, DEFAULT_ECONOMY_ITEMS, EconomyItem, ROUND_DATA, HEX_DATA, getGostForGrade } from "../lib/constants";
-import { Activity, LogOut, Plus, Trash2, Settings, Moon, Sun, Info, TrendingUp, Calculator, Wallet, Layers, Package, Upload, FileText, X, BookOpen, ChevronLeft, Download, Copy, Check, ShoppingCart, Factory, Truck, Search, Filter, AlertCircle, CheckCircle2, FolderSearch, ArrowRight, ClipboardList, HelpCircle } from "lucide-react";
-import { useEffect, useState, useRef, ChangeEvent, MouseEvent, useMemo, Fragment } from "react";
+import AdminPanelHelpTab from './AdminPanelHelpTab';
+import AdminPanelLogisticsTab from './AdminPanelLogisticsTab';
+import AdminPanelProductionTab from './AdminPanelProductionTab';
+import AdminPanelSupplyTab from './AdminPanelSupplyTab';
+import AdminPanelEconomyTab from './AdminPanelEconomyTab';
+import {
+  DEFAULT_STEEL_GRADES,
+  formatInputValue,
+  handleNumericInput,
+  DEFAULT_ECONOMY_ITEMS,
+  EconomyItem,
+  ROUND_DATA,
+  HEX_DATA,
+  getGostForGrade,
+} from "../lib/constants";
+import {
+  Activity,
+  LogOut,
+  Plus,
+  Trash2,
+  Settings,
+  Moon,
+  Sun,
+  Info,
+  TrendingUp,
+  Calculator,
+  Wallet,
+  Layers,
+  Package,
+  Upload,
+  FileText,
+  X,
+  BookOpen,
+  ChevronLeft,
+  Download,
+  Copy,
+  Check,
+  ShoppingCart,
+  Factory,
+  Truck,
+  Search,
+  Filter,
+  AlertCircle,
+  CheckCircle2,
+  FolderSearch,
+  ArrowRight,
+  ClipboardList,
+  HelpCircle,
+} from "lucide-react";
+import {
+  useEffect,
+  useState,
+  useRef,
+  ChangeEvent,
+  MouseEvent,
+  useMemo,
+  Fragment,
+} from "react";
 import { motion, AnimatePresence } from "motion/react";
 import * as XLSX from "xlsx-js-style";
 import { BatchManualModal } from "./BatchManualModal";
 import { StockManualModal } from "./StockManualModal";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend, PieChart, Pie, Cell } from 'recharts';
-
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  Legend,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
 
 interface CalculationResult {
   id: string;
@@ -56,7 +122,7 @@ interface AdminPanelProps {
     customGrades: string[],
     remnantPricing: Record<string, { round: string; hex: string }>,
     economyItems: EconomyItem[],
-    deletedGrades?: string[]
+    deletedGrades?: string[],
   ) => Promise<void>;
   onLogout: () => void;
   isCloudActive: boolean;
@@ -82,19 +148,31 @@ export function AdminPanel({
   initialTab = "economy",
   isPurchasingMode = false,
 }: AdminPanelProps) {
-  const [activeTab, setActiveTab] = useState<"files" | "economy" | "supply" | "production" | "logistics" | "help">(initialTab as any);
-  const [rawPrices, setRawPrices] = useState<Record<string, { md: string; nd: string }>>(initialRawPrices);
+  const [activeTab, setActiveTab] = useState<
+    "files" | "economy" | "supply" | "production" | "logistics" | "help"
+  >(initialTab as any);
+  const [rawPrices, setRawPrices] =
+    useState<Record<string, { md: string; nd: string }>>(initialRawPrices);
   const [scrap, setScrap] = useState(initialScrap);
   const [remnant, setRemnant] = useState(initialRemnant);
   const [customGrades, setCustomGrades] = useState(initialCustomGrades || []);
   const [isBatchManualOpen, setIsBatchManualOpen] = useState(false);
   const [isStockManualOpen, setIsStockManualOpen] = useState(false);
-  const [deletedGrades, setDeletedGrades] = useState<string[]>(initialDeletedGrades || []);
-  const [remnantPricing, setRemnantPricing] = useState<Record<string, { round: string; hex: string }>>(initialRemnantPricing || {});
+  const [deletedGrades, setDeletedGrades] = useState<string[]>(
+    initialDeletedGrades || [],
+  );
+  const [remnantPricing, setRemnantPricing] = useState<
+    Record<string, { round: string; hex: string }>
+  >(initialRemnantPricing || {});
   const [economyItems, setEconomyItems] = useState<EconomyItem[]>(() => {
-    if (!initialEconomyItems || initialEconomyItems.length === 0) return DEFAULT_ECONOMY_ITEMS;
-    const initialMap = new Map(initialEconomyItems.map(item => [item.id, item]));
-    return DEFAULT_ECONOMY_ITEMS.map(defaultItem => initialMap.get(defaultItem.id) || defaultItem);
+    if (!initialEconomyItems || initialEconomyItems.length === 0)
+      return DEFAULT_ECONOMY_ITEMS;
+    const initialMap = new Map(
+      initialEconomyItems.map((item) => [item.id, item]),
+    );
+    return DEFAULT_ECONOMY_ITEMS.map(
+      (defaultItem) => initialMap.get(defaultItem.id) || defaultItem,
+    );
   });
 
   const [newGrade, setNewGrade] = useState("");
@@ -102,8 +180,27 @@ export function AdminPanel({
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
 
-  const [adminSection, setAdminSection] = useState<"direct" | "prices" | "grades">("direct");
-  const [supplySection, setSupplySection] = useState<"files" | "calc" | "stock" | "calc-stock" | "free-stock" | "supply-plans">("calc");
+  const [adminSection, setAdminSection] = useState<
+    "direct" | "prices" | "grades"
+  >("direct");
+  const [supplySection, setSupplySection] = useState<
+    | "files"
+    | "calc"
+    | "stock"
+    | "calc-stock"
+    | "free-stock"
+    | "supply-plans"
+    | "calc-supply"
+  >("files");
+  const [productionSection, setProductionSection] = useState<
+    | "files"
+    | "calc"
+    | "stock"
+    | "calc-stock"
+    | "free-stock"
+    | "supply-plans"
+    | "calc-supply"
+  >("files");
   const [isCopied, setIsCopied] = useState(false);
 
   // Search & Filters state
@@ -112,29 +209,86 @@ export function AdminPanel({
   const [uploadWarnings, setUploadWarnings] = useState<string[]>([]);
 
   const formatCurrency = (val: number) => {
-    return val.toLocaleString("ru-RU", { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + " ₽";
+    return (
+      val.toLocaleString("ru-RU", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }) + " ₽"
+    );
   };
-  const [planFiles, setPlanFiles] = useState<{ id: string; name: string; size: string; date: string; file?: File }[]>([]);
-  const [stockFiles, setStockFiles] = useState<{ id: string; name: string; size: string; date: string; file?: File }[]>([]);
-  const [supplyPlanFiles, setSupplyPlanFiles] = useState<{ id: string; name: string; size: string; date: string; file?: File }[]>([]);
-  const [processedSupplyPlans, setProcessedSupplyPlans] = useState<any[]>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("ais_supply_plans");
-      if (saved) {
-        try { return JSON.parse(saved); } catch (e) {}
-      }
+
+  const [planFilesProd, setPlanFilesProd] = useState<
+    { id: string; name: string; size: string; date: string; file?: File }[]
+  >([]);
+  const [stockFilesProd, setStockFilesProd] = useState<
+    { id: string; name: string; size: string; date: string; file?: File }[]
+  >([]);
+  const [supplyPlanFilesProd, setSupplyPlanFilesProd] = useState<
+    { id: string; name: string; size: string; date: string; file?: File }[]
+  >([]);
+
+  const [planFilesSup, setPlanFilesSup] = useState<
+    { id: string; name: string; size: string; date: string; file?: File }[]
+  >([]);
+  const [stockFilesSup, setStockFilesSup] = useState<
+    { id: string; name: string; size: string; date: string; file?: File }[]
+  >([]);
+  const [supplyPlanFilesSup, setSupplyPlanFilesSup] = useState<
+    { id: string; name: string; size: string; date: string; file?: File }[]
+  >([]);
+
+  const isProduction = activeTab === "production";
+  const planFiles = isProduction ? planFilesProd : planFilesSup;
+  const setPlanFiles = isProduction ? setPlanFilesProd : setPlanFilesSup;
+  const stockFiles = isProduction ? stockFilesProd : stockFilesSup;
+  const setStockFiles = isProduction ? setStockFilesProd : setStockFilesSup;
+  const supplyPlanFiles = isProduction
+    ? supplyPlanFilesProd
+    : supplyPlanFilesSup;
+  const setSupplyPlanFiles = isProduction
+    ? setSupplyPlanFilesProd
+    : setSupplyPlanFilesSup;
+
+  const [processedSupplyPlansProd, setProcessedSupplyPlansProd] = useState<
+    any[]
+  >(() => {
+    try {
+      const s = localStorage.getItem("ais_prod_supply_plans");
+      return s ? JSON.parse(s) : [];
+    } catch (e) {
+      localStorage.removeItem("ais_prod_supply_plans");
+      return [];
     }
-    return [];
   });
-  const [isProcessingSupplyPlans, setIsProcessingSupplyPlans] = useState(false);
-  const [processedStock, setProcessedStock] = useState<any[]>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("ais_stock");
-      if (saved) {
-        try { return JSON.parse(saved); } catch (e) {}
+  const [processedSupplyPlansSup, setProcessedSupplyPlansSup] = useState<any[]>(
+    () => {
+      try {
+        const s = localStorage.getItem("ais_sup_supply_plans");
+        return s ? JSON.parse(s) : [];
+      } catch (e) {
+        localStorage.removeItem("ais_sup_supply_plans");
+        return [];
       }
+    },
+  );
+  const [isProcessingSupplyPlans, setIsProcessingSupplyPlans] = useState(false);
+  const [processedStockProd, setProcessedStockProd] = useState<any[]>(() => {
+    try {
+      const s = localStorage.getItem("ais_prod_stock");
+      return s ? JSON.parse(s) : [];
+    } catch (e) {
+      localStorage.removeItem("ais_prod_stock");
+      return [];
     }
-    return [];
+  });
+  const [processedStockSup, setProcessedStockSup] = useState<any[]>(() => {
+    try {
+      const s = localStorage.getItem("ais_sup_stock");
+      return s ? JSON.parse(s) : [];
+    } catch (e) {
+      localStorage.removeItem("ais_sup_stock");
+      return [];
+    }
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const stockFileInputRef = useRef<HTMLInputElement>(null);
@@ -148,80 +302,137 @@ export function AdminPanel({
 
   // Supply Calculation Logic & Mock Data Extraction
   const [isProcessing, setIsProcessing] = useState(false);
-  const [parsingProgress, setParsingProgress] = useState({ active: false, current: 0, total: 0, message: "" });
-  const [isProcessingStock, setIsProcessingStock] = useState(false);
-  const [calculationResults, setCalculationResults] = useState<CalculationResult[]>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("ais_calc_results");
-      if (saved) {
-        try { return JSON.parse(saved); } catch (e) {}
-      }
-    }
-    return [];
+  const [parsingProgress, setParsingProgress] = useState({
+    active: false,
+    current: 0,
+    total: 0,
+    message: "",
   });
+  const [isProcessingStock, setIsProcessingStock] = useState(false);
+  const [calcResultsProd, setCalcResultsProd] = useState<CalculationResult[]>(
+    () => {
+      try {
+        const s = localStorage.getItem("ais_prod_calc_results");
+        return s ? JSON.parse(s) : [];
+      } catch (e) {
+        localStorage.removeItem("ais_prod_calc_results");
+        return [];
+      }
+    },
+  );
+  const [calcResultsSup, setCalcResultsSup] = useState<CalculationResult[]>(
+    () => {
+      try {
+        const s = localStorage.getItem("ais_sup_calc_results");
+        return s ? JSON.parse(s) : [];
+      } catch (e) {
+        localStorage.removeItem("ais_sup_calc_results");
+        return [];
+      }
+    },
+  );
+
+  const calculationResults = isProduction ? calcResultsProd : calcResultsSup;
+  const setCalculationResults = isProduction
+    ? setCalcResultsProd
+    : setCalcResultsSup;
+  const processedStock = isProduction ? processedStockProd : processedStockSup;
+  const processedSupplyPlans = isProduction
+    ? processedSupplyPlansProd
+    : processedSupplyPlansSup;
 
   useEffect(() => {
-    localStorage.setItem("ais_calc_results", JSON.stringify(calculationResults));
-  }, [calculationResults]);
+    localStorage.setItem(
+      "ais_prod_calc_results",
+      JSON.stringify(calcResultsProd),
+    );
+    localStorage.setItem(
+      "ais_sup_calc_results",
+      JSON.stringify(calcResultsSup),
+    );
+  }, [calcResultsProd, calcResultsSup]);
 
   useEffect(() => {
-    localStorage.setItem("ais_stock", JSON.stringify(processedStock));
-  }, [processedStock]);
+    localStorage.setItem("ais_prod_stock", JSON.stringify(processedStockProd));
+    localStorage.setItem("ais_sup_stock", JSON.stringify(processedStockSup));
+  }, [processedStockProd, processedStockSup]);
 
   useEffect(() => {
-    localStorage.setItem("ais_supply_plans", JSON.stringify(processedSupplyPlans));
-  }, [processedSupplyPlans]);
+    localStorage.setItem(
+      "ais_prod_supply_plans",
+      JSON.stringify(processedSupplyPlansProd),
+    );
+    localStorage.setItem(
+      "ais_sup_supply_plans",
+      JSON.stringify(processedSupplyPlansSup),
+    );
+  }, [processedSupplyPlansProd, processedSupplyPlansSup]);
 
   const applyAllOptimizations = () => {
-    setCalculationResults(prev => prev.map(item => {
-      if (item.optimizedBilletLength && item.optimizedBilletLength !== item.billetLength && item.optimizedKim && item.optimizedKim > (item.remainingToProcess / item.totalWeight) + 0.005) {
-        const newBilletLength = item.optimizedBilletLength;
-        const newDrawLen = newBilletLength * item.drawRatio;
-        const newUsefulLen = newDrawLen / (item.type === "Шестигранник" ? 1.03 * 1.003 : 1.027 * 1.003);
-        
-        let newPcs = 0;
-        let newActualUL = 0;
-        if (item.lengthType === "НД") {
-          for (let i = 1; i <= 20; i++) {
-            const optLen = Math.floor(newUsefulLen / i) - 5;
-            if (optLen >= 3000 && optLen <= 6000) {
-              newPcs = i;
-              newActualUL = newPcs * optLen;
-              break;
-            }
-          }
-          if (newPcs === 0) newActualUL = newUsefulLen;
-        } else {
-          newPcs = Math.floor(newUsefulLen / item.length);
-          newActualUL = newPcs * item.length;
-        }
-        
-        const newKim = newDrawLen > 0 ? newActualUL / newDrawLen : 0;
-        const newTotalWeight = newKim > 0 ? item.remainingToProcess / newKim : item.remainingToProcess;
-        const billetArea = (Math.PI * Math.pow(item.billetDia, 2)) / 4;
-        const wPerM = billetArea * 0.00000785 * 1000;
-        const singleBMass = (newBilletLength / 1000) * wPerM;
-        const newBilletCount = singleBMass > 0 ? Math.ceil((newTotalWeight * 1000) / singleBMass) : 0;
-        const gradePrices = rawPrices[item.grade] || { md: "0", nd: "0" };
-        const basePr = parseFloat(gradePrices.nd || "0");
-        const newPr = item.lengthType === "МД" ? basePr * 1.06 : basePr;
-        const newTotCost = newTotalWeight * newPr;
+    setCalculationResults((prev) =>
+      prev.map((item) => {
+        if (
+          item.optimizedBilletLength &&
+          item.optimizedBilletLength !== item.billetLength &&
+          item.optimizedKim &&
+          item.optimizedKim > item.remainingToProcess / item.totalWeight + 0.005
+        ) {
+          const newBilletLength = item.optimizedBilletLength;
+          const newDrawLen = newBilletLength * item.drawRatio;
+          const newUsefulLen =
+            newDrawLen /
+            (item.type === "Шестигранник" ? 1.03 * 1.003 : 1.027 * 1.003);
 
-        return {
-          ...item,
-          billetLength: newBilletLength,
-          drawLength: newDrawLen,
-          usefulLength: newUsefulLen,
-          actualUsefulLength: newActualUL,
-          pcsPerBillet: newPcs,
-          kim: newKim,
-          totalWeight: newTotalWeight,
-          billetCount: newBilletCount,
-          totalCost: newTotCost
-        };
-      }
-      return item;
-    }));
+          let newPcs = 0;
+          let newActualUL = 0;
+          if (item.lengthType === "НД") {
+            for (let i = 1; i <= 20; i++) {
+              const optLen = Math.floor(newUsefulLen / i) - 5;
+              if (optLen >= 3000 && optLen <= 6000) {
+                newPcs = i;
+                newActualUL = newPcs * optLen;
+                break;
+              }
+            }
+            if (newPcs === 0) newActualUL = newUsefulLen;
+          } else {
+            newPcs = Math.floor(newUsefulLen / item.length);
+            newActualUL = newPcs * item.length;
+          }
+
+          const newKim = newDrawLen > 0 ? newActualUL / newDrawLen : 0;
+          const newTotalWeight =
+            newKim > 0
+              ? item.remainingToProcess / newKim
+              : item.remainingToProcess;
+          const billetArea = (Math.PI * Math.pow(item.billetDia, 2)) / 4;
+          const wPerM = billetArea * 0.00000785 * 1000;
+          const singleBMass = (newBilletLength / 1000) * wPerM;
+          const newBilletCount =
+            singleBMass > 0
+              ? Math.ceil((newTotalWeight * 1000) / singleBMass)
+              : 0;
+          const gradePrices = rawPrices[item.grade] || { md: "0", nd: "0" };
+          const basePr = parseFloat(gradePrices.nd || "0");
+          const newPr = item.lengthType === "МД" ? basePr * 1.06 : basePr;
+          const newTotCost = newTotalWeight * newPr;
+
+          return {
+            ...item,
+            billetLength: newBilletLength,
+            drawLength: newDrawLen,
+            usefulLength: newUsefulLen,
+            actualUsefulLength: newActualUL,
+            pcsPerBillet: newPcs,
+            kim: newKim,
+            totalWeight: newTotalWeight,
+            billetCount: newBilletCount,
+            totalCost: newTotCost,
+          };
+        }
+        return item;
+      }),
+    );
   };
 
   // Grab-to-scroll state for the table
@@ -332,19 +543,23 @@ export function AdminPanel({
 
   // Synchronize prices in calculation results when rawPrices changes
   useEffect(() => {
-    if (calculationResults.length === 0) return;
-    
-    setCalculationResults(prev => prev.map(res => {
-      const gradePrices = rawPrices[res.grade] || { md: "0", nd: "0" };
-      const price = res.lengthType === "МД" ? parseFloat(gradePrices.md || "0") : parseFloat(gradePrices.nd || "0");
-      const totalCost = res.totalWeight * price;
-      
-      return {
-        ...res,
-        price,
-        totalCost
-      };
-    }));
+    const updateFunc = (prev: CalculationResult[]) =>
+      prev.map((res) => {
+        const gradePrices = rawPrices[res.grade] || { md: "0", nd: "0" };
+        const price =
+          res.lengthType === "МД"
+            ? parseFloat(gradePrices.md || "0")
+            : parseFloat(gradePrices.nd || "0");
+        const totalCost = res.totalWeight * price;
+
+        return {
+          ...res,
+          price,
+          totalCost,
+        };
+      });
+    setCalcResultsProd(updateFunc);
+    setCalcResultsSup(updateFunc);
   }, [rawPrices]);
 
   const isNDStock = (stock: any) => {
@@ -374,7 +589,8 @@ export function AdminPanel({
   };
 
   const calculateMetrics = (res: any, bLen: number) => {
-    const totalTechCoef = res.type === "Шестигранник" ? 1.03 * 1.003 : 1.027 * 1.003;
+    const totalTechCoef =
+      res.type === "Шестигранник" ? 1.03 * 1.003 : 1.027 * 1.003;
     const dLen = bLen * res.drawRatio;
     const uLen = dLen / totalTechCoef;
     let pcs = 0;
@@ -402,19 +618,23 @@ export function AdminPanel({
   const isMatch = (stock: any, res: any) => {
     const stockProfile = stock["Профиль"]?.toLowerCase();
     const reqProfile = res.type?.toLowerCase();
-    
+
     // Шестигранник делается из круга
-    const isValidProfile = stockProfile === "круг" || stockProfile === reqProfile;
+    const isValidProfile =
+      stockProfile === "круг" || stockProfile === reqProfile;
     if (!isValidProfile) return false;
 
-    if (stock["Марка стали"]?.toLowerCase() !== res.grade?.toLowerCase()) return false;
-    if (parseFloat(String(stock["Размер"]).replace(',', '.')) !== res.billetDia) return false;
-    
+    if (stock["Марка стали"]?.toLowerCase() !== res.grade?.toLowerCase())
+      return false;
+    if (parseFloat(String(stock["Размер"]).replace(",", ".")) !== res.billetDia)
+      return false;
+
     const stockLength = String(stock["Длина"] || "").toUpperCase();
     const reqLengthType = String(res.lengthType || "").toUpperCase();
-    
+
     if (reqLengthType === "НД") {
-      if (stockLength.includes("Н/Д") || stockLength.includes("НД")) return true;
+      if (stockLength.includes("Н/Д") || stockLength.includes("НД"))
+        return true;
       if (stockLength.includes("МД")) {
         const numMatch = stockLength.match(/\d+/);
         if (numMatch) {
@@ -424,7 +644,11 @@ export function AdminPanel({
       }
       return false;
     } else if (reqLengthType.startsWith("МД")) {
-      return stockLength.includes("Н/Д") || stockLength.includes("НД") || stockLength.includes("МД");
+      return (
+        stockLength.includes("Н/Д") ||
+        stockLength.includes("НД") ||
+        stockLength.includes("МД")
+      );
     }
     return true;
   };
@@ -462,22 +686,44 @@ export function AdminPanel({
   };
 
   const stockCalculationData = useMemo(() => {
-    if (calculationResults.length === 0) return { matchedDemand: [], freeStock: [], totals: { allocated: 0, deficit: 0, remaining: 0, averageKim: 0, techWaste2: 0, usefulRem2: 0 } };
+    if (calculationResults.length === 0)
+      return {
+        matchedDemand: [],
+        freeStock: [],
+        totals: {
+          allocated: 0,
+          deficit: 0,
+          remaining: 0,
+          averageKim: 0,
+          techWaste2: 0,
+          usefulRem2: 0,
+        },
+      };
 
-    let availableStock = [...processedStock].map((item, idx) => ({ 
-      ...item, 
-      _id: idx, 
-      remainingStock: typeof item["Конечный остаток тн."] === 'number' ? item["Конечный остаток тн."] : parseFloat(item["Конечный остаток тн."]) || 0 
+    let availableStock = [...processedStock].map((item, idx) => ({
+      ...item,
+      _id: idx,
+      remainingStock:
+        typeof item["Конечный остаток тн."] === "number"
+          ? item["Конечный остаток тн."]
+          : parseFloat(item["Конечный остаток тн."]) || 0,
     }));
 
     let demands = calculationResults.map((item, idx) => {
       let res = { ...item };
-      
-      if (res.optimizedBilletLength && res.optimizedBilletLength !== res.billetLength && res.optimizedKim && res.optimizedKim > (res.remainingToProcess / res.totalWeight) + 0.005) {
+
+      if (
+        res.optimizedBilletLength &&
+        res.optimizedBilletLength !== res.billetLength &&
+        res.optimizedKim &&
+        res.optimizedKim > res.remainingToProcess / res.totalWeight + 0.005
+      ) {
         const newBilletLength = res.optimizedBilletLength;
         const newDrawLen = newBilletLength * res.drawRatio;
-        const newUsefulLen = newDrawLen / (res.type === "Шестигранник" ? 1.03 * 1.003 : 1.027 * 1.003);
-        
+        const newUsefulLen =
+          newDrawLen /
+          (res.type === "Шестигранник" ? 1.03 * 1.003 : 1.027 * 1.003);
+
         let newPcs = 0;
         let newActualUL = 0;
         if (res.lengthType === "НД") {
@@ -494,10 +740,11 @@ export function AdminPanel({
           newPcs = Math.floor(newUsefulLen / res.length);
           newActualUL = newPcs * res.length;
         }
-        
+
         const newKim = newDrawLen > 0 ? newActualUL / newDrawLen : 0;
-        const newTotalWeight = newKim > 0 ? res.remainingToProcess / newKim : res.remainingToProcess;
-        
+        const newTotalWeight =
+          newKim > 0 ? res.remainingToProcess / newKim : res.remainingToProcess;
+
         res.billetLength = newBilletLength;
         res.totalWeight = newTotalWeight;
       }
@@ -506,35 +753,35 @@ export function AdminPanel({
         ...res,
         _dId: idx,
         allocatedItems: [],
-        allocatedWeight: 0
+        allocatedWeight: 0,
       };
     });
 
-    availableStock.forEach(stock => {
+    availableStock.forEach((stock) => {
       if (stock.remainingStock <= 0) return;
-      
+
       while (stock.remainingStock > 0.0005) {
-        const validDemands = demands.filter(d => 
-          d.allocatedWeight < d.totalWeight && isMatch(stock, d)
+        const validDemands = demands.filter(
+          (d) => d.allocatedWeight < d.totalWeight && isMatch(stock, d),
         );
-        
+
         if (validDemands.length === 0) break;
-        
+
         const sortedDemands = sortDemandsForStock(stock, validDemands);
         const targetDemand = sortedDemands[0];
-        
+
         const needed = targetDemand.totalWeight - targetDemand.allocatedWeight;
         const take = Math.min(needed, stock.remainingStock);
         const stockBeforeTaking = stock.remainingStock;
-        
+
         stock.remainingStock -= take;
         targetDemand.allocatedWeight += take;
-        
+
         targetDemand.allocatedItems.push({
           ...stock,
           allocatedAmount: take,
           stockBeforeTaking,
-          stockAfterTaking: stock.remainingStock
+          stockAfterTaking: stock.remainingStock,
         });
       }
     });
@@ -542,11 +789,11 @@ export function AdminPanel({
     let totalAllocated = 0;
     let totalDeficit = 0;
 
-    const matchedDemand = demands.map(d => {
+    const matchedDemand = demands.map((d) => {
       const allocatedStock = d.allocatedWeight;
       const matchedStockItems = d.allocatedItems;
       const shortageStock = Math.max(0, d.totalWeight - allocatedStock);
-      
+
       totalAllocated += allocatedStock;
       totalDeficit += shortageStock;
 
@@ -564,7 +811,8 @@ export function AdminPanel({
         baseTotalWeight += stock.allocatedAmount;
       });
 
-      const combinedKim = baseTotalWeight > 0 ? combinedFinishedWeight / baseTotalWeight : 0;
+      const combinedKim =
+        baseTotalWeight > 0 ? combinedFinishedWeight / baseTotalWeight : 0;
 
       return {
         ...d,
@@ -573,41 +821,75 @@ export function AdminPanel({
         matchedStockItems,
         combinedTechWaste,
         combinedUsefulRem,
-        combinedKim
+        combinedKim,
       };
     });
 
-    const totalRemaining = availableStock.reduce((sum, item) => sum + item.remainingStock, 0);
-    const sumTarget = matchedDemand.reduce((sum, res) => sum + (res.remainingToProcess || 0), 0);
-    const sumTotalWeight = matchedDemand.reduce((sum, res) => sum + (res.totalWeight || 0), 0);
-    const validDemandsForKim = matchedDemand.filter(res => res.allocatedStock > 0);
-    const averageKim = validDemandsForKim.length > 0 
-      ? validDemandsForKim.reduce((sum, res) => sum + res.combinedKim, 0) / validDemandsForKim.length 
-      : 0;
-    const totalTechWaste2 = matchedDemand.reduce((sum, res) => sum + res.combinedTechWaste, 0);
-    const totalUsefulRem2 = matchedDemand.reduce((sum, res) => sum + res.combinedUsefulRem, 0);
+    const totalRemaining = availableStock.reduce(
+      (sum, item) => sum + item.remainingStock,
+      0,
+    );
+    const sumTarget = matchedDemand.reduce(
+      (sum, res) => sum + (res.remainingToProcess || 0),
+      0,
+    );
+    const sumTotalWeight = matchedDemand.reduce(
+      (sum, res) => sum + (res.totalWeight || 0),
+      0,
+    );
+    const validDemandsForKim = matchedDemand.filter(
+      (res) => res.allocatedStock > 0,
+    );
+    const averageKim =
+      validDemandsForKim.length > 0
+        ? validDemandsForKim.reduce((sum, res) => sum + res.combinedKim, 0) /
+          validDemandsForKim.length
+        : 0;
+    const totalTechWaste2 = matchedDemand.reduce(
+      (sum, res) => sum + res.combinedTechWaste,
+      0,
+    );
+    const totalUsefulRem2 = matchedDemand.reduce(
+      (sum, res) => sum + res.combinedUsefulRem,
+      0,
+    );
 
-    return { 
-      matchedDemand, 
-      freeStock: availableStock.filter(item => item.remainingStock > 0.0005), 
-      totals: { 
-        allocated: totalAllocated, 
-        deficit: totalDeficit, 
+    return {
+      matchedDemand,
+      freeStock: availableStock.filter((item) => item.remainingStock > 0.0005),
+      totals: {
+        allocated: totalAllocated,
+        deficit: totalDeficit,
         remaining: totalRemaining,
         averageKim,
         techWaste2: totalTechWaste2,
-        usefulRem2: totalUsefulRem2
-      } 
+        usefulRem2: totalUsefulRem2,
+      },
     };
   }, [calculationResults, processedStock]);
 
   const supplyCalculationData = useMemo(() => {
-    if (calculationResults.length === 0) return { matchedDemand: [], freeStock: [], totals: { allocated: 0, deficit: 0, remaining: 0, averageKim: 0, techWaste2: 0, usefulRem2: 0 } };
+    if (calculationResults.length === 0)
+      return {
+        matchedDemand: [],
+        freeStock: [],
+        totals: {
+          allocated: 0,
+          deficit: 0,
+          remaining: 0,
+          averageKim: 0,
+          techWaste2: 0,
+          usefulRem2: 0,
+        },
+      };
 
-    let availableStock = [...processedStock].map((item, idx) => ({ 
-      ...item, 
-      _id: idx, 
-      remainingStock: typeof item["Конечный остаток тн."] === 'number' ? item["Конечный остаток тн."] : parseFloat(item["Конечный остаток тн."]) || 0 
+    let availableStock = [...processedStock].map((item, idx) => ({
+      ...item,
+      _id: idx,
+      remainingStock:
+        typeof item["Конечный остаток тн."] === "number"
+          ? item["Конечный остаток тн."]
+          : parseFloat(item["Конечный остаток тн."]) || 0,
     }));
 
     let availableSupply = [...processedSupplyPlans].map((item, idx) => ({
@@ -615,20 +897,27 @@ export function AdminPanel({
       _sId: idx,
       isSupply: true,
       remainingStock: Number(item["Кол-во"]) || 0,
-      "Профиль": item["ПРОФИЛЬ"] || item["Профиль"],
+      Профиль: item["ПРОФИЛЬ"] || item["Профиль"],
       "Марка стали": item["МАРКА"] || item["Марка"],
-      "Размер": item["РАЗМЕР"] || item["Размер"],
-      "Длина": item["ДЛИНА"] || item["Длина"] || "МД6000"
+      Размер: item["РАЗМЕР"] || item["Размер"],
+      Длина: item["ДЛИНА"] || item["Длина"] || "МД6000",
     }));
 
     let demands = calculationResults.map((item, idx) => {
       let res = { ...item };
-      
-      if (res.optimizedBilletLength && res.optimizedBilletLength !== res.billetLength && res.optimizedKim && res.optimizedKim > (res.remainingToProcess / res.totalWeight) + 0.005) {
+
+      if (
+        res.optimizedBilletLength &&
+        res.optimizedBilletLength !== res.billetLength &&
+        res.optimizedKim &&
+        res.optimizedKim > res.remainingToProcess / res.totalWeight + 0.005
+      ) {
         const newBilletLength = res.optimizedBilletLength;
         const newDrawLen = newBilletLength * res.drawRatio;
-        const newUsefulLen = newDrawLen / (res.type === "Шестигранник" ? 1.03 * 1.003 : 1.027 * 1.003);
-        
+        const newUsefulLen =
+          newDrawLen /
+          (res.type === "Шестигранник" ? 1.03 * 1.003 : 1.027 * 1.003);
+
         let newPcs = 0;
         let newActualUL = 0;
         if (res.lengthType === "НД") {
@@ -645,10 +934,11 @@ export function AdminPanel({
           newPcs = Math.floor(newUsefulLen / res.length);
           newActualUL = newPcs * res.length;
         }
-        
+
         const newKim = newDrawLen > 0 ? newActualUL / newDrawLen : 0;
-        const newTotalWeight = newKim > 0 ? res.remainingToProcess / newKim : res.remainingToProcess;
-        
+        const newTotalWeight =
+          newKim > 0 ? res.remainingToProcess / newKim : res.remainingToProcess;
+
         res.billetLength = newBilletLength;
         res.totalWeight = newTotalWeight;
       }
@@ -657,37 +947,38 @@ export function AdminPanel({
         ...res,
         _dId: idx,
         allocatedItems: [],
-        allocatedWeight: 0
+        allocatedWeight: 0,
       };
     });
 
     // Strategy: First stock, then supply plans
     [availableStock, availableSupply].forEach((sourceList) => {
-      sourceList.forEach(item => {
+      sourceList.forEach((item) => {
         if (item.remainingStock <= 0) return;
-        
+
         while (item.remainingStock > 0.0005) {
-          const validDemands = demands.filter(d => 
-            d.allocatedWeight < d.totalWeight && isMatch(item, d)
+          const validDemands = demands.filter(
+            (d) => d.allocatedWeight < d.totalWeight && isMatch(item, d),
           );
-          
+
           if (validDemands.length === 0) break;
-          
+
           const sortedDemands = sortDemandsForStock(item, validDemands);
           const targetDemand = sortedDemands[0];
-          
-          const needed = targetDemand.totalWeight - targetDemand.allocatedWeight;
+
+          const needed =
+            targetDemand.totalWeight - targetDemand.allocatedWeight;
           const take = Math.min(needed, item.remainingStock);
           const stockBeforeTaking = item.remainingStock;
-          
+
           item.remainingStock -= take;
           targetDemand.allocatedWeight += take;
-          
+
           targetDemand.allocatedItems.push({
             ...item,
             allocatedAmount: take,
             stockBeforeTaking,
-            stockAfterTaking: item.remainingStock
+            stockAfterTaking: item.remainingStock,
           });
         }
       });
@@ -696,16 +987,28 @@ export function AdminPanel({
     let totalAllocated = 0;
     let totalDeficit = 0;
 
-    const matchedDemand = demands.map(d => {
+    const matchedDemand = demands.map((d) => {
       const allAllocated = d.allocatedItems || [];
       const stockItems = allAllocated.filter((i: any) => !i.isSupply);
       const supplyItems = allAllocated.filter((i: any) => i.isSupply);
 
-      const allocatedFromStock = stockItems.reduce((sum: number, item: any) => sum + item.allocatedAmount, 0);
-      const shortageAfterStock = Math.max(0, d.totalWeight - allocatedFromStock);
+      const allocatedFromStock = stockItems.reduce(
+        (sum: number, item: any) => sum + item.allocatedAmount,
+        0,
+      );
+      const shortageAfterStock = Math.max(
+        0,
+        d.totalWeight - allocatedFromStock,
+      );
 
-      const allocatedFromSupply = supplyItems.reduce((sum: number, item: any) => sum + item.allocatedAmount, 0);
-      const finalShortage = Math.max(0, shortageAfterStock - allocatedFromSupply);
+      const allocatedFromSupply = supplyItems.reduce(
+        (sum: number, item: any) => sum + item.allocatedAmount,
+        0,
+      );
+      const finalShortage = Math.max(
+        0,
+        shortageAfterStock - allocatedFromSupply,
+      );
 
       let combinedTechWaste2 = 0;
       let combinedUsefulRem2 = 0;
@@ -722,7 +1025,10 @@ export function AdminPanel({
       });
 
       const deficitMetrics = calculateMetrics(d, d.billetLength);
-      const combinedKim2 = stockBaseTotalWeight > 0 ? combinedFinishedWeight2 / stockBaseTotalWeight : 0;
+      const combinedKim2 =
+        stockBaseTotalWeight > 0
+          ? combinedFinishedWeight2 / stockBaseTotalWeight
+          : 0;
 
       let combinedTechWaste3 = 0;
       let combinedUsefulRem3 = 0;
@@ -738,7 +1044,8 @@ export function AdminPanel({
         supplyTotalBase += supply.allocatedAmount;
       });
 
-      const combinedKim3 = supplyTotalBase > 0 ? combinedFinishedWeight3 / supplyTotalBase : 0;
+      const combinedKim3 =
+        supplyTotalBase > 0 ? combinedFinishedWeight3 / supplyTotalBase : 0;
 
       totalAllocated += allocatedFromSupply;
       totalDeficit += finalShortage;
@@ -756,44 +1063,66 @@ export function AdminPanel({
         combinedKim2,
         combinedTechWaste3,
         combinedUsefulRem3,
-        combinedKim3
+        combinedKim3,
       };
     });
 
-    const totalRemaining = availableSupply.reduce((sum, item) => sum + item.remainingStock, 0);
-    const validDemandsForKim3 = matchedDemand.filter(res => res.allocatedFromSupply > 0);
-    const averageKim3 = validDemandsForKim3.length > 0 
-      ? validDemandsForKim3.reduce((sum, res) => sum + res.combinedKim3, 0) / validDemandsForKim3.length 
-      : 0;
-    const totalTechWaste3 = matchedDemand.reduce((sum, res) => sum + res.combinedTechWaste3, 0);
-    const totalUsefulRem3 = matchedDemand.reduce((sum, res) => sum + res.combinedUsefulRem3, 0);
+    const totalRemaining = availableSupply.reduce(
+      (sum, item) => sum + item.remainingStock,
+      0,
+    );
+    const validDemandsForKim3 = matchedDemand.filter(
+      (res) => res.allocatedFromSupply > 0,
+    );
+    const averageKim3 =
+      validDemandsForKim3.length > 0
+        ? validDemandsForKim3.reduce((sum, res) => sum + res.combinedKim3, 0) /
+          validDemandsForKim3.length
+        : 0;
+    const totalTechWaste3 = matchedDemand.reduce(
+      (sum, res) => sum + res.combinedTechWaste3,
+      0,
+    );
+    const totalUsefulRem3 = matchedDemand.reduce(
+      (sum, res) => sum + res.combinedUsefulRem3,
+      0,
+    );
 
-    return { 
-      matchedDemand, 
-      freeSupply: availableSupply.filter(item => item.remainingStock > 0.0005),
-      totals: { 
-        allocated: totalAllocated, 
+    return {
+      matchedDemand,
+      freeSupply: availableSupply.filter(
+        (item) => item.remainingStock > 0.0005,
+      ),
+      totals: {
+        allocated: totalAllocated,
         deficit: totalDeficit,
         remaining: totalRemaining,
         averageKim: averageKim3,
         techWaste2: totalTechWaste3,
-        usefulRem2: totalUsefulRem3
-      } 
+        usefulRem2: totalUsefulRem3,
+      },
     };
   }, [calculationResults, processedStock, processedSupplyPlans]);
 
-  const { matchedDemand, freeStock, totals: stockTotals } = stockCalculationData;
+  const {
+    matchedDemand,
+    freeStock,
+    totals: stockTotals,
+  } = stockCalculationData;
 
   const filteredMatchedDemand = useMemo(() => {
     return matchedDemand.filter((item) => {
       // Free text search
       const query = searchQuery.toLowerCase();
-      const matchesSearch = !query || 
+      const matchesSearch =
+        !query ||
         (item.orderNo && String(item.orderNo).toLowerCase().includes(query)) ||
         (item.client && String(item.client).toLowerCase().includes(query)) ||
-        (item.nomenclature && String(item.nomenclature).toLowerCase().includes(query)) ||
-        (item.internalNo && String(item.internalNo).toLowerCase().includes(query));
-      
+        (item.nomenclature &&
+          String(item.nomenclature).toLowerCase().includes(query)) ||
+        (item.internalNo &&
+          String(item.internalNo).toLowerCase().includes(query));
+
       // Status filter
       let matchesStatus = true;
       if (statusFilter === "OK") {
@@ -808,7 +1137,7 @@ export function AdminPanel({
 
   const groupedByOrderDemand = useMemo(() => {
     const groups: Record<string, any> = {};
-    filteredMatchedDemand.forEach(item => {
+    filteredMatchedDemand.forEach((item) => {
       const key = item.orderNo || "Без заказа";
       if (!groups[key]) {
         groups[key] = {
@@ -818,25 +1147,36 @@ export function AdminPanel({
           shortageStock: 0,
           totalWeight: 0,
           weightTons: 0,
-          nomenclature: key // Using orderNo as label for Top-5 chart
+          nomenclature: key, // Using orderNo as label for Top-5 chart
         };
       }
-      groups[key].allocatedStock += (item.allocatedStock || 0);
-      groups[key].shortageStock += (item.shortageStock || 0);
-      groups[key].totalWeight += (item.totalWeight || 0);
-      groups[key].weightTons += (item.weightTons || 0);
+      groups[key].allocatedStock += item.allocatedStock || 0;
+      groups[key].shortageStock += item.shortageStock || 0;
+      groups[key].totalWeight += item.totalWeight || 0;
+      groups[key].weightTons += item.weightTons || 0;
     });
-    return Object.values(groups).sort((a, b) => b.shortageStock - a.shortageStock);
+    return Object.values(groups).sort(
+      (a, b) => b.shortageStock - a.shortageStock,
+    );
   }, [filteredMatchedDemand]);
 
   const filteredTotals = useMemo(() => {
-    return filteredMatchedDemand.reduce((acc, row) => {
-      acc.allocated += (row.allocatedStock || 0);
-      acc.deficit += (row.shortageStock || 0);
-      acc.techWaste2 += (row.allocatedStock > 0 && row.combinedTechWaste > 0 ? row.combinedTechWaste : 0);
-      acc.usefulRem2 += (row.allocatedStock > 0 && row.combinedUsefulRem > 0 ? row.combinedUsefulRem : 0);
-      return acc;
-    }, { allocated: 0, deficit: 0, techWaste2: 0, usefulRem2: 0 });
+    return filteredMatchedDemand.reduce(
+      (acc, row) => {
+        acc.allocated += row.allocatedStock || 0;
+        acc.deficit += row.shortageStock || 0;
+        acc.techWaste2 +=
+          row.allocatedStock > 0 && row.combinedTechWaste > 0
+            ? row.combinedTechWaste
+            : 0;
+        acc.usefulRem2 +=
+          row.allocatedStock > 0 && row.combinedUsefulRem > 0
+            ? row.combinedUsefulRem
+            : 0;
+        return acc;
+      },
+      { allocated: 0, deficit: 0, techWaste2: 0, usefulRem2: 0 },
+    );
   }, [filteredMatchedDemand]);
 
   // Format supply nomenclature based on profile and marka
@@ -848,10 +1188,10 @@ export function AdminPanel({
       if (profile) {
         let gost = String(profile);
         const p = gost.toLowerCase();
-        if (p.includes('круг')) gost = "Гост 2590-2006";
-        else if (p.includes('шестигранник')) gost = "Гост 2879-2006";
-        else if (p.includes('квадрат')) gost = "Гост 2591-2006";
-        else if (p.includes('полоса')) gost = "Гост 103-2006";
+        if (p.includes("круг")) gost = "Гост 2590-2006";
+        else if (p.includes("шестигранник")) gost = "Гост 2879-2006";
+        else if (p.includes("квадрат")) gost = "Гост 2591-2006";
+        else if (p.includes("полоса")) gost = "Гост 103-2006";
         return `ГОСТ= ${marka} / ${gost}`;
       }
       return `ГОСТ= ${marka}`;
@@ -863,11 +1203,11 @@ export function AdminPanel({
   const formatDate = (input: any): string => {
     if (!input) return "";
     let dateObj: Date | null = null;
-    
-    if (typeof input === 'number') {
+
+    if (typeof input === "number") {
       // Excel date serial conversion
       dateObj = new Date(Math.round((input - 25569) * 86400 * 1000));
-    } else if (typeof input === 'string' && input.trim()) {
+    } else if (typeof input === "string" && input.trim()) {
       const parsed = new Date(input);
       if (!isNaN(parsed.getTime())) {
         dateObj = parsed;
@@ -879,40 +1219,62 @@ export function AdminPanel({
           const m = parseInt(parts[1]) - 1;
           const y = parseInt(parts[2]);
           if (y > 1000 && m < 12 && d < 32) {
-             dateObj = new Date(y, m, d);
+            dateObj = new Date(y, m, d);
           }
         }
       }
     }
 
     if (dateObj && !isNaN(dateObj.getTime())) {
-      const dd = String(dateObj.getDate()).padStart(2, '0');
-      const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const dd = String(dateObj.getDate()).padStart(2, "0");
+      const mm = String(dateObj.getMonth() + 1).padStart(2, "0");
       const yyyy = dateObj.getFullYear();
       return `${dd}.${mm}.${yyyy}`;
     }
     return String(input).trim();
   };
 
-  const handleProcessPlans = async () => {
-    if (planFiles.length === 0) return;
-    
+  const handleProcessPlans = async (
+    type: "production" | "supply",
+    filesToProcess: any[],
+  ) => {
+    if (filesToProcess.length === 0) return;
+
     setIsProcessing(true);
     setUploadWarnings([]);
-    
+
     try {
-      const allExtractedData: Omit<CalculationResult, "billetDia" | "billetLength" | "drawRatio" | "drawLength" | "usefulLength" | "techEnds" | "wastePercent" | "totalWeight" | "billetCount" | "pcsPerBillet" | "targetLength" | "quantity" | "price" | "totalCost">[] = [];
-      
-      for (const fileObj of planFiles) {
+      const allExtractedData: Omit<
+        CalculationResult,
+        | "billetDia"
+        | "billetLength"
+        | "drawRatio"
+        | "drawLength"
+        | "usefulLength"
+        | "techEnds"
+        | "wastePercent"
+        | "totalWeight"
+        | "billetCount"
+        | "pcsPerBillet"
+        | "targetLength"
+        | "quantity"
+        | "price"
+        | "totalCost"
+      >[] = [];
+
+      for (const fileObj of filesToProcess) {
         if (!fileObj.file) continue;
-        
+
         const data = await fileObj.file.arrayBuffer();
         const workbook = XLSX.read(data, { type: "array" });
-        
+
         for (const sheetName of workbook.SheetNames) {
           const worksheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" }) as any[][];
-          
+          const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+            header: 1,
+            defval: "",
+          }) as any[][];
+
           let startRow = 0;
           let colMap = {
             client: 1, // B
@@ -923,7 +1285,7 @@ export function AdminPanel({
             size: 7, // H
             weight: 8, // I
             remaining: -1,
-            shippingDate: -1, 
+            shippingDate: -1,
             internalNo: -1,
             lengthIdx: -1,
           };
@@ -932,88 +1294,209 @@ export function AdminPanel({
           for (let i = 0; i < Math.min(100, jsonData.length); i++) {
             const row = jsonData[i] || [];
             const rowStr = row.join(" ").toLowerCase();
-            
-            if (rowStr.includes("заказ") || rowStr.includes("клиент") || rowStr.includes("профиль") || rowStr.includes("марка") || rowStr.includes("размер") || rowStr.includes("кол-во") || rowStr.includes("вес") || rowStr.includes("номенклатура")) {
+
+            if (
+              rowStr.includes("заказ") ||
+              rowStr.includes("клиент") ||
+              rowStr.includes("профиль") ||
+              rowStr.includes("марка") ||
+              rowStr.includes("размер") ||
+              rowStr.includes("кол-во") ||
+              rowStr.includes("вес") ||
+              rowStr.includes("номенклатура")
+            ) {
               startRow = i + 1;
-              
+
               row.forEach((cell: any, colIdx: number) => {
                 const cellStr = String(cell).toLowerCase().trim();
-                
+
                 // Specific mappings requested by user
-                if (cellStr === "внутренний номер" || cellStr === "внутренняя нумерация") colMap.internalNo = colIdx;
+                if (
+                  cellStr === "внутренний номер" ||
+                  cellStr === "внутренняя нумерация"
+                )
+                  colMap.internalNo = colIdx;
                 if (cellStr === "дата отгрузки") colMap.shippingDate = colIdx;
                 if (cellStr === "клиент") colMap.client = colIdx;
                 if (cellStr === "номенклатура") colMap.nomenclature = colIdx;
                 if (cellStr === "№ заказа") colMap.orderNo = colIdx;
-                if (cellStr === "кол-во" || cellStr === "кол-во тн") colMap.weight = colIdx;
-                if (cellStr.includes("итого остаток к выполнению") || cellStr.includes("итого остаток выполнению") || cellStr.includes("итог остаток к выполнению") || cellStr.includes("итого ост. к выполнению") || cellStr.includes("остаток к выполнению") || cellStr.includes("остаток")) colMap.remaining = colIdx;
-                
+                if (
+                  cellStr === "кол-во" || 
+                  cellStr === "кол-во тн" ||
+                  cellStr === "кол-во тн в заказе" ||
+                  cellStr === "кол-во ="
+                )
+                  colMap.weight = colIdx;
+                if (
+                  cellStr === "итого остаток к выполнению" ||
+                  cellStr === "итого остаток выполнения заказа после расчета / плановое поступление" ||
+                  cellStr.includes("итого остаток к выполнению") ||
+                  cellStr.includes("итого остаток выполнению") ||
+                  cellStr.includes("итог остаток к выполнению") ||
+                  cellStr.includes("итого ост. к выполнению") ||
+                  cellStr.includes("остаток к выполнению") ||
+                  cellStr.includes("остаток") ||
+                  cellStr.includes("после расчета / плановое поступление")
+                )
+                  colMap.remaining = colIdx;
+
                 // Fallbacks and other fields
-                if (colMap.internalNo === -1 && cellStr.includes("внутр") && (cellStr.includes("номер") || cellStr.includes("№"))) colMap.internalNo = colIdx;
-                if (colMap.client === -1 && (cellStr.includes("клиент") || cellStr.includes("покупатель") || cellStr.includes("партнер"))) colMap.client = colIdx;
-                if (colMap.nomenclature === -1 && (cellStr.includes("номенклатура") || cellStr.includes("наименование") || cellStr.includes("товар"))) colMap.nomenclature = colIdx;
-                if (colMap.orderNo === -1 && cellStr.includes("заказ")) colMap.orderNo = colIdx;
-                if (cellStr.includes("профиль") || cellStr.includes("тип")) colMap.type = colIdx;
-                if (cellStr.includes("марка") || cellStr.includes("сталь") || cellStr.includes("материал")) colMap.grade = colIdx;
-                if (cellStr.includes("размер") || cellStr.includes("диаметр")) colMap.size = colIdx;
-                if (colMap.weight === -1 && (cellStr.includes("кол-во") || cellStr.includes("количество") || cellStr.includes("вес") || cellStr.includes("масса") || cellStr.includes("кг") || cellStr.includes("тн"))) colMap.weight = colIdx;
-                if (colMap.shippingDate === -1 && (cellStr.includes("отгруз") || cellStr.includes("дата"))) colMap.shippingDate = colIdx;
+                if (
+                  colMap.internalNo === -1 &&
+                  cellStr.includes("внутр") &&
+                  (cellStr.includes("номер") || cellStr.includes("№"))
+                )
+                  colMap.internalNo = colIdx;
+                if (
+                  colMap.client === -1 &&
+                  (cellStr.includes("клиент") ||
+                    cellStr.includes("покупатель") ||
+                    cellStr.includes("партнер"))
+                )
+                  colMap.client = colIdx;
+                if (
+                  colMap.nomenclature === -1 &&
+                  (cellStr.includes("номенклатура") ||
+                    cellStr.includes("наименование") ||
+                    cellStr.includes("товар"))
+                )
+                  colMap.nomenclature = colIdx;
+                if (colMap.orderNo === -1 && cellStr.includes("заказ"))
+                  colMap.orderNo = colIdx;
+                if (cellStr.includes("профиль") || cellStr.includes("тип"))
+                  colMap.type = colIdx;
+                if (
+                  cellStr.includes("марка") ||
+                  cellStr.includes("сталь") ||
+                  cellStr.includes("материал")
+                )
+                  colMap.grade = colIdx;
+                if (cellStr.includes("размер") || cellStr.includes("диаметр"))
+                  colMap.size = colIdx;
+                if (
+                  colMap.weight === -1 &&
+                  (cellStr.includes("кол-во") ||
+                    cellStr.includes("количество") ||
+                    cellStr.includes("вес") ||
+                    cellStr.includes("масса") ||
+                    cellStr.includes("кг") ||
+                    cellStr.includes("тн"))
+                )
+                  colMap.weight = colIdx;
+                if (
+                  colMap.shippingDate === -1 &&
+                  (cellStr.includes("отгруз") || cellStr.includes("дата"))
+                )
+                  colMap.shippingDate = colIdx;
                 if (cellStr.includes("длина")) colMap.lengthIdx = colIdx;
               });
               break;
             }
           }
-          
+
           // Smart Mapping Validation
           const missingColumns = [];
           if (colMap.client === -1) missingColumns.push("Клиент");
           if (colMap.nomenclature === -1) missingColumns.push("Номенклатура");
           if (colMap.orderNo === -1) missingColumns.push("№ Заказа");
           if (colMap.weight === -1) missingColumns.push("Кол-во (вес)");
-          if (colMap.remaining === -1) missingColumns.push("Остаток к выполнению");
+          if (colMap.remaining === -1)
+            missingColumns.push("Остаток к выполнению");
 
           if (missingColumns.length > 0) {
-            setUploadWarnings(prev => [...prev, `Файл "${fileObj.name}": не найдены колонки: ${missingColumns.join(', ')}`]);
+            setUploadWarnings((prev) => [
+              ...prev,
+              `Файл "${fileObj.name}": не найдены колонки: ${missingColumns.join(", ")}`,
+            ]);
           }
-          
+
           for (let i = startRow; i < jsonData.length; i++) {
             if (i % 25 === 0) {
-              setParsingProgress({ active: true, current: i, total: jsonData.length, message: `Файл планов: Обрабатывается строка ${i} из ${jsonData.length}...` });
-              await new Promise(resolve => setTimeout(resolve, 0));
+              setParsingProgress({
+                active: true,
+                current: i,
+                total: jsonData.length,
+                message: `Файл планов: Обрабатывается строка ${i} из ${jsonData.length}...`,
+              });
+              await new Promise((resolve) => setTimeout(resolve, 0));
             }
 
             const row = jsonData[i] || [];
-            
-            if (row.length === 0 || row.every((c: any) => !c || String(c).trim() === '')) continue;
-            
+
+            if (
+              row.length === 0 ||
+              row.every((c: any) => !c || String(c).trim() === "")
+            )
+              continue;
+
             const orderNo = String(row[colMap.orderNo] || "").trim();
-            const internalNo = colMap.internalNo !== -1 ? String(row[colMap.internalNo] || "").trim() : "";
-            const shippingDate = formatDate(colMap.shippingDate !== -1 ? row[colMap.shippingDate] : "");
+            const internalNo =
+              colMap.internalNo !== -1
+                ? String(row[colMap.internalNo] || "").trim()
+                : "";
+            const shippingDate = formatDate(
+              colMap.shippingDate !== -1 ? row[colMap.shippingDate] : "",
+            );
 
             const client = String(row[colMap.client] || "").trim();
             let nomenclature = String(row[colMap.nomenclature] || "");
-            nomenclature = nomenclature.replace(/Прокат калиброванный/i, "").trim();
-            
+            nomenclature = nomenclature
+              .replace(/Прокат калиброванный/i, "")
+              .trim();
+
             const rawWeight = row[colMap.weight];
-            let weightTons = typeof rawWeight === "number" ? rawWeight : parseFloat(String(rawWeight || "0").replace(/\s/g, "").replace(",", "."));
+            let weightTons =
+              typeof rawWeight === "number"
+                ? rawWeight
+                : parseFloat(
+                    String(rawWeight || "0")
+                      .replace(/\s/g, "")
+                      .replace(",", "."),
+                  );
             if (isNaN(weightTons) || weightTons < 0) weightTons = 0;
 
-            const rawRemaining = colMap.remaining !== -1 ? row[colMap.remaining] : null;
-            let remainingToProcess = rawRemaining !== null ? (typeof rawRemaining === "number" ? rawRemaining : parseFloat(String(rawRemaining || "0").replace(/\s/g, "").replace(",", "."))) : weightTons;
-            if (isNaN(remainingToProcess) || remainingToProcess < 0) remainingToProcess = weightTons;
-            
-            let typeStr = String(row[colMap.type] || nomenclature).toLowerCase();
-            let type = typeStr.includes("шестигранник") || typeStr.includes("шестиг") ? "Шестигранник" : "Круг";
+            const rawRemaining =
+              colMap.remaining !== -1 ? row[colMap.remaining] : null;
+            let remainingToProcess =
+              rawRemaining !== null
+                ? typeof rawRemaining === "number"
+                  ? rawRemaining
+                  : parseFloat(
+                      String(rawRemaining || "0")
+                        .replace(/\s/g, "")
+                        .replace(",", "."),
+                    )
+                : weightTons;
+            if (isNaN(remainingToProcess) || remainingToProcess < 0)
+              remainingToProcess = weightTons;
+
+            let typeStr = String(
+              row[colMap.type] || nomenclature,
+            ).toLowerCase();
+            let type =
+              typeStr.includes("шестигранник") || typeStr.includes("шестиг")
+                ? "Шестигранник"
+                : "Круг";
             let gradeStr = String(row[colMap.grade] || "").trim();
             let grade = gradeStr || "ст.35";
-            
+
             // Fix for incorrect grade extraction
-            if (grade.toUpperCase().includes("1050") || grade.toUpperCase().includes("1414") || grade.toUpperCase().includes("4543") || grade.toUpperCase().includes("ГОСТ") || gradeStr === "") {
-              const gMatch = nomenclature.match(/(?:^|[^а-яА-ЯёЁa-zA-Z])(?:ст\.?|сталь)\s*([0-9a-zA-Zа-яА-Я-]+)/i);
+            if (
+              grade.toUpperCase().includes("1050") ||
+              grade.toUpperCase().includes("1414") ||
+              grade.toUpperCase().includes("4543") ||
+              grade.toUpperCase().includes("ГОСТ") ||
+              gradeStr === ""
+            ) {
+              const gMatch = nomenclature.match(
+                /(?:^|[^а-яА-ЯёЁa-zA-Z])(?:ст\.?|сталь)\s*([0-9a-zA-Zа-яА-Я-]+)/i,
+              );
               if (gMatch) {
                 grade = "ст." + gMatch[1].toUpperCase();
               } else {
-                const alloyMatch = nomenclature.match(/\b(\d{2}[ХхНнМмТтВвГгДд]+[0-9a-zA-Zа-яА-Я-]*)\b/);
+                const alloyMatch = nomenclature.match(
+                  /\b(\d{2}[ХхНнМмТтВвГгДд]+[0-9a-zA-Zа-яА-Я-]*)\b/,
+                );
                 if (alloyMatch) {
                   grade = "ст." + alloyMatch[1].toUpperCase();
                 } else {
@@ -1024,39 +1507,62 @@ export function AdminPanel({
                 }
               }
             } else if (grade.toUpperCase().startsWith("СТ.")) {
-               grade = "ст." + grade.substring(3).toUpperCase();
+              grade = "ст." + grade.substring(3).toUpperCase();
             } else if (grade.toUpperCase().startsWith("СТ")) {
-               grade = "ст." + grade.substring(2).toUpperCase();
-            } else if (grade.toUpperCase() !== "А12" && !grade.toLowerCase().startsWith("ст")) {
-               grade = "ст." + grade.toUpperCase();
+              grade = "ст." + grade.substring(2).toUpperCase();
+            } else if (
+              grade.toUpperCase() !== "А12" &&
+              !grade.toLowerCase().startsWith("ст")
+            ) {
+              grade = "ст." + grade.toUpperCase();
             } else if (grade.toUpperCase() === "А12") {
-               grade = "ст.А12";
+              grade = "ст.А12";
             }
-            
-            grade = grade.replace(/[хХxX]\s*\d{3,}$/i, '');
-            
+
+            grade = grade.replace(/[хХxX]\s*\d{3,}$/i, "");
+
             const rawSize = row[colMap.size];
-            let diameter = typeof rawSize === "number" ? rawSize : parseFloat(String(rawSize || "0").replace(/\s/g, "").replace(",", "."));
+            let diameter =
+              typeof rawSize === "number"
+                ? rawSize
+                : parseFloat(
+                    String(rawSize || "0")
+                      .replace(/\s/g, "")
+                      .replace(",", "."),
+                  );
             if (isNaN(diameter) || diameter <= 0) {
-              const sizeMatch = nomenclature.match(/(?:круг|шестигранник)\s*(?:калибровоченный|калибровочный|калиброванный|калибр\.?)?\s*(\d+(?:[.,]\d+)?)/i);
+              const sizeMatch = nomenclature.match(
+                /(?:круг|шестигранник)\s*(?:калибровоченный|калибровочный|калиброванный|калибр\.?)?\s*(\d+(?:[.,]\d+)?)/i,
+              );
               if (sizeMatch) {
                 diameter = parseFloat(sizeMatch[1].replace(",", "."));
               }
             }
             if (isNaN(diameter) || diameter < 0) diameter = 0;
-            
-            const nomCleanForLen = nomenclature.toUpperCase().replace(/\s/g, '');
-            const isNomND = nomCleanForLen.includes("НД") || nomCleanForLen.includes("Н.Д.") || nomCleanForLen.includes("Н/Д");
-                
+
+            const nomCleanForLen = nomenclature
+              .toUpperCase()
+              .replace(/\s/g, "");
+            const isNomND =
+              nomCleanForLen.includes("НД") ||
+              nomCleanForLen.includes("Н.Д.") ||
+              nomCleanForLen.includes("Н/Д");
+
             let length = 6000;
             let lengthType: "НД" | "МД" = "МД";
-            
+
             if (isNomND) {
               lengthType = "НД";
               length = 6000;
             } else if (colMap.lengthIdx !== -1 && row[colMap.lengthIdx]) {
-              const rawLength = String(row[colMap.lengthIdx]).trim().toUpperCase();
-              if (rawLength.includes("НД") || rawLength.includes("Н/Д") || rawLength.includes("Н.Д.")) {
+              const rawLength = String(row[colMap.lengthIdx])
+                .trim()
+                .toUpperCase();
+              if (
+                rawLength.includes("НД") ||
+                rawLength.includes("Н/Д") ||
+                rawLength.includes("Н.Д.")
+              ) {
                 lengthType = "НД";
               } else {
                 const lengthMatch = rawLength.match(/\d+/);
@@ -1089,7 +1595,7 @@ export function AdminPanel({
               orderNo,
               shippingDate,
               internalNo,
-              remainingToProcess
+              remainingToProcess,
             });
           }
         }
@@ -1101,13 +1607,19 @@ export function AdminPanel({
         return;
       }
 
-      const processed: CalculationResult[] = allExtractedData.map(item => {
+      const processed: CalculationResult[] = allExtractedData.map((item) => {
         const dataTable = item.type === "Шестигранник" ? HEX_DATA : ROUND_DATA;
-        const match = dataTable.find(d => Math.abs(d.target - item.diameter) < 0.001);
-        
+        const match = dataTable.find(
+          (d) => Math.abs(d.target - item.diameter) < 0.001,
+        );
+
         let billetDia = item.diameter ? item.diameter + 2 : 0;
-        let drawRatio = match ? match.coef : (item.diameter > 0 ? Math.pow(billetDia, 2) / Math.pow(item.diameter, 2) : 1);
-        
+        let drawRatio = match
+          ? match.coef
+          : item.diameter > 0
+            ? Math.pow(billetDia, 2) / Math.pow(item.diameter, 2)
+            : 1;
+
         if (match) {
           billetDia = match.raw;
         } else if (item.diameter > 0) {
@@ -1117,9 +1629,10 @@ export function AdminPanel({
           billetDia = 0;
           drawRatio = 1;
         }
-        
+
         let billetLength = 0;
-        const totalTechCoef = item.type === "Шестигранник" ? 1.03 * 1.003 : 1.027 * 1.003;
+        const totalTechCoef =
+          item.type === "Шестигранник" ? 1.03 * 1.003 : 1.027 * 1.003;
 
         if (item.lengthType === "НД") {
           billetLength = 6000;
@@ -1130,7 +1643,7 @@ export function AdminPanel({
         const drawLength = billetLength * drawRatio;
         const usefulLength = drawLength / totalTechCoef;
         const techEnds = drawLength - usefulLength;
-        
+
         let piecesCount = 0;
         let actualUsefulLength = 0;
 
@@ -1157,7 +1670,7 @@ export function AdminPanel({
           const MIN_B = 4000;
           const MAX_B = Math.floor(8400 / drawRatio);
           const STEP = 100;
-          
+
           for (let l = MIN_B; l <= MAX_B; l += STEP) {
             const dL = l * drawRatio;
             const uL = dL / totalTechCoef;
@@ -1165,8 +1678,9 @@ export function AdminPanel({
             if (pCount <= 0) continue;
             const aUL = pCount * item.length;
             const k = dL > 0 ? aUL / dL : 0;
-            
-            if (k > optimizedKim + 0.005) { // Suggest only if improvement > 0.5%
+
+            if (k > optimizedKim + 0.005) {
+              // Suggest only if improvement > 0.5%
               optimizedKim = k;
               optimizedBilletLength = l;
             }
@@ -1175,7 +1689,7 @@ export function AdminPanel({
           const MIN_B = 4000;
           const MAX_B = 6000;
           const STEP = 100;
-          
+
           for (let l = MIN_B; l <= MAX_B; l += STEP) {
             const dL = l * drawRatio;
             const uL = dL / totalTechCoef;
@@ -1191,8 +1705,9 @@ export function AdminPanel({
             }
             if (pCount === 0) continue;
             const k = dL > 0 ? aUL / dL : 0;
-            
-            if (k > optimizedKim + 0.005) { // Suggest only if improvement > 0.5%
+
+            if (k > optimizedKim + 0.005) {
+              // Suggest only if improvement > 0.5%
               optimizedKim = k;
               optimizedBilletLength = l;
             }
@@ -1201,20 +1716,28 @@ export function AdminPanel({
         // ----------------------------------------------
 
         const billetArea = (Math.PI * Math.pow(billetDia, 2)) / 4;
-        const weightPerMBillet = billetArea * 0.00000785 * 1000; 
+        const weightPerMBillet = billetArea * 0.00000785 * 1000;
 
         const kim = drawLength > 0 ? actualUsefulLength / drawLength : 0;
-        const totalWeight = kim > 0 ? item.remainingToProcess / kim : item.remainingToProcess;
-        
+        const totalWeight =
+          kim > 0 ? item.remainingToProcess / kim : item.remainingToProcess;
+
         const singleBilletMass = (billetLength / 1000) * weightPerMBillet;
-        const billetCount = singleBilletMass > 0 ? Math.ceil((totalWeight * 1000) / singleBilletMass) : 0;
+        const billetCount =
+          singleBilletMass > 0
+            ? Math.ceil((totalWeight * 1000) / singleBilletMass)
+            : 0;
 
         const gradePrices = rawPrices[item.grade] || { md: "0", nd: "0" };
         const basePrice = parseFloat(gradePrices.nd || "0");
         const price = item.lengthType === "МД" ? basePrice * 1.06 : basePrice;
         const totalCost = totalWeight * price;
-        const initialLeftovers = item.lengthType === "НД" ? 0 : (usefulLength - ((piecesCount || 0) * item.length));
-        const initialScrapTons = drawLength > 0 ? (initialLeftovers / drawLength) * totalWeight : 0;
+        const initialLeftovers =
+          item.lengthType === "НД"
+            ? 0
+            : usefulLength - (piecesCount || 0) * item.length;
+        const initialScrapTons =
+          drawLength > 0 ? (initialLeftovers / drawLength) * totalWeight : 0;
 
         return {
           ...item,
@@ -1234,7 +1757,7 @@ export function AdminPanel({
           totalCost,
           optimizedBilletLength,
           optimizedKim,
-          initialScrapTons
+          initialScrapTons,
         } as CalculationResult;
       });
 
@@ -1247,45 +1770,63 @@ export function AdminPanel({
     }
   };
 
-  const handleProcessSupplyPlans = async () => {
-    if (supplyPlanFiles.length === 0) return;
+  const handleProcessSupplyPlans = async (
+    type: "production" | "supply",
+    filesToProcess: any[],
+  ) => {
+    if (filesToProcess.length === 0) return;
     setIsProcessingSupplyPlans(true);
-    
+
     try {
       const extractedPlans: any[] = [];
-      
-      for (const fileObj of supplyPlanFiles) {
+
+      for (const fileObj of filesToProcess) {
         if (!fileObj.file) continue;
-        
+
         const data = await fileObj.file.arrayBuffer();
         const workbook = XLSX.read(data, { type: "array" });
-        
+
         for (const sheetName of workbook.SheetNames) {
           const worksheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" }) as any[][];
-          
+          const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+            header: 1,
+            defval: "",
+          }) as any[][];
+
           let startRow = 0;
           let cols: Record<string, number> = {};
-          
+
           for (let i = 0; i < Math.min(100, jsonData.length); i++) {
             const rowStr = jsonData[i].join(" ").toLowerCase();
-            if (rowStr.includes("профиль") || rowStr.includes("марка") || rowStr.includes("размер") || rowStr.includes("поставщик")) {
+            if (
+              rowStr.includes("профиль") ||
+              rowStr.includes("марка") ||
+              rowStr.includes("размер") ||
+              rowStr.includes("поставщик")
+            ) {
               startRow = i + 1;
               jsonData[i].forEach((cell: any, idx: number) => {
                 const c = String(cell).toLowerCase().trim();
                 if (c.includes("профиль")) cols.profile = idx;
                 if (c.includes("марка")) cols.grade = idx;
                 if (c.includes("размер")) cols.size = idx;
-                if (c.includes("кол-во") || c.includes("количество") || c.includes("колличество") || c.includes("вес")) cols.qty = idx;
+                if (
+                  c.includes("кол-во") ||
+                  c.includes("количество") ||
+                  c.includes("колличество") ||
+                  c.includes("вес")
+                )
+                  cols.qty = idx;
                 if (c.includes("длина")) cols.length = idx;
                 if (c.includes("дата разм")) cols.datePlaced = idx;
-                if (c.includes("ожид") && c.includes("дата")) cols.dateExpected = idx;
+                if (c.includes("ожид") && c.includes("дата"))
+                  cols.dateExpected = idx;
                 if (c.includes("поставщик")) cols.supplier = idx;
               });
               break;
             }
           }
-          
+
           if (
             cols.profile === undefined ||
             cols.grade === undefined ||
@@ -1296,48 +1837,63 @@ export function AdminPanel({
             cols.dateExpected === undefined ||
             cols.supplier === undefined
           ) {
-             setUploadWarnings(prev => [...prev, `Файл "${fileObj.name}" (Поставки): не найдены или не распознаны все обязательные колонки (Профиль, Марка, Размер, Кол-во, Длина, Дата размещения, Ожидаемая дата поставки, Поставщик)!`]);
-             continue;
+            setUploadWarnings((prev) => [
+              ...prev,
+              `Файл "${fileObj.name}" (Поставки): не найдены или не распознаны все обязательные колонки (Профиль, Марка, Размер, Кол-во, Длина, Дата размещения, Ожидаемая дата поставки, Поставщик)!`,
+            ]);
+            continue;
           }
-          
+
           for (let i = startRow; i < jsonData.length; i++) {
             if (i % 25 === 0) {
-              setParsingProgress({ active: true, current: i, total: jsonData.length, message: `Файл поставок: Обрабатывается строка ${i} из ${jsonData.length}...` });
-              await new Promise(resolve => setTimeout(resolve, 0));
+              setParsingProgress({
+                active: true,
+                current: i,
+                total: jsonData.length,
+                message: `Файл поставок: Обрабатывается строка ${i} из ${jsonData.length}...`,
+              });
+              await new Promise((resolve) => setTimeout(resolve, 0));
             }
 
             const row = jsonData[i] || [];
             if (!row[cols.profile] && !row[cols.grade]) continue;
-            
+
             const rawQty = row[cols.qty];
-            let qty = typeof rawQty === "number" ? rawQty : parseFloat(String(rawQty || "0").replace(/\s/g, "").replace(",", "."));
+            let qty =
+              typeof rawQty === "number"
+                ? rawQty
+                : parseFloat(
+                    String(rawQty || "0")
+                      .replace(/\s/g, "")
+                      .replace(",", "."),
+                  );
             if (isNaN(qty) || qty <= 0) continue;
 
             const excelDateToJS = (serial: number | string | undefined) => {
-               if (!serial) return "";
-               if (typeof serial === 'number') {
-                 const date = new Date((serial - 25569) * 86400 * 1000);
-                 return date.toLocaleDateString('ru-RU');
-               }
-               return String(serial).trim();
+              if (!serial) return "";
+              if (typeof serial === "number") {
+                const date = new Date((serial - 25569) * 86400 * 1000);
+                return date.toLocaleDateString("ru-RU");
+              }
+              return String(serial).trim();
             };
 
             extractedPlans.push({
-              "Профиль": String(row[cols.profile] || "").trim(),
-              "Марка": String(row[cols.grade] || "").trim(),
-              "Размер": String(row[cols.size] || "").trim(),
+              Профиль: String(row[cols.profile] || "").trim(),
+              Марка: String(row[cols.grade] || "").trim(),
+              Размер: String(row[cols.size] || "").trim(),
               "Кол-во": qty,
-              "Длина": String(row[cols.length] || "").trim(),
+              Длина: String(row[cols.length] || "").trim(),
               "Дата размещения": excelDateToJS(row[cols.datePlaced]),
               "Ожидаемая дата поставки": excelDateToJS(row[cols.dateExpected]),
-              "Поставщик": String(row[cols.supplier] || "").trim()
+              Поставщик: String(row[cols.supplier] || "").trim(),
             });
           }
         }
       }
-      
-      setProcessedSupplyPlans(extractedPlans);
-      
+
+      if (type === "production") setProcessedSupplyPlansProd(extractedPlans);
+      else setProcessedSupplyPlansSup(extractedPlans);
     } catch (err) {
       console.error("Error processing supply plans files:", err);
     } finally {
@@ -1346,118 +1902,160 @@ export function AdminPanel({
     }
   };
 
-  const handleProcessStock = async () => {
-    if (stockFiles.length === 0) return;
+  const handleProcessStock = async (
+    type: "production" | "supply",
+    filesToProcess: any[],
+  ) => {
+    if (filesToProcess.length === 0) return;
     setIsProcessingStock(true);
-    
+
     try {
       const extractedStock: any[] = [];
-      
-      for (const fileObj of stockFiles) {
+
+      for (const fileObj of filesToProcess) {
         if (!fileObj.file) continue;
-        
+
         const data = await fileObj.file.arrayBuffer();
         const workbook = XLSX.read(data, { type: "array" });
-        
+
         for (const sheetName of workbook.SheetNames) {
           const worksheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" }) as any[][];
-          
+          const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+            header: 1,
+            defval: "",
+          }) as any[][];
+
           let startRow = 0;
           let nomCol = -1;
           let weightCol = -1;
-          
+
           for (let i = 0; i < Math.min(100, jsonData.length); i++) {
             const rowStr = jsonData[i].join(" ").toLowerCase();
             if (rowStr.includes("номенклатура") || rowStr.includes("остаток")) {
               startRow = i + 1;
               jsonData[i].forEach((cell: any, idx: number) => {
                 const c = String(cell).toLowerCase().trim();
-                if (c.includes("номенклатура") || c.includes("наименование")) nomCol = idx;
-                if (c.includes("конечный остаток") || c.includes("остаток") || c.includes("кол-во")) weightCol = idx;
+                if (c.includes("номенклатура") || c.includes("наименование"))
+                  nomCol = idx;
+                if (
+                  c.includes("конечный остаток") ||
+                  c.includes("остаток") ||
+                  c.includes("кол-во")
+                )
+                  weightCol = idx;
               });
               break;
             }
           }
-          
+
           if (nomCol === -1 || weightCol === -1) {
-            setUploadWarnings(prev => [...prev, `Файл "${fileObj.name}" (Склад): не найдены ${nomCol === -1 ? 'Номенклатура ' : ''}${weightCol === -1 ? 'Конечный остаток' : ''}`]);
+            setUploadWarnings((prev) => [
+              ...prev,
+              `Файл "${fileObj.name}" (Склад): не найдены ${nomCol === -1 ? "Номенклатура " : ""}${weightCol === -1 ? "Конечный остаток" : ""}`,
+            ]);
             continue;
           }
-          
+
           for (let i = startRow; i < jsonData.length; i++) {
             if (i % 25 === 0) {
-              setParsingProgress({ active: true, current: i, total: jsonData.length, message: `Файл склада: Обрабатывается строка ${i} из ${jsonData.length}...` });
-              await new Promise(resolve => setTimeout(resolve, 0));
+              setParsingProgress({
+                active: true,
+                current: i,
+                total: jsonData.length,
+                message: `Файл склада: Обрабатывается строка ${i} из ${jsonData.length}...`,
+              });
+              await new Promise((resolve) => setTimeout(resolve, 0));
             }
 
             const row = jsonData[i] || [];
             if (!row[nomCol]) continue;
-            
+
             const rawNom = String(row[nomCol]).trim();
             const rawWeight = row[weightCol];
-            let weight = typeof rawWeight === "number" ? rawWeight : parseFloat(String(rawWeight || "0").replace(/\s/g, "").replace(",", "."));
+            let weight =
+              typeof rawWeight === "number"
+                ? rawWeight
+                : parseFloat(
+                    String(rawWeight || "0")
+                      .replace(/\s/g, "")
+                      .replace(",", "."),
+                  );
             if (isNaN(weight) || weight <= 0.0001) continue;
-            
+
             let profile = "круг";
-            if (rawNom.toLowerCase().includes("шестиг")) profile = "шестигранник";
-            
+            if (rawNom.toLowerCase().includes("шестиг"))
+              profile = "шестигранник";
+
             let grade = "ст.35";
-            const gMatch = rawNom.match(/(?:^|[^а-яА-ЯёЁa-zA-Z])(?:ст\.?|сталь)\s*([0-9a-zA-Zа-яА-Я-]+)/i);
+            const gMatch = rawNom.match(
+              /(?:^|[^а-яА-ЯёЁa-zA-Z])(?:ст\.?|сталь)\s*([0-9a-zA-Zа-яА-Я-]+)/i,
+            );
             if (gMatch) {
               grade = "ст." + gMatch[1].toUpperCase();
             } else {
-               const alloyMatch = rawNom.match(/\b(\d{2}[ХхНнМмТтВвГгДд]+[0-9a-zA-Zа-яА-Я-]*)\b/);
-               if (alloyMatch) grade = "ст." + alloyMatch[1].toUpperCase();
+              const alloyMatch = rawNom.match(
+                /\b(\d{2}[ХхНнМмТтВвГгДд]+[0-9a-zA-Zа-яА-Я-]*)\b/,
+              );
+              if (alloyMatch) grade = "ст." + alloyMatch[1].toUpperCase();
             }
-            grade = grade.replace(/[хХxX]\s*\d{3,}$/i, '');
-            
+            grade = grade.replace(/[хХxX]\s*\d{3,}$/i, "");
+
             let diameter = "";
-            const sizeMatch = rawNom.match(/(?:круг|шестигранник)\s*(?:калибровоченный|калибровочный|калиброванный|калибр\.?)?\s*(\d+(?:[.,]\d+)?)/i);
+            const sizeMatch = rawNom.match(
+              /(?:круг|шестигранник)\s*(?:калибровоченный|калибровочный|калиброванный|калибр\.?)?\s*(\d+(?:[.,]\d+)?)/i,
+            );
             if (sizeMatch) {
-                diameter = sizeMatch[1];
+              diameter = sizeMatch[1];
             } else {
-                const sizeFallback = rawNom.match(/\s+(\d+(?:[.,]\d+)?)\s*(?:мм)?\s*/i);
-                if (sizeFallback && !sizeFallback[1].includes("1050") && !sizeFallback[1].includes("7417") && !sizeFallback[1].includes("2590")) {
-                    diameter = sizeFallback[1];
-                }
+              const sizeFallback = rawNom.match(
+                /\s+(\d+(?:[.,]\d+)?)\s*(?:мм)?\s*/i,
+              );
+              if (
+                sizeFallback &&
+                !sizeFallback[1].includes("1050") &&
+                !sizeFallback[1].includes("7417") &&
+                !sizeFallback[1].includes("2590")
+              ) {
+                diameter = sizeFallback[1];
+              }
             }
-            
+
             const nomUpper = rawNom.toUpperCase();
-            const nomClean = nomUpper.replace(/\s/g, '');
-            
+            const nomClean = nomUpper.replace(/\s/g, "");
+
             let lengthType = "НД";
-            
+
             // Парсинг М/Д, МД, Н/Д
             const mdMatch = nomClean.match(/(?:М\/Д|МД)(\d+)?/);
             const ndSlashMatch = nomClean.match(/Н\/Д(\d+)?/);
             const ndMatch = nomClean.includes("НД");
-            
+
             if (mdMatch) {
-              const val = mdMatch[1] === "6000" || !mdMatch[1] ? "6000" : mdMatch[1];
+              const val =
+                mdMatch[1] === "6000" || !mdMatch[1] ? "6000" : mdMatch[1];
               lengthType = "МД " + val;
             }
 
             extractedStock.push({
               "Исходная Номенклатура": rawNom,
-              "Профиль": profile,
-              "НТД": getGostForGrade(grade) + " / ГОСТ 2590-2006",
+              Профиль: profile,
+              НТД: getGostForGrade(grade) + " / ГОСТ 2590-2006",
               "Марка стали": grade,
-              "Размер": diameter,
-              "Длина": lengthType,
-              "Конечный остаток тн.": weight
+              Размер: diameter,
+              Длина: lengthType,
+              "Конечный остаток тн.": weight,
             });
           }
         }
       }
-      
+
       if (extractedStock.length === 0) {
         alert("Не удалось извлечь остатки из загруженных файлов.");
         return;
       }
-      
-      setProcessedStock(extractedStock);
-      
+
+      if (type === "production") setProcessedStockProd(extractedStock);
+      else setProcessedStockSup(extractedStock);
     } catch (err) {
       console.error("Error processing stock files:", err);
     } finally {
@@ -1468,18 +2066,22 @@ export function AdminPanel({
 
   const handleCopyForSheets = async () => {
     if (processedStock.length === 0) return;
-    
+
     const keys = Object.keys(processedStock[0]);
-    const headerRow = keys.join("\t");
-    const rows = processedStock.map(row => 
-      keys.map(key => {
-        const val = row[key];
-        return String(val ?? "").replace(/\t/g, " ").replace(/\n/g, " ");
-      }).join("\t")
+    const headerRow = keys.join("[&_th]");
+    const rows = processedStock.map((row) =>
+      keys
+        .map((key) => {
+          const val = row[key];
+          return String(val ?? "")
+            .replace(/[&_th]/g, " ")
+            .replace(/\n/g, " ");
+        })
+        .join("[&_th]"),
     );
-    
+
     const tsvData = [headerRow, ...rows].join("\n");
-    
+
     try {
       await navigator.clipboard.writeText(tsvData);
       setIsCopied(true);
@@ -1492,10 +2094,24 @@ export function AdminPanel({
 
   const handleExportStock = () => {
     if (processedStock.length === 0) return;
-    const worksheet = XLSX.utils.json_to_sheet(processedStock);
-    const wscols = Object.keys(processedStock[0]).map(key => ({ wch: Math.max(key.length, 15) }));
+
+    // Ensure numeric fields are actually numbers for Excel
+    const dataToExport = processedStock.map((item) => ({
+      ...item,
+      "Конечный остаток тн.":
+        typeof item["Конечный остаток тн."] === "number"
+          ? item["Конечный остаток тн."]
+          : parseFloat(
+              String(item["Конечный остаток тн."]).replace(",", "."),
+            ) || 0,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const wscols = Object.keys(dataToExport[0]).map((key) => ({
+      wch: Math.max(key.length, 15),
+    }));
     wscols[0].wch = 50;
-    worksheet['!cols'] = wscols;
+    worksheet["!cols"] = wscols;
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Остатки_Склад");
     XLSX.writeFile(workbook, "Остатки_обработанные.xlsx");
@@ -1508,10 +2124,16 @@ export function AdminPanel({
         id: Math.random().toString(36).substring(7),
         name: file.name,
         size: (file.size / 1024).toFixed(1) + " KB",
-        date: new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-        file: file
+        date: new Date().toLocaleDateString("ru-RU", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        file: file,
       }));
-      setPlanFiles(prev => [...newFiles, ...prev]);
+      setPlanFiles((prev) => [...newFiles, ...prev]);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
@@ -1523,10 +2145,16 @@ export function AdminPanel({
         id: Math.random().toString(36).substring(7),
         name: file.name,
         size: (file.size / 1024).toFixed(1) + " KB",
-        date: new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-        file: file
+        date: new Date().toLocaleDateString("ru-RU", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        file: file,
       }));
-      setStockFiles(prev => [...newFiles, ...prev]);
+      setStockFiles((prev) => [...newFiles, ...prev]);
       if (stockFileInputRef.current) stockFileInputRef.current.value = "";
     }
   };
@@ -1538,86 +2166,142 @@ export function AdminPanel({
         id: Math.random().toString(36).substring(7),
         name: file.name,
         size: (file.size / 1024).toFixed(1) + " KB",
-        date: new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-        file: file
+        date: new Date().toLocaleDateString("ru-RU", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        file: file,
       }));
-      setSupplyPlanFiles(prev => [...newFiles, ...prev]);
-      if (supplyPlanFileInputRef.current) supplyPlanFileInputRef.current.value = "";
+      setSupplyPlanFiles((prev) => [...newFiles, ...prev]);
+      if (supplyPlanFileInputRef.current)
+        supplyPlanFileInputRef.current.value = "";
     }
   };
 
   const removeFile = (id: string) => {
-    setPlanFiles(prev => prev.filter(f => f.id !== id));
+    setPlanFiles((prev) => prev.filter((f) => f.id !== id));
   };
 
   const removeStockFile = (id: string) => {
-    setStockFiles(prev => prev.filter(f => f.id !== id));
+    setStockFiles((prev) => prev.filter((f) => f.id !== id));
   };
 
   const removeSupplyPlanFile = (id: string) => {
-    setSupplyPlanFiles(prev => prev.filter(f => f.id !== id));
+    setSupplyPlanFiles((prev) => prev.filter((f) => f.id !== id));
   };
 
   useEffect(() => {
-    if (stockFiles.length > 0) {
-      handleProcessStock();
-    } else {
-      setProcessedStock([]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stockFiles]);
+    if (stockFilesProd.length > 0)
+      handleProcessStock("production", stockFilesProd);
+    else setProcessedStockProd([]);
+  }, [stockFilesProd]);
 
   useEffect(() => {
-    if (supplyPlanFiles.length > 0) {
-      handleProcessSupplyPlans();
-    } else {
-      setProcessedSupplyPlans([]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [supplyPlanFiles]);
+    if (stockFilesSup.length > 0) handleProcessStock("supply", stockFilesSup);
+    else setProcessedStockSup([]);
+  }, [stockFilesSup]);
 
   useEffect(() => {
-    if (planFiles.length > 0) {
-      handleProcessPlans();
-    } else {
-      setCalculationResults([]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [planFiles]);
+    if (supplyPlanFilesProd.length > 0)
+      handleProcessSupplyPlans("production", supplyPlanFilesProd);
+    else setProcessedSupplyPlansProd([]);
+  }, [supplyPlanFilesProd]);
 
   useEffect(() => {
-    setRawPrices(prev => JSON.stringify(prev) === JSON.stringify(initialRawPrices) ? prev : initialRawPrices);
-    setScrap(prev => prev === initialScrap ? prev : initialScrap);
-    setRemnant(prev => prev === initialRemnant ? prev : initialRemnant);
-    setCustomGrades(prev => JSON.stringify(prev) === JSON.stringify(initialCustomGrades || []) ? prev : (initialCustomGrades || []));
-    setDeletedGrades(prev => JSON.stringify(prev) === JSON.stringify(initialDeletedGrades || []) ? prev : (initialDeletedGrades || []));
-    setRemnantPricing(prev => JSON.stringify(prev) === JSON.stringify(initialRemnantPricing || {}) ? prev : (initialRemnantPricing || {}));
-    
+    if (supplyPlanFilesSup.length > 0)
+      handleProcessSupplyPlans("supply", supplyPlanFilesSup);
+    else setProcessedSupplyPlansSup([]);
+  }, [supplyPlanFilesSup]);
+
+  useEffect(() => {
+    if (planFilesProd.length > 0)
+      handleProcessPlans("production", planFilesProd);
+    else setCalcResultsProd([]);
+  }, [planFilesProd]);
+
+  useEffect(() => {
+    if (planFilesSup.length > 0) handleProcessPlans("supply", planFilesSup);
+    else setCalcResultsSup([]);
+  }, [planFilesSup]);
+
+  useEffect(() => {
+    setRawPrices((prev) =>
+      JSON.stringify(prev) === JSON.stringify(initialRawPrices)
+        ? prev
+        : initialRawPrices,
+    );
+    setScrap((prev) => (prev === initialScrap ? prev : initialScrap));
+    setRemnant((prev) => (prev === initialRemnant ? prev : initialRemnant));
+    setCustomGrades((prev) =>
+      JSON.stringify(prev) === JSON.stringify(initialCustomGrades || [])
+        ? prev
+        : initialCustomGrades || [],
+    );
+    setDeletedGrades((prev) =>
+      JSON.stringify(prev) === JSON.stringify(initialDeletedGrades || [])
+        ? prev
+        : initialDeletedGrades || [],
+    );
+    setRemnantPricing((prev) =>
+      JSON.stringify(prev) === JSON.stringify(initialRemnantPricing || {})
+        ? prev
+        : initialRemnantPricing || {},
+    );
+
     if (initialEconomyItems && initialEconomyItems.length > 0) {
-      setEconomyItems(prev => {
-        const initialMap = new Map(initialEconomyItems.map(item => [item.id, item]));
-        const merged = DEFAULT_ECONOMY_ITEMS.map(defaultItem => initialMap.get(defaultItem.id) || defaultItem);
+      setEconomyItems((prev) => {
+        const initialMap = new Map(
+          initialEconomyItems.map((item) => [item.id, item]),
+        );
+        const merged = DEFAULT_ECONOMY_ITEMS.map(
+          (defaultItem) => initialMap.get(defaultItem.id) || defaultItem,
+        );
         if (JSON.stringify(prev) === JSON.stringify(merged)) return prev;
         return merged;
       });
     }
-  }, [initialRawPrices, initialScrap, initialRemnant, initialCustomGrades, initialDeletedGrades, initialRemnantPricing, initialEconomyItems]);
+  }, [
+    initialRawPrices,
+    initialScrap,
+    initialRemnant,
+    initialCustomGrades,
+    initialDeletedGrades,
+    initialRemnantPricing,
+    initialEconomyItems,
+  ]);
 
-  const allGrades = [...DEFAULT_STEEL_GRADES, ...customGrades].filter(g => !deletedGrades.includes(g));
+  const allGrades = [...DEFAULT_STEEL_GRADES, ...customGrades].filter(
+    (g) => !deletedGrades.includes(g),
+  );
 
   const RemnantPricingTooltip = () => (
     <div className="group relative inline-block ml-1 align-middle">
       <Info className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 cursor-help" />
       <div className="invisible group-hover:visible absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-3 bg-[#1A1C19] dark:bg-slate-700 text-white text-[10px] rounded-xl shadow-2xl w-60 z-[100] transition-all normal-case font-normal text-left border border-slate-700">
-        <div className="font-bold mb-1 border-b border-white/10 pb-1 text-[11px]">Типы остатков</div>
+        <div className="font-bold mb-1 border-b border-white/10 pb-1 text-[11px]">
+          Типы остатков
+        </div>
         <div className="space-y-2 opacity-95">
           <div>
-            <span className="text-sky-300 font-bold uppercase tracking-tighter">Деловой остаток:</span>
-            <p className="mt-0.5 leading-relaxed">Длинные куски (обычно &gt;2.5м), которые можно продать как полноценную заготовку по цене делового остатка.</p>
+            <span className="text-sky-300 font-bold uppercase tracking-tighter">
+              Деловой остаток:
+            </span>
+            <p className="mt-0.5 leading-relaxed">
+              Длинные куски (обычно &gt;2.5м), которые можно продать как
+              полноценную заготовку по цене делового остатка.
+            </p>
           </div>
           <div>
-            <span className="text-red-400 font-bold uppercase tracking-tighter">По цене лома:</span>
-            <p className="mt-0.5 leading-relaxed">Мелкие обрезки и технические концы, которые не имеют складской ценности и продаются по весу лома.</p>
+            <span className="text-red-400 font-bold uppercase tracking-tighter">
+              По цене лома:
+            </span>
+            <p className="mt-0.5 leading-relaxed">
+              Мелкие обрезки и технические концы, которые не имеют складской
+              ценности и продаются по весу лома.
+            </p>
           </div>
         </div>
         <div className="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent border-t-[#1A1C19] dark:border-t-slate-700"></div>
@@ -1627,29 +2311,38 @@ export function AdminPanel({
 
   const [copySuccess, setCopySuccess] = useState(false);
 
-  const handlePriceChange = (grade: string, type: 'md' | 'nd', value: string) => {
+  const handlePriceChange = (
+    grade: string,
+    type: "md" | "nd",
+    value: string,
+  ) => {
     let val = value.replace(/\s/g, "").replace(/,/g, ".");
     if (val === "" || /^\d*\.?\d*$/.test(val)) {
       setRawPrices((prev) => {
-        const current = prev[grade] || { md: '', nd: '' };
-        const otherType = type === 'md' ? 'nd' : 'md';
-        
+        const current = prev[grade] || { md: "", nd: "" };
+        const otherType = type === "md" ? "nd" : "md";
+
         // If the prices were identical or other was empty, keep them synchronized
-        const shouldSync = !current.md || !current.nd || current.md === current.nd;
-        
-        return { 
-          ...prev, 
-          [grade]: { 
-            ...current, 
+        const shouldSync =
+          !current.md || !current.nd || current.md === current.nd;
+
+        return {
+          ...prev,
+          [grade]: {
+            ...current,
             [type]: val,
-            ...(shouldSync ? { [otherType]: val } : {})
-          } 
+            ...(shouldSync ? { [otherType]: val } : {}),
+          },
         };
       });
     }
   };
 
-  const handlePricingChange = (grade: string, profile: "round" | "hex", value: string) => {
+  const handlePricingChange = (
+    grade: string,
+    profile: "round" | "hex",
+    value: string,
+  ) => {
     setRemnantPricing((prev) => ({
       ...prev,
       [grade]: {
@@ -1663,7 +2356,7 @@ export function AdminPanel({
     const grade = newGrade.trim();
     if (grade && !allGrades.includes(grade)) {
       setCustomGrades([...customGrades, grade]);
-      setRawPrices({ ...rawPrices, [grade]: { md: '', nd: '' } });
+      setRawPrices({ ...rawPrices, [grade]: { md: "", nd: "" } });
       setNewGrade("");
     }
   };
@@ -1688,9 +2381,17 @@ export function AdminPanel({
     setIsSaving(true);
     setSaveError("");
     try {
-      const savePromise = onSave(rawPrices, scrap, remnant, customGrades, remnantPricing, economyItems, deletedGrades);
+      const savePromise = onSave(
+        rawPrices,
+        scrap,
+        remnant,
+        customGrades,
+        remnantPricing,
+        economyItems,
+        deletedGrades,
+      );
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("CloudTimeout")), 5000)
+        setTimeout(() => reject(new Error("CloudTimeout")), 5000),
       );
 
       await Promise.race([savePromise, timeoutPromise]);
@@ -1705,19 +2406,30 @@ export function AdminPanel({
     setIsSaving(false);
   };
 
-  const handleEconomyChange = (id: string, field: keyof EconomyItem, value: string) => {
+  const handleEconomyChange = (
+    id: string,
+    field: keyof EconomyItem,
+    value: string,
+  ) => {
     const val = value.replace(/\s/g, "").replace(/,/g, ".");
     if (val === "" || /^\d*\.?\d*$/.test(val)) {
-      setEconomyItems(prev => prev.map(item => 
-        item.id === id ? { ...item, [field]: val } : item
-      ));
+      setEconomyItems((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, [field]: val } : item)),
+      );
     }
   };
 
-  const directItems = economyItems.filter(i => i.category === 'direct');
-  const overheadItems = economyItems.filter(i => i.category === 'overhead');
+  const directItems = economyItems.filter((i) => i.category === "direct");
+  const overheadItems = economyItems.filter((i) => i.category === "overhead");
 
-  const tabs = ["files", "economy", "supply", "production", "logistics", "help"];
+  const tabs = [
+    "files",
+    "economy",
+    "supply",
+    "production",
+    "logistics",
+    "help",
+  ];
   const handleSwipe = (direction: number) => {
     const currentIndex = tabs.indexOf(activeTab);
     if (direction > 0 && currentIndex > 0) {
@@ -1727,3487 +2439,835 @@ export function AdminPanel({
     }
   };
 
-  return (
-    <div className="min-h-screen bg-[#F4F5F4] dark:bg-[#121411] flex flex-col md:flex-row transition-colors duration-300">
-      {/* Mobile App Navigation Bar */}
-      <div className="md:hidden fixed bottom-0 w-full bg-white/95 dark:bg-[#1A1C19]/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 flex items-center h-[72px] pb-4 px-2 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] overflow-x-auto [&::-webkit-scrollbar]:hidden gap-1">
-         <button 
-           onClick={() => setActiveTab("files")}
-           className={`flex flex-col items-center justify-center min-w-[64px] shrink-0 h-full py-1 transition-all ${activeTab === 'files' ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}
-         >
-           <div className={`px-3 py-1 rounded-full mb-1 transition-colors ${activeTab === 'files' ? 'bg-slate-100 dark:bg-slate-800' : ''}`}>
-             <FileText className="w-5 h-5" />
-           </div>
-           <span className="text-[10px] font-bold tracking-tight">Файлы</span>
-         </button>
-         {!isPurchasingMode && (
-           <button 
-             onClick={() => setActiveTab("economy")}
-             className={`flex flex-col items-center justify-center min-w-[64px] shrink-0 h-full py-1 transition-all ${activeTab === 'economy' ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}
-           >
-             <div className={`px-3 py-1 rounded-full mb-1 transition-colors ${activeTab === 'economy' ? 'bg-slate-100 dark:bg-slate-800' : ''}`}>
-               <TrendingUp className="w-5 h-5" />
-             </div>
-             <span className="text-[10px] font-bold tracking-tight">Экономика</span>
-           </button>
-         )}
-
-         <button 
-           onClick={() => setActiveTab("supply")}
-           className={`flex flex-col items-center justify-center min-w-[64px] shrink-0 h-full py-1 transition-all ${activeTab === 'supply' ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}
-         >
-           <div className={`px-3 py-1 rounded-full mb-1 transition-colors ${activeTab === 'supply' ? 'bg-slate-100 dark:bg-slate-800' : ''}`}>
-             <Package className="w-5 h-5" />
-           </div>
-           <span className="text-[10px] font-bold tracking-tight">Снабжение</span>
-         </button>
-
-         <button 
-           onClick={() => setActiveTab("production")}
-           className={`flex flex-col items-center justify-center min-w-[64px] shrink-0 h-full py-1 transition-all ${activeTab === 'production' ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}
-         >
-           <div className={`px-3 py-1 rounded-full mb-1 transition-colors ${activeTab === 'production' ? 'bg-slate-100 dark:bg-slate-800' : ''}`}>
-             <Factory className="w-5 h-5" />
-           </div>
-           <span className="text-[10px] font-bold tracking-tight">Пр-во</span>
-         </button>
-
-         <button 
-           onClick={() => setActiveTab("logistics")}
-           className={`flex flex-col items-center justify-center min-w-[64px] shrink-0 h-full py-1 transition-all ${activeTab === 'logistics' ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}
-         >
-           <div className={`px-3 py-1 rounded-full mb-1 transition-colors ${activeTab === 'logistics' ? 'bg-slate-100 dark:bg-slate-800' : ''}`}>
-             <Truck className="w-5 h-5" />
-           </div>
-           <span className="text-[10px] font-bold tracking-tight">Логистика</span>
-         </button>
-
-         <button 
-           onClick={() => setActiveTab("help")}
-           className={`flex flex-col items-center justify-center min-w-[64px] shrink-0 h-full py-1 transition-all ${activeTab === 'help' ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}
-         >
-           <div className={`px-3 py-1 rounded-full mb-1 transition-colors ${activeTab === 'help' ? 'bg-slate-100 dark:bg-slate-800' : ''}`}>
-             <BookOpen className="w-5 h-5" />
-           </div>
-           <span className="text-[10px] font-bold tracking-tight">Справка</span>
-         </button>
-
-         <div className="w-[1px] h-8 bg-slate-100 dark:bg-slate-800 mx-1 shrink-0"></div>
-
-         <button onClick={toggleTheme} className="flex flex-col items-center justify-center min-w-[56px] shrink-0 h-full py-1 text-slate-400 dark:text-slate-500 active:scale-95 transition-all">
-           <div className="px-3 py-1 mb-1">
-             {isDarkMode ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5" />}
-           </div>
-           <span className="text-[10px] font-bold tracking-tight">Тема</span>
-         </button>
-
-         <button onClick={onLogout} className="flex flex-col items-center justify-center min-w-[56px] shrink-0 h-full py-1 text-slate-400 hover:text-red-500 dark:text-slate-500 dark:hover:text-red-400 transition-all">
-           <div className="px-3 py-1 mb-1">
-             <LogOut className="w-5 h-5" />
-           </div>
-           <span className="text-[10px] font-bold tracking-tight font-sans">Выйти</span>
-         </button>
+  const renderFilesContent = (hideExtraBlocks = false) => (
+    <motion.div
+      key="files"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.2 }}
+      className="flex flex-col gap-8 h-full"
+    >
+      <div className="flex flex-col gap-2">
+        <h2 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+          Файлы данных
+        </h2>
+        <p className="text-slate-500 dark:text-slate-400">
+          {hideExtraBlocks
+            ? "Расчет потребности в сырье."
+            : "Расчет потребности в сырье, наличия на складе и реестров поставок."}
+        </p>
       </div>
 
-      {/* Desktop Navigation Rail */}
-      <div className="hidden md:flex flex-col w-[88px] bg-[#F0F4F4] dark:bg-[#1A1C19] border-r border-slate-200 dark:border-slate-800 items-center py-6 fixed h-full z-50">
-        <div className="flex flex-col items-center mb-8">
-           <div className="w-12 h-12 bg-slate-700 dark:bg-slate-600 rounded-xl flex items-center justify-center text-white mb-2 shadow-sm">
-             <Calculator className="w-6 h-6" />
-           </div>
-        </div>
-        <div className="flex-1 flex flex-col gap-4 w-full px-3">
-           <button 
-             onClick={() => setActiveTab("files")}
-             className={`w-full flex flex-col items-center justify-center py-4 transition-all active:scale-95 group ${activeTab === 'files' ? 'text-slate-900 dark:text-white' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
-           >
-             <div className={`px-5 py-1.5 mb-1.5 rounded-full transition-colors ${activeTab === 'files' ? 'bg-slate-200 dark:bg-slate-700' : 'group-hover:bg-slate-100 dark:group-hover:bg-slate-800'}`}>
-               <FileText className="w-6 h-6" strokeWidth={2} />
-             </div>
-             <span className="text-[11px] font-medium tracking-wide">Файлы</span>
-           </button>
-           {!isPurchasingMode && (
-             <button 
-               onClick={() => setActiveTab("economy")}
-               className={`w-full flex flex-col items-center justify-center py-4 transition-all active:scale-95 group ${activeTab === 'economy' ? 'text-slate-900 dark:text-white' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
-             >
-               <div className={`px-5 py-1.5 mb-1.5 rounded-full transition-colors ${activeTab === 'economy' ? 'bg-slate-200 dark:bg-slate-700' : 'group-hover:bg-slate-100 dark:group-hover:bg-slate-800'}`}>
-                 <TrendingUp className="w-6 h-6" strokeWidth={2} />
-               </div>
-               <span className="text-[11px] font-medium tracking-wide">Экономика</span>
-             </button>
-           )}
+      <div className="flex flex-col gap-8">
+        {uploadWarnings.length > 0 && (
+          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 p-4 rounded-2xl flex flex-col gap-2">
+            <div className="flex items-center gap-2 mb-1">
+              <AlertCircle className="w-5 h-5 text-amber-500" />
+              <h4 className="font-bold text-amber-800 dark:text-amber-400">
+                Предупреждения при маппинге файлов
+              </h4>
+            </div>
+            <ul className="list-disc list-inside space-y-1">
+              {uploadWarnings.map((warn, i) => (
+                <li
+                  key={i}
+                  className="text-sm text-amber-700 dark:text-amber-500"
+                >
+                  {warn}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {/* File Upload Section */}
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-2 px-1">
+            <FileText className="w-5 h-5 text-slate-700 dark:text-slate-300" />
+            <h3 className="text-lg font-medium text-slate-900 dark:text-white">
+              {activeTab === "supply"
+                ? "Заявка на обеспечение"
+                : "Планы производства"}
+            </h3>
+          </div>
 
-           <button 
-             onClick={() => setActiveTab("supply")}
-             className={`w-full flex flex-col items-center justify-center py-4 transition-all active:scale-95 group ${activeTab === 'supply' ? 'text-slate-900 dark:text-white' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
-           >
-             <div className={`px-5 py-1.5 mb-1.5 rounded-full transition-colors ${activeTab === 'supply' ? 'bg-slate-200 dark:bg-slate-700' : 'group-hover:bg-slate-100 dark:group-hover:bg-slate-800'}`}>
-               <Package className="w-6 h-6" strokeWidth={2} />
-             </div>
-             <span className="text-[11px] font-medium tracking-wide">Снабжение</span>
-           </button>
-
-           <button 
-             onClick={() => setActiveTab("production")}
-             className={`w-full flex flex-col items-center justify-center py-4 transition-all active:scale-95 group ${activeTab === 'production' ? 'text-slate-900 dark:text-white' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
-           >
-             <div className={`px-5 py-1.5 mb-1.5 rounded-full transition-colors ${activeTab === 'production' ? 'bg-slate-200 dark:bg-slate-700' : 'group-hover:bg-slate-100 dark:group-hover:bg-slate-800'}`}>
-               <Factory className="w-6 h-6" strokeWidth={2} />
-             </div>
-             <span className="text-[11px] font-medium tracking-wide">Пр-во</span>
-           </button>
-
-           <button 
-             onClick={() => setActiveTab("logistics")}
-             className={`w-full flex flex-col items-center justify-center py-4 transition-all active:scale-95 group ${activeTab === 'logistics' ? 'text-slate-900 dark:text-white' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
-           >
-             <div className={`px-5 py-1.5 mb-1.5 rounded-full transition-colors ${activeTab === 'logistics' ? 'bg-slate-200 dark:bg-slate-700' : 'group-hover:bg-slate-100 dark:group-hover:bg-slate-800'}`}>
-               <Truck className="w-6 h-6" strokeWidth={2} />
-             </div>
-             <span className="text-[11px] font-medium tracking-wide">Логистика</span>
-           </button>
-
-           <button 
-             onClick={() => setActiveTab("help")}
-             className={`w-full flex flex-col items-center justify-center py-4 transition-all active:scale-95 group ${activeTab === 'help' ? 'text-slate-900 dark:text-white' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
-           >
-             <div className={`px-5 py-1.5 mb-1.5 rounded-full transition-colors ${activeTab === 'help' ? 'bg-slate-200 dark:bg-slate-700' : 'group-hover:bg-slate-100 dark:group-hover:bg-slate-800'}`}>
-               <BookOpen className="w-6 h-6" strokeWidth={2} />
-             </div>
-             <span className="text-[11px] font-medium tracking-wide">Справка</span>
-           </button>
-
-           <button onClick={toggleTheme} className="w-full flex flex-col items-center justify-center py-4 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all active:scale-95 group">
-              <div className="px-5 py-1.5 mb-1.5 transition-colors group-hover:bg-slate-100 dark:group-hover:bg-slate-800 rounded-full">
-                {isDarkMode ? <Sun className="w-6 h-6 text-amber-500" strokeWidth={2} /> : <Moon className="w-6 h-6" strokeWidth={2} />}
-              </div>
-              <span className="text-[11px] font-medium tracking-wide">{isDarkMode ? 'Светлая' : 'Темная'}</span>
-           </button>
-        </div>
-        <div className="w-full px-3">
-           <button onClick={onLogout} className="w-full flex flex-col items-center justify-center py-4 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">
-             <div className="px-5 py-1.5 mb-1.5">
-               <LogOut className="w-6 h-6" strokeWidth={2} />
-             </div>
-             <span className="text-[11px] font-medium tracking-wide">Выйти</span>
-           </button>
-        </div>
-      </div>
-
-      {/* Main Content Area */}
-      <motion.div 
-        className="flex-1 md:ml-[88px] pb-32 md:pb-8 pt-6 sm:pt-8 px-3 sm:px-8 w-full min-w-0"
-      >
-        <AnimatePresence mode="wait">
-          {activeTab === "files" && (
+          <div className="relative group/dropzone">
             <motion.div
-              key="files"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="flex flex-col gap-8 h-full"
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              onClick={() => fileInputRef.current?.click()}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const files = e.dataTransfer.files;
+                if (files && files.length > 0) {
+                  const event = {
+                    target: { files },
+                  } as unknown as ChangeEvent<HTMLInputElement>;
+                  handleFileUpload(event);
+                }
+              }}
+              className={`relative bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed ${planFiles.length === 0 ? "border-blue-400 dark:border-blue-500 animate-pulse-border shadow-[0_0_15px_rgba(59,130,246,0.2)]" : "border-slate-200 dark:border-slate-800"} p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-center sm:justify-start text-center sm:text-left gap-4 sm:gap-5 group cursor-pointer hover:border-slate-400 dark:hover:border-slate-600 transition-all z-10 w-full`}
             >
-              <div className="flex flex-col gap-2">
-                <h2 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                  Файлы данных
-                </h2>
-                <p className="text-slate-500 dark:text-slate-400">
-                  Загрузка планов производства, наличия на складе и реестров поставок.
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                className="hidden"
+                multiple
+                accept=".pdf,.xlsx,.csv,.txt,.docx"
+              />
+              <div className="relative w-14 h-14 bg-slate-50 dark:bg-slate-800 rounded-2xl shrink-0 flex items-center justify-center text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">
+                <Upload className="w-6 h-6" />
+                {planFiles.length === 0 && (
+                  <div className="absolute inset-0 rounded-2xl border-2 border-blue-400 animate-ping opacity-75"></div>
+                )}
+              </div>
+              <div>
+                <p className="text-base font-bold text-slate-900 dark:text-white">
+                  Нажмите или перетащите файл
+                </p>
+                <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
+                  {activeTab === "supply"
+                    ? "Excel или CSV файлы заявок"
+                    : "Excel или CSV файлы планов"}
                 </p>
               </div>
+            </motion.div>
+            {/* Tooltip */}
+            {planFiles.length === 0 && (
+              <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-lg whitespace-nowrap opacity-0 group-hover/dropzone:opacity-100 transition-opacity pointer-events-none z-20">
+                Загрузите выгрузку из 1С в формате Excel (.xlsx). Важен столбец
+                «Остаток к выполнению» или «Количество».
+                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-blue-600 rotate-45"></div>
+              </div>
+            )}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsBatchManualOpen(true);
+              }}
+              className="absolute top-4 right-4 flex items-center justify-center w-9 h-9 bg-white dark:bg-[#1A1C19] hover:bg-slate-100 dark:hover:bg-[#252824] text-slate-600 dark:text-[#E2E3DE] rounded-xl transition-all focus:outline-none border border-slate-200 dark:border-[#2C2F2B] shadow-sm z-10"
+              title="Инструкция по расчетам"
+            >
+              <BookOpen className="w-5 h-5" />
+            </button>
+          </div>
 
-              <div className="flex flex-col gap-8">
-                {uploadWarnings.length > 0 && (
-                  <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 p-4 rounded-2xl flex flex-col gap-2">
-                    <div className="flex items-center gap-2 mb-1">
-                      <AlertCircle className="w-5 h-5 text-amber-500" />
-                      <h4 className="font-bold text-amber-800 dark:text-amber-400">Предупреждения при маппинге файлов</h4>
-                    </div>
-                    <ul className="list-disc list-inside space-y-1">
-                      {uploadWarnings.map((warn, i) => (
-                        <li key={i} className="text-sm text-amber-700 dark:text-amber-500">{warn}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {/* File Upload Section */}
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-center gap-2 px-1">
-                    <FileText className="w-5 h-5 text-slate-700 dark:text-slate-300" />
-                    <h3 className="text-lg font-medium text-slate-900 dark:text-white">Планы производства</h3>
-                  </div>
-                  
-                  <div className="relative group/dropzone">
-                    <div 
-                      onClick={() => fileInputRef.current?.click()}
-                      onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const files = e.dataTransfer.files;
-                        if (files && files.length > 0) {
-                          const event = { target: { files } } as unknown as ChangeEvent<HTMLInputElement>;
-                          handleFileUpload(event);
-                        }
-                      }}
-                      className={`relative bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed ${planFiles.length === 0 ? 'border-blue-400 dark:border-blue-500 animate-pulse-border shadow-[0_0_15px_rgba(59,130,246,0.5)]' : 'border-slate-200 dark:border-slate-800'} p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-center sm:justify-start text-center sm:text-left gap-4 sm:gap-6 group cursor-pointer hover:border-slate-400 dark:hover:border-slate-600 transition-all z-10`}
-                    >
-                      <input 
-                        type="file" 
-                        ref={fileInputRef}
-                        onChange={handleFileUpload}
-                        className="hidden" 
-                        multiple
-                        accept=".pdf,.xlsx,.csv,.txt,.docx"
-                      />
-                      <div className="relative w-14 h-14 bg-slate-50 dark:bg-slate-800 rounded-2xl shrink-0 flex items-center justify-center text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">
-                        <Upload className="w-6 h-6" />
-                        {planFiles.length === 0 && (
-                          <div className="absolute inset-0 rounded-2xl border-2 border-blue-400 animate-ping opacity-75"></div>
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-base font-bold text-slate-900 dark:text-white">Нажмите или перетащите файл</p>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Excel или CSV файлы планов</p>
-                      </div>
-                    </div>
-                    {/* Tooltip */}
-                    {planFiles.length === 0 && (
-                      <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-lg whitespace-nowrap opacity-0 group-hover/dropzone:opacity-100 transition-opacity pointer-events-none z-20">
-                        Загрузите выгрузку из 1С в формате Excel (.xlsx). Важен столбец «Остаток к выполнению» или «Количество».
-                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-blue-600 rotate-45"></div>
-                      </div>
-                    )}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsBatchManualOpen(true);
-                      }}
-                      className="absolute top-4 right-4 flex items-center justify-center w-9 h-9 bg-white dark:bg-[#1A1C19] hover:bg-slate-100 dark:hover:bg-[#252824] text-slate-600 dark:text-[#E2E3DE] rounded-xl transition-all focus:outline-none border border-slate-200 dark:border-[#2C2F2B] shadow-sm z-10"
-                      title="Инструкция по расчетам"
-                    >
-                      <BookOpen className="w-5 h-5" />
-                    </button>
-                  </div>
-
-                  {planFiles.length > 0 && (
-                    <div className="bg-white dark:bg-[#1A1C19] rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                      <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                        <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Загруженные файлы</span>
-                        <div className="flex items-center gap-3">
-                          <span className="text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-full">{planFiles.length} файлов</span>
-                          {isProcessing && (
-                            <div className="text-[10px] text-slate-500 flex items-center gap-2 font-medium">
-                              <div className="w-3 h-3 border-2 border-sky-500/20 border-t-sky-500 rounded-full animate-spin" />
-                              {parsingProgress.active ? parsingProgress.message : "Расчет..."}
-                            </div>
-                          )}
-                          {!isProcessing && calculationResults.length > 0 && (
-                            <motion.button 
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                              onClick={() => {
-                                setActiveTab("supply");
-                                setSupplySection("calc");
-                              }}
-                              className="bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 text-[10px] font-bold px-4 py-1.5 rounded-full hover:bg-sky-200 dark:hover:bg-sky-900/50 transition-all flex items-center gap-2"
-                            >
-                              <Activity className="w-3.5 h-3.5" />
-                              <span>Показать расчеты</span>
-                            </motion.button>
-                          )}
-                        </div>
-                      </div>
-                      <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                        {planFiles.map(file => (
-                          <div key={file.id} className="p-4 sm:p-6 flex items-center justify-between hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors px-6">
-                            <div className="flex items-center gap-4">
-                              <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400">
-                                <FileText className="w-6 h-6" />
-                              </div>
-                              <div>
-                                <h4 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">{file.name}</h4>
-                                <p className="text-[10px] font-medium text-slate-400 flex items-center gap-2 mt-0.5">
-                                  <span>{file.size}</span>
-                                  <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
-                                  <span>{file.date}</span>
-                                </p>
-                              </div>
-                            </div>
-                            <button 
-                              onClick={() => removeFile(file.id)}
-                              className="text-slate-400 hover:text-red-500 transition-colors p-2"
-                            >
-                              <X className="w-5 h-5" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
+          {planFiles.length > 0 && (
+            <div className="bg-white dark:bg-[#1A1C19] rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                  Загруженные файлы
+                </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-full">
+                    {planFiles.length} файлов
+                  </span>
+                  {isProcessing && (
+                    <div className="text-[10px] text-slate-500 flex items-center gap-2 font-medium">
+                      <div className="w-3 h-3 border-2 border-sky-500/20 border-t-sky-500 rounded-full animate-spin" />
+                      {parsingProgress.active
+                        ? parsingProgress.message
+                        : "Расчет..."}
                     </div>
                   )}
-
-                  {/* Stock Inventory Section */}
-                  <div className="flex items-center gap-2 px-1 mt-2">
-                    <Layers className="w-5 h-5 text-slate-700 dark:text-slate-300" />
-                    <h3 className="text-lg font-medium text-slate-900 dark:text-white">Наличие на складе (г/к прокат)</h3>
-                  </div>
-                  
-                  <div className="relative">
-                    <div 
-                      onClick={() => stockFileInputRef.current?.click()}
-                      onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const files = e.dataTransfer.files;
-                        if (files && files.length > 0) {
-                          const event = { target: { files } } as unknown as ChangeEvent<HTMLInputElement>;
-                          handleStockFileUpload(event);
+                  {!isProcessing && calculationResults.length > 0 && (
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        if (activeTab === "supply") setSupplySection("calc");
+                        else {
+                          setProductionSection("calc");
                         }
                       }}
-                      className="bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed border-sky-200 dark:border-sky-900/30 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-center sm:justify-start text-center sm:text-left gap-4 sm:gap-6 group cursor-pointer hover:border-sky-400 dark:hover:border-sky-700 transition-all shadow-sm"
+                      className="bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 text-[10px] font-bold px-4 py-1.5 rounded-full hover:bg-sky-200 dark:hover:bg-sky-900/50 transition-all flex items-center gap-2"
                     >
-                      <input 
-                        type="file" 
-                        ref={stockFileInputRef}
-                        onChange={handleStockFileUpload}
-                        className="hidden" 
-                        multiple
-                        accept=".pdf,.xlsx,.csv,.txt,.docx"
-                      />
-                      <div className="w-14 h-14 bg-sky-50 dark:bg-sky-900/20 rounded-2xl shrink-0 flex items-center justify-center text-sky-400 group-hover:text-sky-600 transition-colors">
-                        <Layers className="w-6 h-6" />
+                      <Activity className="w-3.5 h-3.5" />
+                      <span>Показать расчеты</span>
+                    </motion.button>
+                  )}
+                </div>
+              </div>
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                {planFiles.map((file) => (
+                  <div
+                    key={file.id}
+                    className="p-4 sm:p-6 flex items-center justify-between hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors px-6"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400">
+                        <FileText className="w-6 h-6" />
                       </div>
                       <div>
-                        <p className="text-base font-bold text-slate-900 dark:text-white">Загрузить реестр склада</p>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Остатки горячекатаного проката в любом формате</p>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setIsStockManualOpen(true);
-                          }}
-                          className="text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300 font-medium text-sm mt-2 underline"
-                        >
-                          Как правильно подготовить файл склада?
-                        </button>
+                        <h4 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">
+                          {file.name}
+                        </h4>
+                        <p className="text-[10px] font-medium text-slate-400 flex items-center gap-2 mt-0.5">
+                          <span>{file.size}</span>
+                          <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
+                          <span>{file.date}</span>
+                        </p>
                       </div>
                     </div>
+                    <button
+                      onClick={() => removeFile(file.id)}
+                      className="text-slate-400 hover:text-red-500 transition-colors p-2"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Stock Inventory Section */}
+          {!hideExtraBlocks && (
+            <>
+              <div className="flex items-center gap-2 px-1 mt-2">
+                <Layers className="w-5 h-5 text-slate-700 dark:text-slate-300" />
+                <h3 className="text-lg font-medium text-slate-900 dark:text-white">
+                  Наличие на складе (г/к прокат)
+                </h3>
+              </div>
+
+              <div className="relative">
+                <motion.div
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                  onClick={() => stockFileInputRef.current?.click()}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const files = e.dataTransfer.files;
+                    if (files && files.length > 0) {
+                      const event = {
+                        target: { files },
+                      } as unknown as ChangeEvent<HTMLInputElement>;
+                      handleStockFileUpload(event);
+                    }
+                  }}
+                  className="bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed border-sky-200 dark:border-sky-900/30 p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-center sm:justify-start text-center sm:text-left gap-4 sm:gap-5 group cursor-pointer hover:border-sky-400 dark:hover:border-sky-700 transition-all shadow-sm w-full"
+                >
+                  <input
+                    type="file"
+                    ref={stockFileInputRef}
+                    onChange={handleStockFileUpload}
+                    className="hidden"
+                    multiple
+                    accept=".pdf,.xlsx,.csv,.txt,.docx"
+                  />
+                  <div className="w-14 h-14 bg-sky-50 dark:bg-sky-900/20 rounded-2xl shrink-0 flex items-center justify-center text-sky-400 group-hover:text-sky-600 transition-colors">
+                    <Layers className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="text-base font-bold text-slate-900 dark:text-white">
+                      Загрузить реестр склада
+                    </p>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
+                      Остатки горячекатаного проката в любом формате
+                    </p>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         setIsStockManualOpen(true);
                       }}
-                      className="absolute top-4 right-4 flex items-center justify-center w-9 h-9 bg-white dark:bg-[#1A1C19] hover:bg-slate-100 dark:hover:bg-[#252824] text-slate-600 dark:text-[#E2E3DE] rounded-xl transition-all focus:outline-none border border-slate-200 dark:border-[#2C2F2B] shadow-sm z-10"
-                      title="Инструкция по складу"
+                      className="text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300 font-medium text-sm mt-2 underline"
                     >
-                      <BookOpen className="w-5 h-5" />
+                      Как правильно подготовить файл склада?
                     </button>
                   </div>
-
-                  {stockFiles.length > 0 && (
-                    <div className="bg-white dark:bg-[#1A1C19] rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                      <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                        <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Загруженные файлы склада</span>
-                        <div className="flex items-center gap-3">
-                          <span className="text-[10px] font-medium bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-300 px-2.5 py-1 rounded-full">{stockFiles.length} файлов</span>
-                          
-                          {isProcessingStock && (
-                            <div className="text-[10px] text-slate-500 flex items-center gap-2 font-medium">
-                              <div className="w-3 h-3 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
-                              {parsingProgress.active ? parsingProgress.message : "Обработка..."}
-                            </div>
-                          )}
-
-                          {!isProcessingStock && processedStock.length > 0 && (
-                            <motion.button 
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                              onClick={() => {
-                                setActiveTab("supply");
-                                setSupplySection("stock");
-                              }}
-                              className="bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 text-[10px] font-bold px-4 py-1.5 rounded-full hover:bg-sky-200 dark:hover:bg-sky-900/50 transition-all flex items-center gap-2"
-                            >
-                              <Layers className="w-3.5 h-3.5" />
-                              <span>Показать наличие</span>
-                            </motion.button>
-                          )}
-                        </div>
-                      </div>
-                      <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                        {stockFiles.map(file => (
-                          <div key={file.id} className="p-4 sm:p-6 flex items-center justify-between hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors px-6">
-                            <div className="flex items-center gap-4">
-                              <div className="w-10 h-10 bg-sky-50 dark:bg-sky-900/30 rounded-xl flex items-center justify-center text-sky-600 dark:text-sky-400">
-                                <Layers className="w-6 h-6" />
-                              </div>
-                              <div>
-                                <h4 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">{file.name}</h4>
-                                <p className="text-[10px] font-medium text-slate-400 flex items-center gap-2 mt-0.5">
-                                  <span>{file.size}</span>
-                                  <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
-                                  <span>{file.date}</span>
-                                </p>
-                              </div>
-                            </div>
-                            <button 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                removeStockFile(file.id);
-                              }}
-                              className="text-slate-400 hover:text-red-500 transition-colors p-2"
-                            >
-                              <X className="w-5 h-5" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Supply Plan Registry Section */}
-                  <div className="flex items-center gap-2 px-1 mt-2">
-                    <ShoppingCart className="w-5 h-5 text-slate-700 dark:text-slate-300" />
-                    <h3 className="text-lg font-medium text-slate-900 dark:text-white">Реестр поставок</h3>
-                  </div>
-                  
-                  <div className="relative">
-                    <div 
-                      onClick={() => supplyPlanFileInputRef.current?.click()}
-                      onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const files = e.dataTransfer.files;
-                        if (files && files.length > 0) {
-                          const event = { target: { files } } as unknown as ChangeEvent<HTMLInputElement>;
-                          handleSupplyPlanFileUpload(event);
-                        }
-                      }}
-                      className="bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed border-sky-200 dark:border-sky-900/30 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-center sm:justify-start text-center sm:text-left gap-4 sm:gap-6 group cursor-pointer hover:border-sky-400 dark:hover:border-sky-700 transition-all shadow-sm"
-                    >
-                      <input 
-                        type="file" 
-                        ref={supplyPlanFileInputRef}
-                        onChange={handleSupplyPlanFileUpload}
-                        className="hidden" 
-                        multiple
-                        accept=".pdf,.xlsx,.csv,.txt,.docx"
-                      />
-                      <div className="w-14 h-14 bg-sky-50 dark:bg-sky-900/20 rounded-2xl shrink-0 flex items-center justify-center text-sky-400 group-hover:text-sky-600 transition-colors">
-                        <ShoppingCart className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <p className="text-base font-bold text-slate-900 dark:text-white">Загрузить реестр с планом поставок сырья</p>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">График ожидаемых поступлений металла</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {supplyPlanFiles.length > 0 && (
-                    <div className="bg-white dark:bg-[#1A1C19] rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mt-6">
-                      <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                        <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Загруженные файлы поставок</span>
-                        <div className="flex items-center gap-3">
-                          <span className="text-[10px] font-medium bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-300 px-2.5 py-1 rounded-full">{supplyPlanFiles.length} файлов</span>
-                          
-                          {isProcessingSupplyPlans && (
-                            <div className="text-[10px] text-slate-500 flex items-center gap-2 font-medium">
-                              <div className="w-3 h-3 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
-                              {parsingProgress.active ? parsingProgress.message : "Обработка..."}
-                            </div>
-                          )}
-
-                          {!isProcessingSupplyPlans && processedSupplyPlans.length > 0 && (
-                            <motion.button 
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                              onClick={() => {
-                                setActiveTab("supply");
-                                setSupplySection("supply-plans");
-                              }}
-                              className="bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 text-[10px] font-bold px-4 py-1.5 rounded-full hover:bg-sky-200 dark:hover:bg-sky-900/50 transition-all flex items-center gap-2"
-                            >
-                              <ShoppingCart className="w-3.5 h-3.5" />
-                              <span>Показать поставки</span>
-                            </motion.button>
-                          )}
-                        </div>
-                      </div>
-                      <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                        {supplyPlanFiles.map(file => (
-                          <div key={file.id} className="p-4 sm:p-6 flex items-center justify-between hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors px-6">
-                            <div className="flex items-center gap-4">
-                              <div className="w-10 h-10 bg-sky-50 dark:bg-sky-900/30 rounded-xl flex items-center justify-center text-sky-600 dark:text-sky-400">
-                                <ShoppingCart className="w-6 h-6" />
-                              </div>
-                              <div>
-                                <h4 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">{file.name}</h4>
-                                <p className="text-[10px] font-medium text-slate-400 flex items-center gap-2 mt-0.5">
-                                  <span>{file.size}</span>
-                                  <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
-                                  <span>{file.date}</span>
-                                </p>
-                              </div>
-                            </div>
-                            <button 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                removeSupplyPlanFile(file.id);
-                              }}
-                              className="text-slate-400 hover:text-red-500 transition-colors p-2"
-                            >
-                              <X className="w-5 h-5" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {activeTab === "supply" && (
-            <motion.div
-              key="supply"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="flex flex-col gap-8"
-            >
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                  <h2 className="text-2xl sm:text-3xl font-normal tracking-tight text-[#1A1C19] dark:text-white">
-                    Снабжение и закупки
-                  </h2>
-                  <p className="text-sm text-[#43483F] dark:text-slate-400 mt-2 max-w-2xl">
-                    Управление реестром поставок, складскими остатками и расчет потребности в сырье.
-                  </p>
-                </div>
-                {supplySection !== "free-stock" && supplySection !== "calc" && supplySection !== "stock" && (() => {
-                  const isSupplyView = supplySection === "calc-supply" || supplySection === "supply-plans";
-                  const activeDashboardTotals = {
-                    allocated: isSupplyView ? (supplyCalculationData.totals.allocated || 0) : (stockTotals.allocated || 0),
-                    deficit: isSupplyView ? (supplyCalculationData.totals.deficit || 0) : (stockTotals.deficit || 0),
-                    remaining: isSupplyView ? (supplyCalculationData.totals.remaining || 0) : (stockTotals.remaining || 0),
-                    techWaste2: isSupplyView ? (supplyCalculationData.totals.techWaste2 || 0) : (stockTotals.techWaste2 || 0),
-                    usefulRem2: isSupplyView ? (supplyCalculationData.totals.usefulRem2 || 0) : (stockTotals.usefulRem2 || 0),
-                    averageKim: isSupplyView ? (supplyCalculationData.totals.averageKim || 0) : (stockTotals.averageKim || 0)
-                  };
-                  return (
-                  <div className="flex-none min-w-0 xl:max-w-2xl w-full md:w-auto relative overflow-hidden">
-                    <div 
-                      ref={summaryContainerRef}
-                      onMouseDown={onSummaryMouseDown}
-                      onMouseUp={onSummaryMouseLeaveOrUp}
-                      onMouseLeave={onSummaryMouseLeaveOrUp}
-                      onMouseMove={handleMouseMove}
-                      className={`flex items-stretch xl:items-center gap-2 sm:gap-3 xl:gap-2 xl:ml-2 w-full p-1.5 sm:p-2 bg-slate-50/80 dark:bg-[#1A1C19]/40 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/60 rounded-[18px] sm:rounded-2xl overflow-x-auto xl:overflow-x-visible xl:justify-around hide-scrollbar snap-x snap-mandatory xl:snap-none transition-all ${
-                        isSummaryDragging ? 'cursor-grabbing select-none scroll-auto' : 'cursor-grab xl:cursor-default scroll-smooth'
-                      }`}
-                    >
-                      
-                      {/* Item 1: Взято со склада (emerald) */}
-                      <div className="shrink-0 xl:shrink-0 snap-start flex flex-col min-w-[130px] sm:min-w-[140px] xl:min-w-max xl:flex-none justify-center px-4 py-2.5 sm:py-3 xl:px-1 bg-gradient-to-br from-emerald-50 to-emerald-100/30 dark:from-emerald-950/40 dark:to-emerald-900/10 border border-emerald-200/50 dark:border-emerald-800/50 rounded-xl sm:rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] relative overflow-hidden group">
-                        <div className="absolute -right-4 -top-4 w-16 h-16 bg-emerald-500/10 blur-xl rounded-full group-hover:scale-150 transition-transform duration-700" />
-                        <span className="text-[10px] sm:text-[11px] xl:text-[7.5px] 2xl:text-[10px] text-emerald-600 dark:text-emerald-400 font-black uppercase tracking-widest mb-1 relative z-10 flex items-center leading-tight">
-                          <Package className="w-3 h-3 xl:w-2 xl:h-2 2xl:w-3.5 2xl:h-3.5 mr-1 xl:mr-0.5 opacity-80 shrink-0" />
-                          <span className="truncate">Взято из заг.</span>
-                        </span>
-                        <span className="text-xl sm:text-2xl xl:text-[13px] 2xl:text-xl font-black text-emerald-950 dark:text-emerald-50 leading-none relative z-10 tracking-tighter">
-                          {activeDashboardTotals.allocated.toFixed(3)}<span className="text-[9px] sm:text-[10px] xl:text-[7px] 2xl:text-[9px] text-emerald-600/60 dark:text-emerald-400/50 font-bold ml-1 uppercase">тн</span>
-                        </span>
-                      </div>
-
-                      {/* Item 2: Дефицит */}
-                      <div className="shrink-0 xl:shrink-0 snap-start flex flex-col min-w-[130px] sm:min-w-[140px] xl:min-w-max xl:flex-none justify-center px-4 py-2.5 sm:py-3 xl:px-1 bg-gradient-to-br from-rose-50 to-rose-100/30 dark:from-rose-950/40 dark:to-rose-900/10 border border-rose-200/50 dark:border-rose-800/50 rounded-xl sm:rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] relative overflow-hidden group">
-                        <div className="absolute -right-4 -top-4 w-16 h-16 bg-rose-500/10 blur-xl rounded-full group-hover:scale-150 transition-transform duration-700" />
-                        <span className="text-[10px] sm:text-[11px] xl:text-[7.5px] 2xl:text-[10px] text-rose-600 dark:text-rose-400 font-black uppercase tracking-widest mb-1 relative z-10 flex items-center leading-tight">
-                           <ShoppingCart className="w-3 h-3 xl:w-2 xl:h-2 2xl:w-3.5 2xl:h-3.5 mr-1 xl:mr-0.5 opacity-80 shrink-0" />
-                           <span className="truncate">Дефицит</span>
-                        </span>
-                        <span className="text-xl sm:text-2xl xl:text-[13px] 2xl:text-xl font-black text-rose-950 dark:text-rose-50 leading-none relative z-10 tracking-tighter">
-                          {activeDashboardTotals.deficit.toFixed(3)}<span className="text-[9px] sm:text-[10px] xl:text-[7px] 2xl:text-[9px] text-rose-600/60 dark:text-rose-400/50 font-bold ml-1 uppercase">тн</span>
-                        </span>
-                      </div>
-
-                      {/* Divider */}
-                      <div className="shrink-0 hidden 2xl:block w-px h-10 bg-slate-200/80 dark:bg-slate-800/80 mx-2 self-center" />
-
-                      {/* Item 3: Остаток заг. */}
-                      <div className="shrink-0 xl:shrink-0 snap-start flex flex-col min-w-[110px] sm:min-w-[120px] xl:min-w-max xl:flex-none justify-center px-4 py-2.5 sm:py-3 xl:px-1 bg-white dark:bg-[#1A1C19] border border-slate-100 dark:border-slate-800/80 rounded-xl sm:rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow">
-                        <span className="text-[10px] sm:text-[11px] xl:text-[7.5px] 2xl:text-[10px] text-sky-500 dark:text-sky-400 font-black uppercase tracking-widest mb-1 flex items-center leading-tight truncate">
-                          Остаток заг.
-                        </span>
-                        <span className="text-xl sm:text-2xl xl:text-[13px] 2xl:text-xl font-black text-slate-800 dark:text-white leading-none tracking-tighter">
-                          {activeDashboardTotals.remaining.toFixed(3)}<span className="text-[9px] sm:text-[10px] xl:text-[7px] 2xl:text-[9px] text-slate-400/80 dark:text-slate-500 font-bold ml-1 uppercase">тн</span>
-                        </span>
-                      </div>
-
-                      {/* Item 4: Тех. отходы 2 */}
-                      <div className="shrink-0 xl:shrink-0 snap-start flex flex-col min-w-[110px] sm:min-w-[120px] xl:min-w-max xl:flex-none justify-center px-4 py-2.5 sm:py-3 xl:px-1 bg-white dark:bg-[#1A1C19] border border-slate-100 dark:border-slate-800/80 rounded-xl sm:rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow">
-                        <span className="text-[10px] sm:text-[11px] xl:text-[7.5px] 2xl:text-[10px] text-amber-500 dark:text-amber-400 font-black uppercase tracking-widest mb-1 flex items-center leading-tight truncate" title={isSupplyView ? "Тех. отходы / плановое поступление" : "Тех. отходы 2"}>
-                          {isSupplyView ? "Тех. отх / план" : "Тех. отходы 2"}
-                        </span>
-                        <span className="text-xl sm:text-2xl xl:text-[13px] 2xl:text-xl font-black text-slate-800 dark:text-white leading-none tracking-tighter">
-                          {activeDashboardTotals.techWaste2.toFixed(3)}<span className="text-[9px] sm:text-[10px] xl:text-[7px] 2xl:text-[9px] text-slate-400/80 dark:text-slate-500 font-bold ml-1 uppercase">тн</span>
-                        </span>
-                      </div>
-
-                      {/* Item 5: Дел. остатки 2 */}
-                      <div className="shrink-0 xl:shrink-0 snap-start flex flex-col min-w-[110px] sm:min-w-[120px] xl:min-w-max xl:flex-none justify-center px-4 py-2.5 sm:py-3 xl:px-1 bg-white dark:bg-[#1A1C19] border border-slate-100 dark:border-slate-800/80 rounded-xl sm:rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow">
-                        <span className="text-[10px] sm:text-[11px] xl:text-[7.5px] 2xl:text-[10px] text-amber-500 dark:text-amber-400 font-black uppercase tracking-widest mb-1 flex items-center leading-tight truncate" title={isSupplyView ? "Дел. Остатки / плановое поступление" : "Дел. остатки 2"}>
-                          {isSupplyView ? "Дел. ост / план" : "Дел. остатки 2"}
-                        </span>
-                        <span className="text-xl sm:text-2xl xl:text-[13px] 2xl:text-xl font-black text-slate-800 dark:text-white leading-none tracking-tighter">
-                          {activeDashboardTotals.usefulRem2.toFixed(3)}<span className="text-[9px] sm:text-[10px] xl:text-[7px] 2xl:text-[9px] text-slate-400/80 dark:text-slate-500 font-bold ml-1 uppercase">тн</span>
-                        </span>
-                      </div>
-
-                      {/* Item 6: СР. КИМ 2 */}
-                      <div className="shrink-0 xl:shrink-0 snap-start flex flex-col min-w-[100px] sm:min-w-[110px] xl:min-w-max xl:flex-none justify-center px-4 py-2.5 sm:py-3 xl:px-1 bg-white dark:bg-[#1A1C19] border border-slate-100 dark:border-slate-800/80 rounded-xl sm:rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow">
-                        <span className="text-[10px] sm:text-[11px] xl:text-[7.5px] 2xl:text-[10px] text-emerald-500 dark:text-emerald-400/80 font-black uppercase tracking-widest mb-1 flex items-center leading-tight truncate" title={isSupplyView ? "КИМ / плановое поступление" : "Ср. КИМ 2"}>
-                          {isSupplyView ? "КИМ / план" : "Ср. КИМ 2"}
-                        </span>
-                        <span className="text-xl sm:text-2xl xl:text-[13px] 2xl:text-xl font-black text-slate-800 dark:text-white leading-none tracking-tighter">
-                          {Math.max(0, activeDashboardTotals.averageKim || 0).toFixed(3)}<span className="text-[9px] sm:text-[10px] xl:text-[7px] 2xl:text-[9px] text-emerald-500/60 dark:text-emerald-400/50 font-bold ml-1 uppercase truncate">коэф</span>
-                        </span>
-                      </div>
-                      
-                    </div>
-                  </div>
-                )})()}
-
-              </div>
-
-              {/* Sub-navigation for Supply */}
-              <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 w-full min-w-0 pb-2">
-                <div className="flex items-center gap-1.5 sm:gap-2 bg-white dark:bg-[#1A1C19] p-1.5 rounded-[18px] sm:rounded-2xl border border-slate-200 dark:border-slate-800 w-full xl:w-fit shrink-0 overflow-x-auto hide-scrollbar">
-                  <button
-                    onClick={() => setSupplySection("calc")}
-                    className={`whitespace-nowrap px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-                      supplySection === "calc" 
-                        ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm" 
-                        : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50"
-                    }`}
-                  >
-                    Потребность
-                  </button>
-                  <button
-                    onClick={() => setSupplySection("stock")}
-                    className={`whitespace-nowrap px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-                      supplySection === "stock" 
-                        ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm" 
-                        : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50"
-                    }`}
-                  >
-                    Наличие
-                  </button>
-                  <div className="relative group/calc-stock">
-                    <button
-                      onClick={() => setSupplySection("calc-stock")}
-                      className={`relative whitespace-nowrap px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all border border-transparent ${
-                        supplySection === "calc-stock" 
-                          ? "bg-sky-50 dark:bg-sky-900/20 text-sky-600 dark:text-sky-400 border-sky-200/50 dark:border-sky-800/50" 
-                          : "text-slate-500 hover:text-sky-600 dark:text-slate-400 dark:hover:text-sky-400 hover:bg-sky-50/50 dark:hover:bg-sky-900/10"
-                      }`}
-                    >
-                      Расчет с учетом наличия
-                      {planFiles.length > 0 && stockFiles.length > 0 && supplySection !== "calc-stock" && (
-                        <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-3 w-3 bg-orange-500 border-2 border-white dark:border-[#1A1C19]"></span>
-                        </span>
-                      )}
-                    </button>
-                    {/* Tooltip */}
-                    {planFiles.length > 0 && stockFiles.length > 0 && supplySection !== "calc-stock" && (
-                      <div className="absolute -bottom-14 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs font-medium px-3 py-2 rounded-lg shadow-xl w-64 text-center opacity-0 group-hover/calc-stock:opacity-100 transition-opacity z-50 pointer-events-none">
-                        Кликните сюда: система сопоставит ваши заказы со складом и покажет итоговый Дефицит (объем к закупке).
-                        <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 rotate-45"></div>
-                      </div>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => setSupplySection("free-stock")}
-                    className={`whitespace-nowrap px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all border border-transparent ${
-                      supplySection === "free-stock" 
-                        ? "bg-sky-50 dark:bg-sky-900/20 text-sky-600 dark:text-sky-400 border-sky-200/50 dark:border-sky-800/50" 
-                        : "text-slate-500 hover:text-sky-600 dark:text-slate-400 dark:hover:text-sky-400 hover:bg-sky-50/50 dark:hover:bg-sky-900/10"
-                    }`}
-                  >
-                    Свободный остаток заготовки
-                  </button>
-                  <button
-                    onClick={() => setSupplySection("supply-plans")}
-                    className={`whitespace-nowrap px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all border border-transparent ${
-                      supplySection === "supply-plans" 
-                        ? "bg-sky-50 dark:bg-sky-900/20 text-sky-600 dark:text-sky-400 border-sky-200/50 dark:border-sky-800/50" 
-                        : "text-slate-500 hover:text-sky-600 dark:text-slate-400 dark:hover:text-sky-400 hover:bg-sky-50/50 dark:hover:bg-sky-900/10"
-                    }`}
-                  >
-                    Планы поставок
-                  </button>
-                  <button
-                    onClick={() => setSupplySection("calc-supply")}
-                    className={`whitespace-nowrap px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all border border-transparent ${
-                      supplySection === "calc-supply" 
-                        ? "bg-sky-50 dark:bg-sky-900/20 text-sky-600 dark:text-sky-400 border-sky-200/50 dark:border-sky-800/50" 
-                        : "text-slate-500 hover:text-sky-600 dark:text-slate-400 dark:hover:text-sky-400 hover:bg-sky-50/50 dark:hover:bg-sky-900/10"
-                    }`}
-                  >
-                    Расчет с учетом поставок
-                  </button>
-                </div>
-                
-                
-                {supplySection === "calc" && calculationResults.length > 0 && (
-                  <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-1.5 sm:gap-2 w-full xl:w-auto mt-2 xl:mt-0 shrink-0 mb-2 xl:mb-0">
-                    <button
-                      onClick={() => {
-                        const headers = ["НТД", "Профиль", "Марка заг.", "Размер мм. (Заг.)", "Длина мм.", "Кол-во тн заг."];
-                        if (!isPurchasingMode) headers.push("Сумма (руб)");
-
-                        const rows = Object.entries<{weight: number, count: number, cost: number}>(
-                          calculationResults.reduce((acc, curr) => {
-                            const label = curr.lengthType === "НД" ? "НД" : `МД ${curr.billetLength}`;
-                            const key = `${curr.grade} | ${curr.billetDia} | ${label}`;
-                            if (!acc[key]) acc[key] = { weight: 0, count: 0, cost: 0 };
-                            acc[key].weight += curr.totalWeight;
-                            acc[key].count += curr.billetCount || 0;
-                            acc[key].cost += curr.totalCost || 0;
-                            return acc;
-                          }, {} as Record<string, {weight: number, count: number, cost: number}>)
-                        )
-                        .filter(([_, data]) => data.weight >= 0.0005)
-                        .sort((a, b) => b[1].weight - a[1].weight)
-                        .map(([key, data]) => {
-                          const [grade, size, length] = key.split(' | ');
-                          const row = [
-                            `ГОСТ 2590-2006/${getGostForGrade(grade)}`,
-                            "Круг",
-                            grade,
-                            String(size).replace(".", ","),
-                            length,
-                            String(data.weight.toFixed(3)).replace(".", ",")
-                          ];
-                          if (!isPurchasingMode) row.push(String(Math.round(data.cost)).replace(".", ","));
-                          return row;
-                        });
-
-                        const tsv = [headers, ...rows].map(row => row.join("\t")).join("\n");
-                        navigator.clipboard.writeText(tsv);
-                        setCopySuccess(true);
-                        setTimeout(() => setCopySuccess(false), 2000);
-                      }}
-                      className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50"
-                      title="Скопировать заявку для вставки (Ctrl+V) в Google Таблицы"
-                    >
-                      {copySuccess ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        const headers = ["НТД", "Профиль", "Марка заг.", "Размер мм. (Заг.)", "Длина мм.", "Кол-во тн заг."];
-                        if (!isPurchasingMode) headers.push("Сумма (руб)");
-
-                        const rows = Object.entries<{weight: number, count: number, cost: number}>(
-                          calculationResults.reduce((acc, curr) => {
-                            const label = curr.lengthType === "НД" ? "НД" : `МД ${curr.billetLength}`;
-                            const key = `${curr.grade} | ${curr.billetDia} | ${label}`;
-                            if (!acc[key]) acc[key] = { weight: 0, count: 0, cost: 0 };
-                            acc[key].weight += curr.totalWeight;
-                            acc[key].count += curr.billetCount || 0;
-                            acc[key].cost += curr.totalCost || 0;
-                            return acc;
-                          }, {} as Record<string, {weight: number, count: number, cost: number}>)
-                        )
-                        .filter(([_, data]) => data.weight >= 0.0005)
-                        .sort((a, b) => b[1].weight - a[1].weight)
-                        .map(([key, data]) => {
-                          const [grade, size, length] = key.split(' | ');
-                          const row = [
-                            `ГОСТ 2590-2006/${getGostForGrade(grade)}`,
-                            "Круг",
-                            grade,
-                            String(size).replace(".", ","),
-                            length,
-                            String(data.weight.toFixed(3)).replace(".", ",")
-                          ];
-                          if (!isPurchasingMode) row.push(String(Math.round(data.cost)).replace(".", ","));
-                          return row;
-                        });
-
-                        const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-                        const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
-                        
-                        for (let R = range.s.r; R <= range.e.r; ++R) {
-                          for (let C = range.s.c; C <= range.e.c; ++C) {
-                            const cell_address = { c: C, r: R };
-                            const cell_ref = XLSX.utils.encode_cell(cell_address);
-                            if (!worksheet[cell_ref]) continue;
-
-                            worksheet[cell_ref].s = {
-                              font: { sz: 8 },
-                              alignment: { 
-                                horizontal: "center", 
-                                vertical: "center"
-                              }
-                            };
-                            
-                            if (R === 0) {
-                              worksheet[cell_ref].s.font.bold = true;
-                            }
-                          }
-                        }
-
-                        worksheet["!views"] = [{ state: "frozen", ySplit: 1 }];
-                        const out_wcut = [
-                            { wch: 25 }, { wch: 15 }, { wch: 20 }, { wch: 20 }, { wch: 15 }, { wch: 20 }, { wch: 15 }
-                        ];
-                        worksheet["!cols"] = out_wcut;
-                        
-                        const workbook = XLSX.utils.book_new();
-                        XLSX.utils.book_append_sheet(workbook, worksheet, "Заявка");
-                        XLSX.writeFile(workbook, "Заявка_на_сырье.xlsx");
-                      }}
-                      className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
-                      title="Скачать в Excel"
-                    >
-                      <Download className="w-4 h-4" />
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              <AnimatePresence mode="wait">
-                {supplySection === "stock" ? (
-                  <motion.div
-                    key="supply-stock"
-                    initial={{ opacity: 0, x: 10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="flex flex-col gap-8"
-                  >
-                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-[#1A1C19] p-6 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-sm">
-                      <div className="flex items-center gap-4">
-                         <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                           <Layers className="w-6 h-6" />
-                         </div>
-                         <div>
-                           <h3 className="text-xl font-bold text-slate-900 dark:text-white">Актуальные остатки</h3>
-                           <div className="flex items-center gap-3 mt-1 text-sm font-medium">
-                             <span className="text-slate-500">Обнаружено {processedStock.length} позиций</span>
-                             <span className="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700"></span>
-                             <span className="text-emerald-600 dark:text-emerald-400 font-black">
-                               Итого: {processedStock.reduce((acc, curr) => acc + (typeof curr["Конечный остаток тн."] === 'number' ? curr["Конечный остаток тн."] : parseFloat(curr["Конечный остаток тн."]) || 0), 0).toFixed(3)} тн.
-                             </span>
-                           </div>
-                         </div>
-                      </div>
-                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto mt-2 sm:mt-0">
-                         <button 
-                           onClick={handleCopyForSheets}
-                           className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50"
-                           title="Скопировать для Excel"
-                         >
-                           {isCopied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
-                         </button>
-                         <button 
-                           onClick={handleExportStock}
-                           className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
-                           title="Скачать в Excel"
-                         >
-                           <Download className="w-4 h-4" />
-                         </button>
-                      </div>
-                   </div>
-
-                   <div className="bg-white dark:bg-[#1A1C19] rounded-[40px] border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden">
-                      <div 
-                        ref={stockTableRef}
-                        onMouseDown={onStockMouseDown}
-                        onMouseLeave={handleMouseLeaveOrUp}
-                        onMouseUp={handleMouseLeaveOrUp}
-                        onMouseMove={handleMouseMove}
-                        className={`overflow-auto custom-scrollbar max-h-[calc(100vh-300px)] min-h-[400px] relative ${isStockDragging ? 'select-none cursor-grabbing' : 'cursor-grab'}`}
-                      >
-                        <table className="w-full text-left border-separate border-spacing-0 block md:table">
-                          <thead className="text-[10px] uppercase font-black tracking-widest text-slate-400 dark:text-slate-500 sticky top-0 z-10 shadow-sm hidden md:table-header-group">
-                            <tr>
-                              <th className="px-8 py-5 bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Номенклатура</th>
-                              <th className="px-6 py-5 bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Профиль</th>
-                              <th className="px-6 py-5 text-center bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Сталь</th>
-                              <th className="px-6 py-5 text-center bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Размер</th>
-                              <th className="px-6 py-5 text-center bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Длина</th>
-                              <th className="px-8 py-5 text-right bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Тн.</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50 text-[11px] font-medium text-slate-600 dark:text-slate-300 block md:table-row-group">
-                            {processedStock.map((row, i) => (
-                              <tr key={i} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group block md:table-row mb-4 md:mb-0 border border-slate-200 dark:border-slate-800 md:border-none rounded-xl md:rounded-none bg-white dark:bg-[#1A1C19] p-2 md:p-0 md:bg-transparent">
-                                <td className="px-4 md:px-8 py-3 md:py-4 text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Номенклатура</span>
-                                  <div className="max-w-[200px] md:max-w-[300px] truncate font-mono text-[10px] text-right md:text-left" title={row["Исходная Номенклатура"]}>
-                                    {row["Исходная Номенклатура"]}
-                                  </div>
-                                </td>
-                                <td className="px-4 md:px-6 py-3 md:py-4 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Профиль</span>
-                                  <span className="inline-flex items-center px-3 py-1.5 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">{row["Профиль"]}</span>
-                                </td>
-                                <td className="px-4 md:px-6 py-3 md:py-4 text-right md:text-center font-bold text-slate-700 dark:text-slate-200 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Сталь</span>
-                                  <span>{row["Марка стали"]}</span>
-                                </td>
-                                <td className="px-4 md:px-6 py-3 md:py-4 text-right md:text-center flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Размер</span>
-                                   <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 rounded">
-                                     {row["Размер"]}
-                                   </span>
-                                </td>
-                                <td className="px-4 md:px-6 py-3 md:py-4 text-right md:text-center flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Длина</span>
-                                   <span className={`inline-flex items-center px-3 py-1.5 rounded-md text-[10px] font-bold ${row["Длина"] === "НД" ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10' : 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'}`}>{row["Длина"]}</span>
-                                </td>
-                                <td className="px-4 md:px-8 py-3 md:py-4 text-right flex justify-between items-center md:table-cell min-h-[44px]">
-                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Тн.</span>
-                                  <div>
-                                     <span className="text-slate-900 dark:text-white font-black text-xs">{row["Конечный остаток тн."]}</span>
-                                     <span className="ml-1 text-[10px] text-slate-400 font-bold">тн</span>
-                                  </div>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                   </div>
-                  </motion.div>
-                ) : supplySection === "calc" ? (
-                  <motion.div
-                    key="supply-calc"
-                    initial={{ opacity: 0, x: 10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="flex flex-col gap-8"
-                  >
-                    {calculationResults.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center py-24 bg-white/50 dark:bg-[#1A1C19]/40 rounded-[40px] border border-slate-100 dark:border-slate-800/50">
-                        <div className="relative w-24 h-24 mb-6">
-                          <div className="absolute inset-0 bg-slate-100 dark:bg-slate-800 rounded-3xl rotate-6 mix-blend-multiply opacity-50"></div>
-                          <div className="absolute inset-0 bg-slate-50 dark:bg-slate-900 rounded-3xl -rotate-3 border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-sm">
-                            <FolderSearch className="w-10 h-10 text-slate-400 dark:text-slate-500" />
-                          </div>
-                        </div>
-                        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Здесь пока пусто</h3>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 text-center max-w-sm px-6 leading-relaxed mb-8">
-                          Мы не можем представить образец, пока вы не откорректируете список заказов. Загрузите файл с заказами клиентов, чтобы начать работу.
-                        </p>
-                        
-                        <button 
-                          onClick={() => setActiveTab("files")} 
-                          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-[0_4px_20px_rgba(37,99,235,0.2)] hover:shadow-[0_4px_24px_rgba(37,99,235,0.3)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center gap-2"
-                        >
-                          Перейти к загрузке файлов
-                          <ArrowRight className="w-4 h-4 ml-1" />
-                        </button>
-                        
-                        {isProcessing && (
-                          <div className="mt-8 flex items-center gap-3 h-12 px-8 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-2xl font-bold text-sm shadow-sm border border-slate-200 dark:border-slate-700">
-                            <div className="w-4 h-4 border-2 border-sky-500/30 border-t-sky-500 rounded-full animate-spin"></div>
-                            Идет расчет...
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="flex flex-col gap-6">
-                        <div className={`grid grid-cols-1 ${!isPurchasingMode ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} gap-6`}>
-                          {!isPurchasingMode && (
-                            <div className="bg-violet-50 dark:bg-violet-900/10 border border-violet-100 dark:border-violet-900/30 p-6 rounded-[24px] flex flex-col justify-center">
-                              <span className="text-[10px] font-bold text-violet-600 dark:text-violet-500 uppercase tracking-widest">Общая стоимость (без НДС)</span>
-                              <div className="text-3xl font-black text-violet-600 dark:text-violet-400 mt-1">
-                                {Math.round(calculationResults.reduce((acc, curr) => acc + (curr.totalCost || 0), 0)).toLocaleString()} <span className="text-lg font-normal">₽</span>
-                              </div>
-                              
-                              <div className="mt-4 pt-4 border-t border-violet-100 dark:border-violet-900/30">
-                                <div className="mb-2">
-                                  <span className="text-[9px] font-bold text-violet-500/60 uppercase tracking-wider">ср/цена на закупку г/к проката</span>
-                                </div>
-                                <div className="space-y-1.5 max-h-[140px] overflow-y-auto pr-2 custom-scrollbar">
-                                  {Object.entries<{ totalCost: number; totalWeight: number }>(
-                                    calculationResults.reduce((acc, curr) => {
-                                      const key = curr.grade;
-                                      if (!acc[key]) acc[key] = { totalCost: 0, totalWeight: 0 };
-                                      acc[key].totalCost += curr.totalCost || 0;
-                                      acc[key].totalWeight += curr.totalWeight;
-                                      return acc;
-                                    }, {} as Record<string, { totalCost: number; totalWeight: number }>)
-                                  )
-                                    .map(([grade, data]) => ({
-                                      grade,
-                                      avgPrice: data.totalWeight > 0 ? data.totalCost / data.totalWeight : 0
-                                    }))
-                                    .sort((a, b) => b.avgPrice - a.avgPrice)
-                                    .map(({ grade, avgPrice }) => (
-                                      <div key={grade} className="flex justify-between items-center text-[11px]">
-                                        <span className="text-slate-500 dark:text-slate-400 font-medium">{grade}</span>
-                                        <span className="text-violet-600 dark:text-violet-400 font-bold">
-                                          {Math.round(avgPrice).toLocaleString()} ₽/тн
-                                        </span>
-                                      </div>
-                                    ))}
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                          <div className="bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 p-6 rounded-[24px] flex flex-col relative shadow-sm transition-all hover:shadow-md">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 dark:bg-sky-500/10 rounded-bl-[64px] rounded-tr-[24px] pointer-events-none"></div>
-                            <div className="z-10 flex items-start justify-between">
-                              <div>
-                                <div className="flex items-center gap-2 mb-1">
-                                  <div className="w-2 h-2 rounded-full bg-sky-500"></div>
-                                  <h3 className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Итого заготовка</h3>
-                                </div>
-                                <div className="flex items-baseline gap-1">
-                                  <span className="text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-none h-[40px] flex items-baseline">
-                                    {calculationResults.reduce((acc, curr) => acc + curr.totalWeight, 0).toFixed(3)}
-                                  </span>
-                                  <span className="text-sm font-bold text-slate-400">тн</span>
-                                </div>
-                              </div>
-                              <button
-                                onClick={() => {
-                                  const headers = ["НТД", "Профиль", "Марка заг.", "Размер мм.", "Длина", "Кол-во тн"];
-                                  if (!isPurchasingMode) headers.push("Сумма (руб)");
-
-                                  const rows = Object.entries<{weight: number, count: number, cost: number}>(
-                                    calculationResults.reduce((acc, curr) => {
-                                      const label = curr.lengthType === "НД" ? "НД" : `МД ${curr.billetLength}`;
-                                      const key = `${curr.grade} | ${curr.billetDia} | ${label}`;
-                                      if (!acc[key]) acc[key] = { weight: 0, count: 0, cost: 0 };
-                                      acc[key].weight += curr.totalWeight;
-                                      acc[key].count += curr.billetCount || 0;
-                                      acc[key].cost += curr.totalCost || 0;
-                                      return acc;
-                                    }, {} as Record<string, {weight: number, count: number, cost: number}>)
-                                  )
-                                  .filter(([_, data]) => data.weight >= 0.0005)
-                                  .sort((a, b) => b[1].weight - a[1].weight)
-                                  .map(([key, data]) => {
-                                    const [grade, size, length] = key.split(' | ');
-                                    const row = [
-                                      `ГОСТ 2590-2006/${getGostForGrade(grade)}`,
-                                      "Круг",
-                                      grade,
-                                      String(size).replace(".", ","),
-                                      length,
-                                      String(data.weight.toFixed(3)).replace(".", ",")
-                                    ];
-                                    if (!isPurchasingMode) row.push(String(Math.round(data.cost)).replace(".", ","));
-                                    return row;
-                                  });
-
-                                  const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-                                  const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
-                                  
-                                  for (let R = range.s.r; R <= range.e.r; ++R) {
-                                    for (let C = range.s.c; C <= range.e.c; ++C) {
-                                      const cell_address = { c: C, r: R };
-                                      const cell_ref = XLSX.utils.encode_cell(cell_address);
-                                      if (!worksheet[cell_ref]) continue;
-
-                                      worksheet[cell_ref].s = {
-                                        font: { sz: 8 },
-                                        alignment: { 
-                                          horizontal: "center", 
-                                          vertical: "center"
-                                        }
-                                      };
-                                      
-                                      if (R === 0) {
-                                        worksheet[cell_ref].s.font.bold = true;
-                                      }
-                                    }
-                                  }
-
-                                  worksheet["!views"] = [{ state: "frozen", ySplit: 1 }];
-                                  const out_wcut = [
-                                      { wch: 25 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }
-                                  ];
-                                  worksheet["!cols"] = out_wcut;
-                                  
-                                  const workbook = XLSX.utils.book_new();
-                                  XLSX.utils.book_append_sheet(workbook, worksheet, "Итого заготовка");
-                                  XLSX.writeFile(workbook, "Сводка_заготовка.xlsx");
-                                }}
-                                className="flex items-center gap-1.5 px-3 py-1.5 bg-sky-50 dark:bg-sky-500/10 hover:bg-sky-100 dark:hover:bg-sky-500/20 text-sky-600 dark:text-sky-400 rounded-lg text-xs font-bold transition-colors border border-sky-200 dark:border-sky-500/20 shadow-sm"
-                                title="Скачать сводку по заготовке в Excel"
-                              >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                Скачать
-                              </button>
-                            </div>
-
-                            <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/60 flex-1 z-10 flex flex-col min-h-0">
-                              <div className="space-y-1.5 max-h-[140px] overflow-y-auto pr-1 transition-all custom-scrollbar flex-1">
-                                {Object.entries<{weight: number, count: number, cost: number}>(
-                                  calculationResults.reduce((acc, curr) => {
-                                    const label = curr.lengthType === "НД" ? "НД" : `МД ${curr.billetLength}`;
-                                    const key = `${curr.grade} | ${curr.billetDia} | ${label}`;
-                                    if (!acc[key]) acc[key] = { weight: 0, count: 0, cost: 0 };
-                                    acc[key].weight += curr.totalWeight;
-                                    acc[key].count += curr.billetCount || 0;
-                                    acc[key].cost += curr.totalCost || 0;
-                                    return acc;
-                                  }, {} as Record<string, {weight: number, count: number, cost: number}>)
-                                )
-                                  .sort((a, b) => b[1].weight - a[1].weight)
-                                  .map(([key, data]) => {
-                                    const [grade, size, length] = key.split(' | ');
-                                    return (
-                                      <div key={key} className="flex justify-between items-center group bg-slate-50 dark:bg-slate-800/30 hover:bg-sky-50 dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-800/50 px-2 py-1.5 rounded-lg transition-colors">
-                                        <div className="flex items-center gap-1.5">
-                                          <span className="text-slate-700 dark:text-slate-300 font-bold text-[10px] min-w-[32px]">{grade}</span>
-                                          <span className="text-slate-500 dark:text-slate-400 font-semibold text-[9px] min-w-[20px]">{size}</span>
-                                          <span className="text-[8px] text-sky-600 dark:text-sky-400 bg-sky-100 dark:bg-sky-900/30 px-1 py-0.5 rounded font-bold uppercase">{length}</span>
-                                        </div>
-                                        <div className="flex flex-col items-end leading-none gap-0.5">
-                                          <div className="flex items-baseline gap-1.5">
-                                            <span className="text-sky-700 dark:text-sky-400 font-black text-[10px]">{data.weight.toFixed(3)} <span className="font-medium text-[8px] text-sky-600/60 uppercase">тн</span></span>
-                                          </div>
-                                          {!isPurchasingMode && <span className="text-[7.5px] text-slate-400 font-medium uppercase">{Math.round(data.cost).toLocaleString()} ₽</span>}
-                                        </div>
-                                      </div>
-                                    )
-                                  })}
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 p-6 rounded-[24px] flex flex-col relative shadow-sm transition-all hover:shadow-md">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 dark:bg-amber-500/10 rounded-bl-[64px] rounded-tr-[24px] pointer-events-none"></div>
-                            <div className="z-10">
-                              <div className="flex items-center justify-between mb-1">
-                                <div className="flex items-center gap-2">
-                                  <div className="w-2 h-2 rounded-full bg-amber-500"></div>
-                                  <h3 className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                                    Коэф. Использования (КИМ)
-                                    <div className="group relative z-[100]">
-                                      <Info className="w-3.5 h-3.5 text-amber-500/70 hover:text-amber-500 cursor-help transition-colors" />
-                                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-2.5 bg-slate-900 dark:bg-slate-800 border border-slate-700 text-white text-[10.5px] rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 translate-y-1 group-hover:translate-y-0 shadow-xl normal-case tracking-normal">
-                                        Показывает, какая часть заготовки идет в продукцию. Чем ближе к 1.0, тем лучше.
-                                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900 dark:bg-slate-800 border-b border-r border-slate-700 rotate-45"></div>
-                                      </div>
-                                    </div>
-                                  </h3>
-                                </div>
-                                <div className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 bg-emerald-50 dark:bg-emerald-500/10 px-1.5 py-0.5 rounded-md">
-                                  Цель ≥ 0.980
-                                </div>
-                              </div>
-                              <div className="flex items-baseline gap-2">
-                                <span className="text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-none h-[40px] flex items-baseline">
-                                  {(calculationResults.reduce((acc, curr) => acc + curr.remainingToProcess, 0) / (calculationResults.reduce((acc, curr) => acc + curr.totalWeight, 0) || 1)).toFixed(3)}
-                                </span>
-                                <span className="text-sm font-bold text-amber-500/80">средний</span>
-                              </div>
-                            </div>
-
-                            <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/60 flex-1 z-10 flex flex-col justify-end">
-                              <div className="space-y-2">
-                                <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-800/50 p-3 rounded-xl transition-colors hover:bg-amber-50 dark:hover:bg-slate-800">
-                                  <div className="flex flex-col">
-                                    <span className="text-slate-500 dark:text-slate-400 font-bold text-[9px] uppercase tracking-wider mb-0.5">Лом (Тех. отходы)</span>
-                                    <span className="text-amber-600 dark:text-amber-500 font-black text-[13px]">
-                                      {calculationResults.reduce((acc, curr) => acc + (curr.drawLength > 0 ? (curr.techEnds / curr.drawLength) * curr.totalWeight : 0), 0).toFixed(3)} <span className="font-medium text-[9px] text-amber-600/60 uppercase">тн</span>
-                                    </span>
-                                  </div>
-                                  <div className="flex flex-col items-end">
-                                    <span className="text-slate-400 font-medium text-[9px] uppercase tracking-widest mb-0.5">Доля</span>
-                                    <span className="text-slate-700 dark:text-slate-200 font-bold text-[13px]">
-                                      {((calculationResults.reduce((acc, curr) => acc + (curr.drawLength > 0 ? (curr.techEnds / curr.drawLength) * curr.totalWeight : 0), 0) / (calculationResults.reduce((acc, curr) => acc + curr.totalWeight, 0) || 1)) * 100).toFixed(1)}%
-                                    </span>
-                                  </div>
-                                </div>
-                                
-                                <div className="bg-slate-50 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-800/50 p-3 rounded-xl transition-colors hover:bg-amber-50 dark:hover:bg-slate-800 flex flex-col gap-2">
-                                  <div className="flex justify-between items-center pb-2 border-b border-slate-200 dark:border-slate-700/50">
-                                    <span className="text-slate-500 dark:text-slate-400 font-bold text-[9px] uppercase tracking-wider">Деловой остаток</span>
-                                    <div className="flex flex-col items-end">
-                                      <span className="text-slate-400 font-medium text-[9px] uppercase tracking-widest mb-0.5">Текущая доля</span>
-                                      <span className="text-slate-700 dark:text-slate-200 font-bold text-[13px]">
-                                        {((calculationResults.reduce((acc, curr) => {
-                                          const leftovers = curr.lengthType === "НД" ? 0 : (curr.usefulLength - (curr.pcsPerBillet * curr.length));
-                                          return acc + (curr.drawLength > 0 ? (leftovers / curr.drawLength) * curr.totalWeight : 0);
-                                        }, 0) / (calculationResults.reduce((acc, curr) => acc + curr.totalWeight, 0) || 1)) * 100).toFixed(1)}%
-                                      </span>
-                                    </div>
-                                  </div>
-                                  <div className="flex justify-between items-center text-[13px] pt-1">
-                                    <span className="text-slate-600 dark:text-slate-300 font-bold">По факту:</span>
-                                    <span className="text-amber-600 dark:text-amber-500 font-black">
-                                      {calculationResults.reduce((acc, curr) => {
-                                        const leftovers = curr.lengthType === "НД" ? 0 : (curr.usefulLength - (curr.pcsPerBillet * curr.length));
-                                        return acc + (curr.drawLength > 0 ? (leftovers / curr.drawLength) * curr.totalWeight : 0);
-                                      }, 0).toFixed(3)} <span className="font-medium text-[9px] uppercase">тн</span>
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="bg-white dark:bg-[#1A1C19] rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                          <div className="p-4 sm:p-6 sm:px-8 border-b border-slate-100 dark:border-slate-800 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-slate-50/50 dark:bg-slate-800/20">
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6 w-full xl:w-auto">
-                              <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white uppercase tracking-widest shrink-0">Потребность по позициям</h4>
-                              <div className="bg-slate-100 dark:bg-slate-800 rounded-lg px-4 py-2 border border-slate-200 dark:border-slate-700 flex items-baseline w-full sm:w-auto">
-                                <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider mr-3 shrink-0">ИТОГО ост. к выполнению</span>
-                                <span className="text-sm font-black text-sky-600 dark:text-sky-400">
-                                  {calculationResults.reduce((sum, res) => sum + (res.remainingToProcess || 0), 0).toFixed(3)} <span className="text-[10px] font-bold text-slate-500 ml-1">тн</span>
-                                </span>
-                              </div>
-                            </div>
-                            <div className="flex flex-wrap items-stretch sm:items-center gap-2 sm:gap-4 w-full xl:w-auto">
-                              <div className="text-xs font-bold text-slate-400 dark:text-slate-500 hidden sm:block">{calculationResults.length} строк</div>
-                              
-                              <button
-                                onClick={() => {
-                                  const headers = [
-                                    "Внутренняя нумерация", "Дата отгрузки", "№ Заказа", "Клиент", "Номенклатура", "Профиль", "Марка", "Размер мм.", "Длина", "Кол-во тн в заказе", "ИТОГО остаток к выполнению"
-                                  ];
-                                  if (!isPurchasingMode) headers.push("Цена (руб)", "Сумма (руб)");
-
-                                  const rows = calculationResults
-                                    
-                                    .map(res => {
-                                      const row = [
-                                      res.internalNo || "",
-                                      res.shippingDate || "",
-                                      res.orderNo || "",
-                                      res.client || "",
-                                      res.nomenclature || "",
-                                      res.type || "",
-                                      res.grade || "",
-                                      String(res.diameter).replace(".", ","),
-                                      res.lengthType === "НД" ? "НД" : `МД ${res.length}`,
-                                      String(res.weightTons).replace(".", ","),
-                                      String(res.remainingToProcess.toFixed(3)).replace(".", ",")
-                                    ];
-                                    if (!isPurchasingMode) {
-                                      row.push(String(res.price).replace(".", ","), String(res.totalCost.toFixed(0)).replace(".", ","));
-                                    }
-                                    return row;
-                                  });
-                                  
-                                  const tsv = [headers, ...rows].map(row => row.join("\t")).join("\n");
-                                  navigator.clipboard.writeText(tsv);
-                                  setCopySuccess(true);
-                                  setTimeout(() => setCopySuccess(false), 2000);
-                                }}
-                                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm w-[calc(50%-0.25rem)] sm:w-auto ${
-                                  copySuccess 
-                                    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" 
-                                    : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50"
-                                }`}
-                                title="Скопировать для вставки (Ctrl+V) в Google Таблицы"
-                              >
-                                {copySuccess ? (
-                                  <>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                    Скопировано!
-                                  </>
-                                ) : (
-                                  <>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                                    <span className="truncate">Sheets</span>
-                                  </>
-                                )}
-                              </button>
-
-                              <button
-                                onClick={() => {
-                                  if (calculationResults.length === 0) return;
-                                  
-                                  const headers = [
-                                    "Внутренняя нумерация", "Дата отгрузки", "№ Заказа", "Клиент", "Номенклатура", "Профиль", "Марка", "Размер мм.", "Длина", "Кол-во тн в заказе", "ИТОГО остаток к выполнению"
-                                  ];
-                                  if (!isPurchasingMode) headers.push("Цена (руб)", "Сумма (руб)");
-                                  
-                                  const rows = calculationResults
-                                    
-                                    .map(res => {
-                                      const row = [
-                                      res.internalNo || "",
-                                      res.shippingDate || "",
-                                      res.orderNo || "",
-                                      res.client || "",
-                                      res.nomenclature || "",
-                                      res.type || "",
-                                      res.grade || "",
-                                      String(res.diameter).replace(".", ","),
-                                      res.lengthType === "НД" ? "НД" : `МД ${res.length}`,
-                                      String(res.weightTons).replace(".", ","),
-                                      String(res.remainingToProcess.toFixed(3)).replace(".", ",")
-                                    ];
-                                    if (!isPurchasingMode) {
-                                      row.push(String(res.price).replace(".", ","), String(res.totalCost.toFixed(0)).replace(".", ","));
-                                    }
-                                    return row;
-                                  });
-                                  
-                                  const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-
-                                  // Apply styling
-                                  const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
-                                  const centerCols = [0, 1, 6, 7, 9, 10, 12, 13, 14, 15]; 
-
-                                  for (let R = range.s.r; R <= range.e.r; ++R) {
-                                    for (let C = range.s.c; C <= range.e.c; ++C) {
-                                      const cell_address = { c: C, r: R };
-                                      const cell_ref = XLSX.utils.encode_cell(cell_address);
-                                      if (!worksheet[cell_ref]) continue;
-
-                                      const isCentered = centerCols.includes(C);
-
-                                      worksheet[cell_ref].s = {
-                                        font: { sz: 8 },
-                                        alignment: { 
-                                          horizontal: isCentered ? "center" : "left", 
-                                          vertical: "center",
-                                          wrapText: C === 4 || C === 11 // Wrap text for Nomenclature columns
-                                        }
-                                      };
-                                      
-                                      // Bold headers
-                                      if (R === 0) {
-                                        worksheet[cell_ref].s.font.bold = true;
-                                        worksheet[cell_ref].s.alignment.horizontal = "center";
-                                      }
-                                    }
-                                  }
-
-                                  // Freeze the first row
-                                  worksheet["!views"] = [{ state: "frozen", ySplit: 1 }];
-
-                                  const out_wcut = [
-                                      { wch: 20 }, { wch: 15 }, { wch: 25 }, { wch: 40 }, { wch: 15 },
-                                      { wch: 10 }, { wch: 10 }, { wch: 15 }, { wch: 10 },
-                                      { wch: 15 }, { wch: 15 },
-                                      { wch: 30 }, { wch: 10 }, { wch: 15 }, { wch: 15 }, { wch: 15 }
-                                  ];
-                                  worksheet["!cols"] = out_wcut;
-                                  
-                                  const workbook = XLSX.utils.book_new();
-                                  XLSX.utils.book_append_sheet(workbook, worksheet, "Потребность");
-                                  XLSX.writeFile(workbook, "Потребность_в_сырье.xlsx");
-                                }}
-                                className="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-colors shadow-sm w-[calc(50%-0.25rem)] sm:w-auto"
-                              >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                <span className="truncate">Excel</span>
-                              </button>
-                               {calculationResults.some(item => item.optimizedBilletLength && item.optimizedBilletLength !== item.billetLength && item.optimizedKim && item.optimizedKim > (item.remainingToProcess / item.totalWeight) + 0.005) && (
-                                <button
-                                  onClick={applyAllOptimizations}
-                                  className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl text-xs font-bold transition-colors shadow-sm w-full sm:w-auto"
-                                  title="Автоматически применить все предложенные улучшения КИМ"
-                                >
-                                  <TrendingUp className="w-4 h-4" />
-                                  <span className="truncate">Применить все улучшения КИМ</span>
-                                </button>
-                              )}
-                            </div>
-                          </div>
-
-                          <div 
-                            ref={tableContainerRef}
-                            onMouseDown={handleMouseDown}
-                            onMouseLeave={handleMouseLeaveOrUp}
-                            onMouseUp={handleMouseLeaveOrUp}
-                            onMouseMove={handleMouseMove}
-                            className={`overflow-auto max-h-[60vh] custom-scrollbar relative ${isDragging ? 'select-none cursor-grabbing' : 'cursor-grab'}`}
-                          >
-                            <table className="w-full border-separate border-spacing-0 pointer-events-auto block md:table">
-                              <thead className="sticky top-0 z-20 hidden md:table-header-group">
-                                <tr className="bg-slate-50/95 dark:bg-[#1A1C19]/95 backdrop-blur-sm shadow-[0_1px_0_rgba(241,245,249,1)] dark:shadow-[0_1px_0_rgba(30,41,59,1)]">
-                                  <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest w-20">Внутренняя нумерация</th>
-                                  <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest w-16">Дата отгрузки</th>
-                                  <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">№ Заказа</th>
-                                  <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Клиент</th>
-                                  <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Номенклатура</th>
-                                  <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Профиль</th>
-                                  <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Марка</th>
-                                  <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Размер мм.</th>
-                                  <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Длина</th>
-                                  <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Кол-во тн в заказе</th>
-                                  <th className="px-5 py-4 text-center text-[10px] font-bold text-sky-600 uppercase tracking-widest whitespace-nowrap">ИТОГО ост. к выполнению</th>
-                                  <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Номенклатура</th>
-                                  <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Марка<br/>заг.</th>
-                                  <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Размер мм.</th>
-                                  <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap text-emerald-600">Кол-во тн<br/>заг.</th>
-                                  <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Длина мм.</th>
-                                  <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap text-amber-500/80">Тех.<br/>Отходы</th>
-                                  <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap text-amber-500/80">Делов.<br/>Остаток</th>
-                                  <th className="px-5 py-4 text-center text-[10px] font-bold text-amber-500 uppercase tracking-widest whitespace-nowrap">
-                                    <div className="flex items-center justify-center gap-1.5">
-                                      КИМ / Совет
-                                      <div className="group relative z-[100]">
-                                        <Info className="w-3.5 h-3.5 text-amber-500/70 hover:text-amber-500 cursor-help transition-colors" />
-                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-2.5 bg-slate-900 dark:bg-slate-800 border border-slate-700 text-white text-[10.5px] rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 translate-y-1 group-hover:translate-y-0 shadow-xl normal-case tracking-normal whitespace-normal">
-                                          Показывает, какая часть заготовки идет в продукцию. Чем ближе к 1.0, тем лучше.
-                                          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900 dark:bg-slate-800 border-b border-r border-slate-700 rotate-45"></div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </th>
-                                  {!isPurchasingMode && (
-                                    <>
-                                      <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Цена за 1т</th>
-                                      <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Сумма</th>
-                                    </>
-                                  )}
-                                </tr>
-                              </thead>
-                              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-[11px] block md:table-row-group">
-                                {calculationResults.map(res => (
-                                  <tr key={res.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors block md:table-row mb-4 md:mb-0 border border-slate-200 dark:border-slate-800 md:border-none p-2 md:p-0 rounded-xl md:rounded-none bg-white dark:bg-[#1A1C19] md:bg-transparent">
-                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Внутр. нум.</span>
-                                      <div className="text-right md:text-center text-slate-600 dark:text-slate-400 whitespace-nowrap">{res.internalNo}</div>
-                                    </td>
-                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Дата отгр.</span>
-                                      <div className="text-right md:text-center text-slate-600 dark:text-slate-400 whitespace-nowrap">{res.shippingDate}</div>
-                                    </td>
-                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">№ Заказа</span>
-                                      <div className="text-right md:text-center font-bold text-slate-600 dark:text-slate-400 whitespace-nowrap">{res.orderNo}</div>
-                                    </td>
-                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Клиент</span>
-                                      <div className="text-right md:text-center font-medium text-slate-800 dark:text-slate-200 whitespace-nowrap">{res.client}</div>
-                                    </td>
-                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px] md:max-w-[200px]">
-                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px] shrink-0 mr-2">Номенклатура</span>
-                                      <div className="max-w-[150px] md:mx-auto truncate font-mono text-[10px] text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors text-right md:text-center" title={res.nomenclature}>
-                                        {res.nomenclature}
-                                      </div>
-                                    </td>
-                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Профиль</span>
-                                      <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 ml-auto md:ml-0 md:mx-auto">
-                                        {res.type}
-                                      </span>
-                                    </td>
-                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Марка</span>
-                                      <div className="text-right md:text-center font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap">{res.grade}</div>
-                                    </td>
-                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Размер мм.</span>
-                                      <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded ml-auto md:ml-0 md:mx-auto">
-                                        {parseFloat(res.diameter.toFixed(2))}
-                                      </span>
-                                    </td>
-                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Длина</span>
-                                      <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType === "НД" ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10' : 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'} ml-auto md:ml-0 md:mx-auto`}>
-                                        {res.lengthType === "НД" ? "НД" : `МД ${res.length}`}
-                                      </span>
-                                    </td>
-                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Кол-во тн</span>
-                                      <div className="text-right md:text-center font-black text-slate-900 dark:text-white whitespace-nowrap">{res.weightTons.toFixed(3)}</div>
-                                    </td>
-                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-sky-100 dark:border-sky-900/50 md:border-0 min-h-[44px] bg-sky-50/50 dark:bg-sky-900/10">
-                                      <span className="md:hidden font-bold text-sky-600 dark:text-sky-400 uppercase text-[10px]">ИТОГО ост.</span>
-                                      <div className="text-right md:text-center font-bold text-sky-600 dark:text-sky-400 whitespace-nowrap">{res.remainingToProcess.toFixed(3)}</div>
-                                    </td>
-                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Номенклатура заг.</span>
-                                      <div className="max-w-[150px] md:mx-auto truncate font-medium text-[10px] text-slate-500 text-right md:text-center" title={`Круг ${getGostForGrade(res.grade)}/ГОСТ 2590-2006`}>
-                                        Круг {getGostForGrade(res.grade)}/ГОСТ 2590-2006
-                                      </div>
-                                    </td>
-                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Марка заг.</span>
-                                      <div className="text-right md:text-center font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap">{res.grade}</div>
-                                    </td>
-                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Размер мм.</span>
-                                      <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded ml-auto md:ml-0 md:mx-auto">
-                                        {parseFloat(res.billetDia.toFixed(2))}
-                                      </span>
-                                    </td>
-                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                      <span className="md:hidden font-bold text-emerald-600 dark:text-emerald-400 uppercase text-[10px]">Кол-во тн заг.</span>
-                                      <div className="text-right md:text-center font-black text-emerald-600 dark:text-emerald-400 whitespace-nowrap">{res.totalWeight.toFixed(3)}</div>
-                                    </td>
-                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                      <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Длина мм.</span>
-                                      <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType === "НД" ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10' : 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'} ml-auto md:ml-0 md:mx-auto`}>
-                                        {res.lengthType === "НД" ? "НД" : `МД ${res.billetLength}`}
-                                      </span>
-                                    </td>
-                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                      <span className="md:hidden font-bold text-amber-500/80 uppercase text-[10px]">Тех. Отходы</span>
-                                      <div className="text-right md:text-center whitespace-nowrap">
-                                        <span className={`font-bold text-red-500/80 block`}>{res.drawLength > 0 ? ((res.techEnds / res.drawLength) * res.totalWeight).toFixed(3) : 0} тн</span>
-                                        <span className={`text-[9px] text-slate-400 block`}>{res.drawLength > 0 ? (((res.techEnds / res.drawLength) * res.totalWeight / res.totalWeight) * 100).toFixed(1) : 0}%</span>
-                                      </div>
-                                    </td>
-                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                      <span className="md:hidden font-bold text-amber-500/80 uppercase text-[10px]">Делов. Остаток</span>
-                                      <div className="text-right md:text-center whitespace-nowrap">
-                                        <span className={`font-bold text-sky-500/80 block`}>{(res.lengthType === "НД" || res.drawLength <= 0 ? 0 : ((res.usefulLength - (res.pcsPerBillet * res.length)) / res.drawLength * res.totalWeight)).toFixed(3)} тн</span>
-                                        <span className={`text-[9px] text-slate-400 block`}>{(res.lengthType === "НД" || res.drawLength <= 0 ? 0 : (((res.usefulLength - (res.pcsPerBillet * res.length)) / res.drawLength * res.totalWeight / res.totalWeight) * 100)).toFixed(1)}%</span>
-                                      </div>
-                                    </td>
-                                    <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                      <span className="md:hidden font-bold text-amber-500 uppercase text-[10px]">КИМ / Совет</span>
-                                      <div className={`flex flex-col items-end md:items-center gap-1`}>
-                                        <span className={`font-black text-[10px] ${res.remainingToProcess / res.totalWeight < 0.92 ? 'text-red-500' : 'text-amber-600'}`}>
-                                          {(res.remainingToProcess / res.totalWeight).toFixed(3)}
-                                        </span>
-                                        {res.optimizedBilletLength && res.optimizedBilletLength !== res.billetLength && res.optimizedKim && res.optimizedKim > (res.remainingToProcess / res.totalWeight) + 0.005 && (
-                                          <button 
-                                            onClick={() => {
-                                              // Implement applying optimization logic
-                                              setCalculationResults(prev => prev.map(item => {
-                                                if (item.id === res.id && res.optimizedBilletLength) {
-                                                  const newBilletLength = res.optimizedBilletLength;
-                                                  const newDrawLen = newBilletLength * item.drawRatio;
-                                                  const newUsefulLen = newDrawLen / (item.type === "Шестигранник" ? 1.03 * 1.003 : 1.027 * 1.003);
-                                                  let newPcs = 0;
-                                                  let newActualUL = 0;
-                                                  if (item.lengthType === "НД") {
-                                                    for (let i = 1; i <= 20; i++) {
-                                                      const optLen = Math.floor(newUsefulLen / i) - 5;
-                                                      if (optLen >= 3000 && optLen <= 6000) {
-                                                        newPcs = i;
-                                                        newActualUL = newPcs * optLen;
-                                                        break;
-                                                      }
-                                                    }
-                                                    if (newPcs === 0) newActualUL = newUsefulLen;
-                                                  } else {
-                                                    newPcs = Math.floor(newUsefulLen / item.length);
-                                                    newActualUL = newPcs * item.length;
-                                                  }
-                                                  const newKim = newDrawLen > 0 ? newActualUL / newDrawLen : 0;
-                                                  const newTotalWeight = newKim > 0 ? item.remainingToProcess / newKim : item.remainingToProcess;
-                                                  const billetArea = (Math.PI * Math.pow(item.billetDia, 2)) / 4;
-                                                  const wPerM = billetArea * 0.00000785 * 1000;
-                                                  const singleBMass = (newBilletLength / 1000) * wPerM;
-                                                  const newBilletCount = singleBMass > 0 ? Math.ceil((newTotalWeight * 1000) / singleBMass) : 0;
-                                                  
-                                                  return {
-                                                    ...item,
-                                                    billetLength: newBilletLength,
-                                                    drawLength: newDrawLen,
-                                                    usefulLength: newUsefulLen,
-                                                    pcsPerBillet: newPcs,
-                                                    wastePercent: (1 - newKim) * 100,
-                                                    totalWeight: newTotalWeight,
-                                                    billetCount: newBilletCount,
-                                                    quantity: newBilletCount,
-                                                    totalCost: newTotalWeight * item.price
-                                                  };
-                                                }
-                                                return item;
-                                              }));
-                                            }}
-                                            className={`px-2 py-0.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[9px] font-bold rounded-full shadow-sm shadow-emerald-500/20 active:scale-95 transition-all flex items-center gap-1`}
-                                            title={`Улучшить КИМ до ${res.optimizedKim.toFixed(3)} используя L заг. ${res.optimizedBilletLength}`}
-                                          >
-                                            <TrendingUp className={`w-2.5 h-2.5`} />
-                                            {res.optimizedBilletLength}
-                                          </button>
-                                        )}
-                                      </div>
-                                    </td>
-                                    {!isPurchasingMode && (
-                                      <>
-                                        <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                          <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Цена за 1т</span>
-                                          <div className={`text-right md:text-center font-medium text-slate-600 dark:text-slate-400 whitespace-nowrap`}>
-                                            {res.price ? formatCurrency(res.price) : "—"}
-                                          </div>
-                                        </td>
-                                        <td className="px-4 md:px-5 py-3 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                          <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Сумма</span>
-                                          <div className={`text-right md:text-center font-bold text-slate-900 dark:text-white whitespace-nowrap`}>
-                                            {res.totalCost ? formatCurrency(res.totalCost) : "—"}
-                                          </div>
-                                        </td>
-                                      </>
-                                    )}
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </motion.div>
-                ) : supplySection === "calc-stock" ? (
-                  <motion.div
-                    key="supply-calc-stock"
-                    initial={{ opacity: 0, x: 10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className={`flex flex-col gap-8`}
-                  >
-                    {matchedDemand.length === 0 ? (
-                      <div className="bg-white/50 dark:bg-[#1A1C19]/40 border border-slate-200 dark:border-slate-800 rounded-[40px] p-12 flex flex-col items-center justify-center min-h-[500px]">
-                        <div className="flex items-center gap-4 sm:gap-8 mb-8 relative">
-                          <div className="relative">
-                            <div className="w-20 h-20 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center border border-blue-100 dark:border-blue-800/30 z-10 relative">
-                              <ClipboardList className="w-10 h-10 text-blue-500" />
-                            </div>
-                            <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-bold text-slate-500">Заказы</span>
-                          </div>
-                          
-                          <div className="flex items-center w-24 sm:w-32">
-                             <div className="w-full h-[2px] bg-gradient-to-r from-blue-300 via-slate-300 to-emerald-300 dark:from-blue-600 dark:via-slate-600 dark:to-emerald-600 border border-dashed border-transparent [background-clip:padding-box]" style={{ backgroundImage: 'linear-gradient(90deg, transparent 50%, rgba(148, 163, 184, 0.5) 50%)', backgroundSize: '16px 2px' }}></div>
-                          </div>
-
-                          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white dark:bg-slate-800 rounded-full border-2 border-slate-100 dark:border-slate-700 flex items-center justify-center shadow-lg transform -translate-y-6">
-                             <HelpCircle className="w-6 h-6 text-slate-400" />
-                          </div>
-                          
-                          <div className="relative">
-                            <div className="w-20 h-20 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center border border-emerald-100 dark:border-emerald-800/30 z-10 relative">
-                              <Package className="w-10 h-10 text-emerald-500" />
-                            </div>
-                            <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-bold text-slate-500">Склад</span>
-                          </div>
-                        </div>
-                        
-                        <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-4 mb-2">Сравнивать пока нечего</h3>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 text-center max-w-sm px-6 leading-relaxed mb-8">
-                          Чтобы найти дефицит металла, нам нужно вычесть складские остатки из вашей потребности. Нужно загрузить сразу два файла!
-                        </p>
-                        
-                        <button 
-                          onClick={() => setActiveTab("files")} 
-                          className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center gap-2"
-                        >
-                          <Upload className="w-4 h-4" />
-                          Загрузить файлы для сравнения
-                        </button>
-                      </div>
-                    ) : (
-                      <>
-                        <div className={`bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-[20px] sm:rounded-[32px] overflow-hidden flex flex-col shadow-xl shadow-slate-200/50 dark:shadow-none`}>
-                        <div className={`flex flex-col 2xl:flex-row 2xl:items-center justify-between gap-4 sm:gap-6 p-4 sm:p-5 xl:p-6 pb-2 sm:pb-3 xl:pb-6 bg-white dark:bg-[#1A1C19]`}>
-                           <div className={`flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 2xl:border-r border-slate-200 dark:border-slate-800 2xl:pr-6 w-full 2xl:w-auto`}>
-                             <h4 className={`text-sm sm:text-base font-black text-slate-900 dark:text-white uppercase tracking-widest`}>Расчет с учетом наличия</h4>
-                              <div className="flex flex-wrap gap-2 sm:gap-4 w-full 2xl:w-auto">
-                                <div className="flex items-baseline justify-between sm:justify-start px-3 sm:px-4 py-2 text-sky-600 font-black bg-sky-50/80 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800/30 rounded-xl sm:rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-                                  <span className="text-[10px] sm:text-[11px] mr-2 uppercase font-bold text-sky-600/80 tracking-widest">Взято со склада</span>
-                                  <div>
-                                    <span className="text-lg sm:text-xl tracking-tight leading-none">
-                                      {filteredTotals.allocated.toFixed(3)}
-                                    </span>
-                                    <span className="text-[9px] sm:text-[10px] ml-1 uppercase font-bold text-sky-600/70">тн</span>
-                                  </div>
-                                </div>
-                                <div className="flex items-baseline justify-between sm:justify-start px-3 sm:px-4 py-2 text-rose-600 font-black bg-rose-50/80 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800/30 rounded-xl sm:rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-                                  <span className="text-[10px] sm:text-[11px] mr-2 uppercase font-bold text-rose-600/80 tracking-widest">Дефицит</span>
-                                  <div>
-                                    <span className="text-lg sm:text-xl tracking-tight leading-none">
-                                      {filteredTotals.deficit.toFixed(3)}
-                                    </span>
-                                    <span className="text-[9px] sm:text-[10px] ml-1 uppercase font-bold text-rose-600/70">тн</span>
-                                  </div>
-                                </div>
-                              </div>
-                           </div>
-                           <div className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full 2xl:w-auto flex-wrap`}>
-                             <div className="flex items-center bg-slate-50 dark:bg-slate-800 rounded-xl px-3 py-2 sm:w-64 border border-slate-200 dark:border-slate-700">
-                               <Search className="w-4 h-4 text-slate-400 mr-2 shrink-0" />
-                               <input 
-                                 type="text" 
-                                 placeholder="Поиск по заказу, клиенту..." 
-                                 value={searchQuery}
-                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                 className="bg-transparent border-none outline-none text-xs w-full text-slate-700 dark:text-slate-200 placeholder:text-slate-400"
-                               />
-                             </div>
-                             <div className="flex items-center bg-slate-50 dark:bg-slate-800 rounded-xl px-3 py-2 border border-slate-200 dark:border-slate-700">
-                               <Filter className="w-4 h-4 text-slate-400 mr-2 shrink-0" />
-                               <select 
-                                 value={statusFilter}
-                                 onChange={(e) => setStatusFilter(e.target.value)}
-                                 className="bg-transparent border-none outline-none text-xs text-slate-700 dark:text-slate-200"
-                               >
-                                 <option value="ALL">Все статусы</option>
-                                 <option value="OK">Обеспечено</option>
-                                 <option value="DEFICIT">Дефицит</option>
-                               </select>
-                             </div>
-                             <button
-                               onClick={() => {
-                                 if (filteredMatchedDemand.length === 0) return;
-                                 const headers = [
-                                   "Внутренняя нумерация", "Дата отгрузки", "№ Заказа", "Клиент", "Номенклатура", "Профиль", "Марка", "Размер мм.", "Длина", "Кол-во тн в заказе", "ИТОГО остаток к выполнению", "Взято со склада (тн)", "ИТОГО остатка к завершению", "Тех. отходы склад г/к", "Дел. Остатки склад г/к", "КИМ склад г/к", "Исходная Номенклатура", "Профиль наличия", "НТД", "Марка стали наличия", "Размер наличия", "Длина (склад г/к)", "Остаток на складе г/к. (тн)", "Взято со склада г/к (тн)", "Свободный остаток г/к склад (тн)"
-                                 ];
-                                 const rows: string[][] = [];
-                                 matchedDemand.forEach((res: any) => {
-                                   const baseRow = [
-                                     res.internalNo || "",
-                                     res.shippingDate || "",
-                                     res.orderNo || "",
-                                     res.client || "",
-                                     res.nomenclature || "",
-                                     res.type || "",
-                                     res.grade || "",
-                                     String(res.diameter).replace(".", ","),
-                                     res.lengthType === "НД" ? "НД" : `МД ${res.length}`,
-                                     String(res.weightTons || 0).replace(".", ","),
-                                     String(res.remainingToProcess || 0).replace(".", ","),
-                                     String(res.allocatedStock || 0).replace(".", ","),
-                                     String(res.shortageStock || 0).replace(".", ","),
-                                     res.allocatedStock > 0 && res.combinedTechWaste > 0 ? String(res.combinedTechWaste.toFixed(3)).replace(".", ",") : "0",
-                                     res.allocatedStock > 0 && res.combinedUsefulRem > 0 ? String(res.combinedUsefulRem.toFixed(3)).replace(".", ",") : "0",
-                                     res.allocatedStock > 0 && res.combinedKim > 0 ? String(res.combinedKim.toFixed(3)).replace(".", ",") : "0"
-                                   ];
-                                   const maxRows = Math.max(1, res.matchedStockItems?.length || 0);
-                                   const rowTemplate = Array(headers.length).fill("");
-                                   for(let i=0; i<16; i++) rowTemplate[i] = baseRow[i];
-                                   
-                                   for (let r = 0; r < maxRows; r++) {
-                                     const outRow = [...rowTemplate];
-                                     if (r > 0) {
-                                       for (let c = 0; c < 16; c++) outRow[c] = "";
-                                     }
-
-                                     const st = res.matchedStockItems?.[r];
-                                     if (st) {
-                                       outRow[16] = st["Исходная Номенклатура"] || "";
-                                       outRow[17] = st["Профиль"] || "";
-                                       outRow[18] = st["НТД"] || "";
-                                       outRow[19] = st["Марка стали"] || "";
-                                       outRow[20] = String(st["Размер"] || "").replace(".", ",");
-                                       outRow[21] = st["Длина"] || "";
-                                       outRow[22] = String(st.stockBeforeTaking || 0).replace(".", ",");
-                                       outRow[23] = String(st.allocatedAmount || 0).replace(".", ",");
-                                       outRow[24] = String(st.stockAfterTaking || 0).replace(".", ",");
-                                     }
-                                     rows.push(outRow);
-                                   }
-                                 });
-                                 
-                                 const tsv = [headers, ...rows].map(row => row.join("\t")).join("\n");
-                                  
-                                  let rowsHtml = '<table border="1"><thead><tr>' + headers.map(h => '<th style="text-align:center;font-weight:bold;">' + h + '</th>').join('') + '</tr></thead><tbody>';
-                                  
-                                  matchedDemand.forEach((res: any) => {
-                                      const baseRow = [
-                                          res.internalNo || "", res.shippingDate || "", res.orderNo || "", res.client || "", res.nomenclature || "", res.type || "", res.grade || "", String(res.diameter).replace(".", ","),
-                                          res.lengthType === "НД" ? "НД" : "МД " + res.length, String(res.weightTons || 0).replace(".", ","), String(res.remainingToProcess || 0).replace(".", ","),
-                                          String(res.allocatedStock || 0).replace(".", ","), String(res.shortageStock || 0).replace(".", ","),
-                                          String(res.allocatedStock > 0 && res.combinedTechWaste > 0 ? res.combinedTechWaste.toFixed(3) : "0").replace(".", ","),
-                                          String(res.allocatedStock > 0 && res.combinedUsefulRem > 0 ? res.combinedUsefulRem.toFixed(3) : "0").replace(".", ","),
-                                          String(res.allocatedStock > 0 && res.combinedKim > 0 ? res.combinedKim.toFixed(3) : "0").replace(".", ",")
-                                      ];
-                                      const numRows = Math.max(1, res.matchedStockItems?.length || 0);
-                                      if (res.matchedStockItems?.length === 0) {
-                                          rowsHtml += '<tr>' + baseRow.map(v => '<td style="text-align:center;vertical-align:middle;">' + v + '</td>').join('') + '<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
-                                      } else {
-                                          res.matchedStockItems?.forEach((stock: any, index: number) => {
-                                              const stockRow = [
-                                                  stock["Исходная Номенклатура"] || "", stock["Профиль"] || "", stock["НТД"] || "", stock["Марка стали"] || "",
-                                                  String(stock["Размер"] || "").replace(".", ","), stock["Длина"] || "", String(stock.stockBeforeTaking || 0).replace(".", ","),
-                                                  String(stock.allocatedAmount || 0).replace(".", ","), String(stock.stockAfterTaking || 0).replace(".", ",")
-                                              ];
-                                              rowsHtml += '<tr>';
-                                              if (index === 0) {
-                                                  baseRow.forEach(v => {
-                                                      rowsHtml += '<td rowspan="' + numRows + '" style="text-align:center;vertical-align:middle;">' + v + '</td>';
-                                                  });
-                                              }
-                                              stockRow.forEach(v => {
-                                                  rowsHtml += '<td style="text-align:center;vertical-align:middle;">' + v + '</td>';
-                                              });
-                                              rowsHtml += '</tr>';
-                                          });
-                                      }
-                                  });
-                                  rowsHtml += '</tbody></table>';
-                                  
-                                  try {
-                                    const blobText = new Blob([tsv], { type: "text/plain" });
-                                    const blobHtml = new Blob([rowsHtml], { type: "text/html" });
-                                    const item = new ClipboardItem({ "text/html": blobHtml, "text/plain": blobText });
-                                    navigator.clipboard.write([item]).catch(() => navigator.clipboard.writeText(tsv));
-                                  } catch (e) {
-                                    navigator.clipboard.writeText(tsv);
-                                  }
-                                 setIsCopied(true);
-                                 setTimeout(() => setIsCopied(false), 2000);
-                               }}
-                               className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-[#121411] sm:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
-                               title="Скопировать для Excel"
-                             >
-                               {isCopied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
-                             </button>
-                             <button
-                               onClick={() => {
-                                 if (matchedDemand.length === 0) return;
-                                 const headers = [
-                                   "Внутренняя нумерация", "Дата отгрузки", "№ Заказа", "Клиент", "Номенклатура", "Профиль", "Марка", "Размер мм.", "Длина", "Кол-во тн в заказе", "ИТОГО остаток к выполнению", "Взято со склада (тн)", "ИТОГО остатка к завершению", "Тех. отходы склад г/к", "Дел. Остатки склад г/к", "КИМ склад г/к", "Исходная Номенклатура", "Профиль наличия", "НТД", "Марка стали наличия", "Размер наличия", "Длина (склад г/к)", "Остаток на складе г/к. (тн)", "Взято со склада г/к (тн)", "Свободный остаток г/к склад (тн)"
-                                 ];
-                                 const rows: any[][] = [];
-                                 matchedDemand.forEach((res: any) => {
-                                   const baseRow = [
-                                     res.internalNo || "",
-                                     res.shippingDate || "",
-                                     res.orderNo || "",
-                                     res.client || "",
-                                     res.nomenclature || "",
-                                     res.type || "",
-                                     res.grade || "",
-                                     res.diameter,
-                                     res.lengthType === "НД" ? "НД" : `МД ${res.length}`,
-                                     Number(res.weightTons || 0),
-                                     Number(res.remainingToProcess || 0),
-                                     Number(res.allocatedStock || 0),
-                                     Number(res.shortageStock || 0),
-                                     res.allocatedStock > 0 && res.combinedTechWaste > 0 ? Number(res.combinedTechWaste.toFixed(3)) : 0,
-                                     res.allocatedStock > 0 && res.combinedUsefulRem > 0 ? Number(res.combinedUsefulRem.toFixed(3)) : 0,
-                                     res.allocatedStock > 0 && res.combinedKim > 0 ? Number(res.combinedKim.toFixed(3)) : 0
-                                   ];
-                                   const maxRows = Math.max(1, res.matchedStockItems?.length || 0);
-                                   const rowTemplate = Array(headers.length).fill("");
-                                   for(let i=0; i<16; i++) rowTemplate[i] = baseRow[i];
-                                   
-                                   for (let r = 0; r < maxRows; r++) {
-                                     const outRow = [...rowTemplate];
-                                     if (r > 0) {
-                                       for (let c = 0; c < 16; c++) outRow[c] = "";
-                                     }
-
-                                     const st = res.matchedStockItems?.[r];
-                                     if (st) {
-                                       outRow[16] = st["Исходная Номенклатура"] || "";
-                                       outRow[17] = st["Профиль"] || "";
-                                       outRow[18] = st["НТД"] || "";
-                                       outRow[19] = st["Марка стали"] || "";
-                                       outRow[20] = st["Размер"] || "";
-                                       outRow[21] = st["Длина"] || "";
-                                       outRow[22] = Number(st.stockBeforeTaking || 0);
-                                       outRow[23] = Number(st.allocatedAmount || 0);
-                                       outRow[24] = Number(st.stockAfterTaking || 0);
-                                     }
-                                     rows.push(outRow);
-                                   }
-                                 });
-                                 
-                                 const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-                                 const numberCols = [9, 10, 11, 12, 13, 14, 15, 22, 23, 24];
-                                 const range = XLSX.utils.decode_range(worksheet['!ref'] || "A1:A1");
-                                 for (let R = 1; R <= range.e.r; ++R) {
-                                   for (let c of numberCols) {
-                                     const cellAddress = { c: c, r: R };
-                                     const cellRef = XLSX.utils.encode_cell(cellAddress);
-                                     if (worksheet[cellRef] && typeof worksheet[cellRef].v === 'number') {
-                                       worksheet[cellRef].t = 'n';
-                                       worksheet[cellRef].z = '#,##0.000" тн."';
-                                     }
-                                   }
-                                 }
-
-                                 const workbook = XLSX.utils.book_new();
-                                 XLSX.utils.book_append_sheet(workbook, worksheet, "Расчет с наличием");
-                                 XLSX.writeFile(workbook, "Расчет_с_учетом_наличия.xlsx");
-                               }}
-                               className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
-                               title="Скачать в Excel"
-                             >
-                               <Download className="w-4 h-4" />
-                             </button>
-                           </div>
-                         </div>
-                        </div>
-                         
-                         {filteredMatchedDemand.length > 0 && (
-                            <>
-                              <div className="bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm overflow-hidden flex flex-col h-full">
-                                <div 
-                                  ref={supplyTableRef}
-                                  onMouseDown={onSupplyMouseDown}
-                                  onMouseLeave={handleMouseLeaveOrUp}
-                                  onMouseUp={handleMouseLeaveOrUp}
-                                  onMouseMove={handleMouseMove}
-                                  className={`flex-1 overflow-auto custom-scrollbar relative ${isSupplyDragging ? 'select-none cursor-grabbing' : 'cursor-grab'}`}
-                                >
-                                  <table className="w-full text-left border-separate border-spacing-0">
-                                    <thead className="bg-slate-50 dark:bg-slate-800/50 sticky top-0 z-10 shadow-sm">
-                                      <tr>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Вх. №</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Дата отгр.</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">№ Заказа</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Заказчик</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap border-r border-slate-200 dark:border-slate-700">Номенклатура</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Профиль</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">М. стали</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Размер</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Длина</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Кол-во тн в зак.</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-sky-600 uppercase tracking-widest whitespace-nowrap border-r border-slate-200 dark:border-slate-700">ИТОГО ост. к выполнению</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Номенклатура<br/>заг.</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Марка<br/>заг.</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Размер<br/>заг.</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-emerald-600 uppercase tracking-widest whitespace-nowrap">Кол-во тн<br/>заг.</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap border-r border-slate-200 dark:border-slate-700">Длина мм.</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-amber-500/80 uppercase tracking-widest whitespace-nowrap">Тех.<br/>Отходы</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-amber-500/80 uppercase tracking-widest whitespace-nowrap">Делов.<br/>Остаток</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-amber-500 uppercase tracking-widest whitespace-nowrap border-r border-slate-200 dark:border-slate-700">КИМ /<br/>Совет</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-emerald-500 uppercase tracking-widest whitespace-nowrap">Взято со склада (тн)</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-rose-500 uppercase tracking-widest whitespace-nowrap border-r border-slate-200 dark:border-slate-700">ИТОГО ост. к завершению /<br/>после склада г/к</th>
-                                        <th className="px-5 py-2 text-center text-[10px] font-bold text-amber-500 uppercase tracking-widest whitespace-nowrap align-middle">
-                                          <div className="flex flex-col items-center justify-center gap-1">
-                                            <span>Тех. отходы склад г/к</span>
-                                            <div className="inline-flex items-center gap-1 border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 rounded text-[9px] font-black tracking-normal">
-                                              <span className="text-amber-500/70">Σ</span>
-                                              <span>{filteredTotals.techWaste2.toFixed(3)} тн</span>
-                                            </div>
-                                          </div>
-                                        </th>
-                                        <th className="px-5 py-2 text-center text-[10px] font-bold text-amber-500 uppercase tracking-widest whitespace-nowrap align-middle">
-                                          <div className="flex flex-col items-center justify-center gap-1">
-                                            <span>Дел. Остатки склад г/к</span>
-                                            <div className="inline-flex items-center gap-1 border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 rounded text-[9px] font-black tracking-normal">
-                                              <span className="text-amber-500/70">Σ</span>
-                                              <span>{filteredTotals.usefulRem2.toFixed(3)} тн</span>
-                                            </div>
-                                          </div>
-                                        </th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-amber-500 uppercase tracking-widest whitespace-nowrap">КИМ склад г/к</th>
-                                        <th className="px-5 py-4 text-left text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Исход Номенклатура</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Профиль</th>
-                                        <th className="px-5 py-4 text-left text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">НТД</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Марка стали</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Размер</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Длина</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Исх. Остаток (тн)</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-emerald-500 uppercase tracking-widest whitespace-nowrap">Взято (тн)</th>
-                                        <th className="px-5 py-4 text-center text-[10px] font-bold text-sky-500 uppercase tracking-widest whitespace-nowrap">Остаток на складе (тн)</th>
-                                      </tr>
-                                    </thead>
-                             <tbody className={`divide-y divide-slate-100 dark:divide-slate-800 text-[11px]`}>
-                               {filteredMatchedDemand.map((res) => {
-                                 const renderMainRow = (stockItem: any = null, isSubRow = false) => (
-                                    <tr key={`${res.id}${stockItem ? `-${stockItem._id}` : ''}`} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
-                                      {/* Demand section (duplicated on sub-rows but dimmed) */}
-                                      {!isSubRow && (
-                                        <>
-                                          <td className={`px-5 py-3 align-middle whitespace-nowrap text-center ${res.matchedStockItems.length > 1 ? 'font-black text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-900/20' : 'text-slate-600 dark:text-slate-400'}`} rowSpan={Math.max(1, res.matchedStockItems.length)}>{res.internalNo || "—"}</td>
-                                          <td className={`px-5 py-3 align-middle whitespace-nowrap text-center text-slate-600 dark:text-slate-400`} rowSpan={Math.max(1, res.matchedStockItems.length)}>{res.shippingDate}</td>
-                                          <td className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-slate-600 dark:text-slate-400 group relative`} rowSpan={Math.max(1, res.matchedStockItems.length)}>
-                                             <div className="font-bold text-slate-600 dark:text-slate-400 cursor-help">{res.orderNo}</div>
-                                             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 z-50">
-                                               <div className="bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur-md text-white text-[10px] py-2 px-3 rounded-xl shadow-xl border border-white/10 whitespace-nowrap min-w-[120px]">
-                                                 <div className="flex flex-col gap-1.5 text-left">
-                                                   <div className="flex justify-between items-center gap-3">
-                                                     <span className="text-slate-400 text-[9px]">Обеспечено:</span>
-                                                     <span className="font-bold text-emerald-400">{res.allocatedStock.toFixed(3)} тн</span>
-                                                   </div>
-                                                   <div className="flex justify-between items-center gap-3">
-                                                     <span className="text-slate-400 text-[9px]">Дефицит:</span>
-                                                     <span className="font-bold text-rose-400">{res.shortageStock.toFixed(3)} тн</span>
-                                                   </div>
-                                                 </div>
-                                               </div>
-                                               <div className="w-2 h-2 bg-slate-900 dark:bg-slate-800 rotate-45 absolute -bottom-1 left-1/2 -translate-x-1/2 border-r border-b border-white/10"></div>
-                                             </div>
-                                           </td>
-                                          <td className={`px-5 py-3 align-middle text-center font-medium text-slate-800 dark:text-slate-200 whitespace-nowrap group relative`} rowSpan={Math.max(1, res.matchedStockItems.length)}>
-                                             <div className="font-medium text-slate-800 dark:text-slate-200 whitespace-nowrap cursor-help">{res.client}</div>
-                                             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 z-50">
-                                               <div className="bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur-md text-white text-[10px] py-2 px-3 rounded-xl shadow-xl border border-white/10 whitespace-nowrap min-w-[120px]">
-                                                 <div className="flex flex-col gap-1.5 text-left">
-                                                   <div className="flex justify-between items-center gap-3">
-                                                     <span className="text-slate-400 text-[9px]">Обеспечено:</span>
-                                                     <span className="font-bold text-emerald-400">{res.allocatedStock.toFixed(3)} тн</span>
-                                                   </div>
-                                                   <div className="flex justify-between items-center gap-3">
-                                                     <span className="text-slate-400 text-[9px]">Дефицит:</span>
-                                                     <span className="font-bold text-rose-400">{res.shortageStock.toFixed(3)} тн</span>
-                                                   </div>
-                                                 </div>
-                                               </div>
-                                               <div className="w-2 h-2 bg-slate-900 dark:bg-slate-800 rotate-45 absolute -bottom-1 left-1/2 -translate-x-1/2 border-r border-b border-white/10"></div>
-                                             </div>
-                                           </td>
-                                          <td className={`px-5 py-3 align-middle text-center max-w-[200px]`} rowSpan={Math.max(1, res.matchedStockItems.length)}>
-                                            <div className="max-w-[150px] mx-auto truncate font-mono text-[10px] text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors" title={res.nomenclature}>{res.nomenclature}</div>
-                                          </td>
-                                          <td className={`px-5 py-3 align-middle whitespace-nowrap text-center`} rowSpan={Math.max(1, res.matchedStockItems.length)}>
-                                            <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">{res.type}</span>
-                                          </td>
-                                          <td className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-slate-700 dark:text-slate-200`} rowSpan={Math.max(1, res.matchedStockItems.length)}>{res.grade}</td>
-                                          <td className={`px-5 py-3 align-middle whitespace-nowrap text-center`} rowSpan={Math.max(1, res.matchedStockItems.length)}>
-                                            <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded">
-                                              {parseFloat(res.diameter.toFixed(2))}
-                                            </span>
-                                          </td>
-                                          <td className={`px-5 py-3 align-middle whitespace-nowrap text-center`} rowSpan={Math.max(1, res.matchedStockItems.length)}>
-                                            <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType === "НД" ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10' : 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'}`}>
-                                              {res.lengthType === "НД" ? "НД" : `МД ${res.length}`}
-                                            </span>
-                                          </td>
-                                          <td className={`px-5 py-3 align-middle whitespace-nowrap text-center font-black text-slate-900 dark:text-white`} rowSpan={Math.max(1, res.matchedStockItems.length)}>{res.weightTons.toFixed(3)}</td>
-                                          <td className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-sky-600 dark:text-sky-400`} rowSpan={Math.max(1, res.matchedStockItems.length)}>{res.remainingToProcess.toFixed(3)}</td>
-                                          <td className="px-5 py-3 align-middle whitespace-nowrap text-center text-slate-500" rowSpan={Math.max(1, res.matchedStockItems.length)}>
-                                            <div className="max-w-[150px] mx-auto truncate font-medium text-[10px] text-slate-500" title={`Круг ${getGostForGrade(res.grade)}/ГОСТ 2590-2006`}>
-                                              Круг {getGostForGrade(res.grade)}/ГОСТ 2590-2006
-                                            </div>
-                                          </td>
-                                          <td className="px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-slate-700 dark:text-slate-200" rowSpan={Math.max(1, res.matchedStockItems.length)}>{res.grade}</td>
-                                          <td className="px-5 py-3 align-middle whitespace-nowrap text-center" rowSpan={Math.max(1, res.matchedStockItems.length)}>
-                                            <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded">
-                                              {parseFloat(res.billetDia.toFixed(2))}
-                                            </span>
-                                          </td>
-                                          <td className="px-5 py-3 align-middle whitespace-nowrap text-center font-black text-emerald-600 dark:text-emerald-400" rowSpan={Math.max(1, res.matchedStockItems.length)}>{res.totalWeight.toFixed(3)}</td>
-                                          <td className="px-5 py-3 align-middle whitespace-nowrap text-center" rowSpan={Math.max(1, res.matchedStockItems.length)}>
-                                            <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType === "НД" ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10' : 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'}`}>
-                                              {res.lengthType === "НД" ? "НД" : `МД ${res.billetLength}`}
-                                            </span>
-                                          </td>
-                                          <td className="px-5 py-3 align-middle whitespace-nowrap text-center" rowSpan={Math.max(1, res.matchedStockItems.length)}>
-                                            <span className={`font-bold text-red-500/80 block`}>{res.drawLength > 0 ? ((res.techEnds / res.drawLength) * res.totalWeight).toFixed(3) : 0} тн</span>
-                                            <span className={`text-[9px] text-slate-400 block`}>{res.drawLength > 0 ? (((res.techEnds / res.drawLength) * res.totalWeight / res.totalWeight) * 100).toFixed(1) : 0}%</span>
-                                          </td>
-                                          <td className="px-5 py-3 align-middle whitespace-nowrap text-center" rowSpan={Math.max(1, res.matchedStockItems.length)}>
-                                            <span className={`font-bold text-sky-500/80 block`}>{(res.lengthType === "НД" || res.drawLength <= 0 ? 0 : ((res.usefulLength - (res.pcsPerBillet * res.length)) / res.drawLength * res.totalWeight)).toFixed(3)} тн</span>
-                                            <span className={`text-[9px] text-slate-400 block`}>{(res.lengthType === "НД" || res.drawLength <= 0 ? 0 : (((res.usefulLength - (res.pcsPerBillet * res.length)) / res.drawLength * res.totalWeight / res.totalWeight) * 100)).toFixed(1)}%</span>
-                                          </td>
-                                          <td className="px-5 py-3 align-middle whitespace-nowrap text-center" rowSpan={Math.max(1, res.matchedStockItems.length)}>
-                                            <span className={`font-black tracking-tight ${res.remainingToProcess / res.totalWeight < 0.92 ? 'text-red-500' : 'text-amber-600'}`}>
-                                              {(res.remainingToProcess / res.totalWeight).toFixed(3)}
-                                            </span>
-                                          </td>
-                                          <td className={`px-5 py-3 align-middle whitespace-nowrap text-center font-black ${res.allocatedStock > 0 ? 'text-emerald-600 dark:text-emerald-500' : 'text-slate-400'}`} rowSpan={Math.max(1, res.matchedStockItems.length)}>
-                                            {res.allocatedStock > 0 ? res.allocatedStock.toFixed(3) : "—"}
-                                          </td>
-                                          <td className={`px-5 py-3 align-middle whitespace-nowrap text-center font-black ${res.shortageStock > 0.0005 ? 'text-rose-600 dark:text-rose-500' : 'text-slate-400'}`} rowSpan={Math.max(1, res.matchedStockItems.length)}>
-                                            {res.shortageStock > 0.0005 ? res.shortageStock.toFixed(3) : "—"}
-                                          </td>
-                                          <td className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-amber-600`} rowSpan={Math.max(1, res.matchedStockItems.length)}>
-                                            {res.allocatedStock > 0 && res.combinedTechWaste > 0 ? res.combinedTechWaste.toFixed(3) : "—"}
-                                          </td>
-                                          <td className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-amber-600`} rowSpan={Math.max(1, res.matchedStockItems.length)}>
-                                            {res.allocatedStock > 0 && res.combinedUsefulRem > 0 ? res.combinedUsefulRem.toFixed(3) : "—"}
-                                          </td>
-                                          <td className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-amber-600`} rowSpan={Math.max(1, res.matchedStockItems.length)}>
-                                            {res.allocatedStock > 0 && res.combinedKim > 0 ? res.combinedKim.toFixed(3) : "—"}
-                                          </td>
-                                        </>
-                                      )}
-
-                                      {stockItem ? (
-                                        <>
-                                          <td className="px-5 py-4 text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors max-w-[200px] text-left">
-                                            <div className="max-w-[150px] truncate font-mono text-[10px]" title={stockItem["Исходная Номенклатура"]}>
-                                              {stockItem["Исходная Номенклатура"]}
-                                            </div>
-                                          </td>
-                                          <td className="px-5 py-4 text-center">
-                                            <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                                              {stockItem["Профиль"]}
-                                            </span>
-                                          </td>
-                                          <td className="px-5 py-4 text-left text-[10px] text-slate-500 max-w-[150px] truncate">{stockItem["НТД"]}</td>
-                                          <td className="px-5 py-4 text-center">
-                                            <span className="font-bold text-slate-700 dark:text-slate-200">{stockItem["Марка стали"]}</span>
-                                          </td>
-                                          <td className="px-5 py-4 text-center">
-                                            <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded">
-                                              {stockItem["Размер"]}
-                                            </span>
-                                          </td>
-                                          <td className="px-5 py-4 text-center">
-                                            <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${
-                                              stockItem["Длина"].toString().includes('МД') 
-                                                ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10' 
-                                                : 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10'
-                                            }`}>
-                                              {stockItem["Длина"]}
-                                            </span>
-                                          </td>
-                                          <td className="px-5 py-3 text-center font-bold text-slate-400">{stockItem.stockBeforeTaking.toFixed(3)}</td>
-                                          <td className="px-5 py-3 text-center font-black text-emerald-600">{stockItem.allocatedAmount.toFixed(3)}</td>
-                                          <td className="px-5 py-3 text-center font-bold text-sky-600">{stockItem.stockAfterTaking.toFixed(3)}</td>
-                                        </>
-                                      ) : (
-                                        <>
-                                          <td className="px-5 py-3 text-slate-400 italic text-left" colSpan={9}>—</td>
-                                        </>
-                                      )}
-                                   </tr>
-                                 );
-
-                                 if (res.matchedStockItems.length === 0) {
-                                   return renderMainRow();
-                                 }
-
-                                 return (
-                                   <Fragment key={res.id}>
-                                     {res.matchedStockItems.map((stock: any, index: number) => renderMainRow(stock, index > 0))}
-                                   </Fragment>
-                                 );
-                               })}
-                             </tbody>
-                            </table>
-                          </div>
-                        </div>
-                        </>
-                      )}
-                    </>
-                  )}
                 </motion.div>
-                ) : supplySection === "free-stock" ? (
-                  <motion.div
-                    key="supply-free-stock"
-                    initial={{ opacity: 0, x: 10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className={`flex flex-col gap-8`}
-                  >
-                    <div className="bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-[20px] sm:rounded-[32px] overflow-hidden flex flex-col shadow-xl">
-                       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 sm:gap-6 p-4 sm:p-5 xl:p-6 pb-2 sm:pb-3 xl:pb-6 bg-white dark:bg-[#1A1C19]">
-                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 xl:border-r border-slate-200 dark:border-slate-800 xl:pr-6 w-full xl:w-auto">
-                           <h4 className="text-sm sm:text-base font-black text-slate-900 dark:text-white uppercase tracking-widest">Свободный остаток заготовки</h4>
-                           <div className="flex items-baseline justify-between sm:justify-start px-4 sm:px-5 py-2 sm:py-2.5 text-emerald-600 font-black bg-emerald-50/80 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/30 rounded-xl sm:rounded-2xl w-full sm:w-auto shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-                             <span className="text-[11px] sm:text-xs mr-3 uppercase font-bold text-emerald-600/80 tracking-widest">Общий остаток</span>
-                             <div>
-                               <span className="text-xl sm:text-2xl tracking-tight leading-none">
-                                 {freeStock.reduce((acc, row) => acc + row.remainingStock, 0).toFixed(3)}
-                               </span>
-                               <span className="text-[10px] sm:text-[11px] ml-1 uppercase font-bold text-emerald-600/80">тн</span>
-                             </div>
-                           </div>
-                         </div>
-                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full xl:w-auto">
-                           <button
-                             onClick={() => {
-                               if (freeStock.length === 0) return;
-                               const headers = ["Номенклатура", "Профиль", "Сталь", "Размер", "Длина", "Остаток тн."];
-                               const rows = freeStock.map((row: any) => [
-                                 row["Исходная Номенклатура"] || "",
-                                 row["Профиль"] || "",
-                                 row["Марка стали"] || "",
-                                 String(row["Размер"]).replace(".", ","),
-                                 row["Длина"] || "",
-                                 String(row.remainingStock.toFixed(3)).replace(".", ",")
-                               ]);
-                               
-                               const tsv = [headers, ...rows].map(row => row.join("\t")).join("\n");
-                               navigator.clipboard.writeText(tsv);
-                               setIsCopied(true);
-                               setTimeout(() => setIsCopied(false), 2000);
-                             }}
-                             className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-[#121411] sm:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
-                               title="Скопировать для Excel"
-                             >
-                               {isCopied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
-                           </button>
-                           <button
-                             onClick={() => {
-                               if (freeStock.length === 0) return;
-                               const headers = ["Номенклатура", "Профиль", "Сталь", "Размер", "Длина", "Остаток тн."];
-                               const excelRows = freeStock.map((row: any) => ({
-                                 "Номенклатура": row["Исходная Номенклатура"],
-                                 "Профиль": row["Профиль"],
-                                 "Сталь": row["Марка стали"],
-                                 "Размер": row["Размер"],
-                                 "Длина": row["Длина"],
-                                 "Остаток тн.": parseFloat(row.remainingStock.toFixed(3))
-                               }));
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsStockManualOpen(true);
+                  }}
+                  className="absolute top-4 right-4 flex items-center justify-center w-9 h-9 bg-white dark:bg-[#1A1C19] hover:bg-slate-100 dark:hover:bg-[#252824] text-slate-600 dark:text-[#E2E3DE] rounded-xl transition-all focus:outline-none border border-slate-200 dark:border-[#2C2F2B] shadow-sm z-10"
+                  title="Инструкция по складу"
+                >
+                  <BookOpen className="w-5 h-5" />
+                </button>
+              </div>
 
-                               const worksheet = XLSX.utils.json_to_sheet(excelRows);
-                               
-                               const wscols = [
-                                 { wch: 30 },
-                                 { wch: 15 },
-                                 { wch: 15 },
-                                 { wch: 12 },
-                                 { wch: 15 },
-                                 { wch: 15 }
-                               ];
-                               worksheet["!cols"] = wscols;
+              {stockFiles.length > 0 && (
+                <div className="bg-white dark:bg-[#1A1C19] rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                  <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                      Загруженные файлы склада
+                    </span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-[10px] font-medium bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-300 px-2.5 py-1 rounded-full">
+                        {stockFiles.length} файлов
+                      </span>
 
-                               const range = XLSX.utils.decode_range(worksheet["!ref"] || "A1");
-                               for (let R = range.s.r; R <= range.e.r; ++R) {
-                                 for (let C = range.s.c; C <= range.e.c; ++C) {
-                                   const cell_address = { c: C, r: R };
-                                   const cell_ref = XLSX.utils.encode_cell(cell_address);
-                                   if (!worksheet[cell_ref]) continue;
-
-                                   worksheet[cell_ref].s = {
-                                     font: { sz: 8 },
-                                     alignment: { 
-                                       horizontal: "center", 
-                                       vertical: "center"
-                                     }
-                                   };
-                                   
-                                   if (R === 0) {
-                                     worksheet[cell_ref].s.font.bold = true;
-                                   }
-                                 }
-                               }
-
-                               const workbook = XLSX.utils.book_new();
-                               XLSX.utils.book_append_sheet(workbook, worksheet, "Свободный остаток");
-                               XLSX.writeFile(workbook, "Свободный_остаток_заготовки.xlsx");
-                             }}
-                             className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
-                               title="Скачать в Excel"
-                             >
-                               <Download className="w-4 h-4" />
-                             </button>
-                         </div>
-                       </div>
-
-                       <div 
-                         ref={freeStockTableRef}
-                         onMouseDown={onFreeStockMouseDown}
-                         onMouseLeave={handleMouseLeaveOrUp}
-                         onMouseUp={handleMouseLeaveOrUp}
-                         onMouseMove={handleMouseMove}
-                         className={`overflow-auto custom-scrollbar max-h-[calc(100vh-300px)] min-h-[400px] relative ${isFreeStockDragging ? 'select-none cursor-grabbing' : 'cursor-grab'}`}
-                       >
-                        <table className="w-full text-left border-separate border-spacing-0 block md:table">
-                          <thead className="text-[10px] uppercase font-black tracking-widest text-slate-400 dark:text-slate-500 sticky top-0 z-10 shadow-sm hidden md:table-header-group">
-                            <tr>
-                              <th className="px-8 py-5 bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Номенклатура</th>
-                              <th className="px-6 py-5 bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Профиль</th>
-                              <th className="px-6 py-5 text-center bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Сталь</th>
-                              <th className="px-6 py-5 text-center bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Размер</th>
-                              <th className="px-6 py-5 text-center bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Длина</th>
-                              <th className="px-8 py-5 text-right bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Остаток тн.</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50 text-[11px] font-medium text-slate-600 dark:text-slate-300 block md:table-row-group">
-                            {freeStock.map((row, i) => (
-                              <tr key={i} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group block md:table-row mb-4 md:mb-0 border border-slate-200 dark:border-slate-800 md:border-none rounded-xl md:rounded-none bg-white dark:bg-[#1A1C19] p-2 md:p-0 md:bg-transparent">
-                                <td className="px-4 md:px-8 py-3 md:py-4 text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Номенклатура</span>
-                                  <div className="max-w-[200px] md:max-w-[300px] truncate font-mono text-[10px] text-right md:text-left" title={row["Исходная Номенклатура"]}>
-                                    {row["Исходная Номенклатура"]}
-                                  </div>
-                                </td>
-                                <td className="px-4 md:px-6 py-3 md:py-4 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Профиль</span>
-                                  <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 ml-auto md:ml-0 md:mx-auto">{row["Профиль"]}</span>
-                                </td>
-                                <td className="px-4 md:px-6 py-3 md:py-4 text-right md:text-center font-bold text-slate-700 dark:text-slate-200 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Сталь</span>
-                                  <span>{row["Марка стали"]}</span>
-                                </td>
-                                <td className="px-4 md:px-6 py-3 md:py-4 text-right md:text-center flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Размер</span>
-                                   <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded ml-auto md:ml-0 md:mx-auto">
-                                     {row["Размер"]}
-                                   </span>
-                                </td>
-                                <td className="px-4 md:px-6 py-3 md:py-4 text-right md:text-center flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Длина</span>
-                                   <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${row["Длина"] === "НД" ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10' : 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'} ml-auto md:ml-0 md:mx-auto`}>{row["Длина"]}</span>
-                                </td>
-                                <td className="px-4 md:px-8 py-3 md:py-4 text-right flex justify-between items-center md:table-cell min-h-[44px]">
-                                   <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Остаток тн.</span>
-                                   <div>
-                                     <span className="text-slate-900 dark:text-white font-black text-xs">{row.remainingStock.toFixed(3)}</span>
-                                     <span className="ml-1 text-[10px] text-slate-400 font-bold">тн</span>
-                                   </div>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </motion.div>
-                ) : supplySection === "calc-supply" ? (
-                  <motion.div
-                    key="supply-calc-supply"
-                    initial={{ opacity: 0, x: 10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className={`flex flex-col gap-8`}
-                  >
-                    {supplyCalculationData.matchedDemand.length === 0 ? (
-                      <div className={`bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-[32px] p-12 flex flex-col items-center justify-center min-h-[400px]`}>
-                        <div className={`w-20 h-20 bg-sky-50 dark:bg-sky-900/20 rounded-[30px] flex items-center justify-center text-sky-500 mb-6`}>
-                          <Activity className={`w-10 h-10`} />
+                      {isProcessingStock && (
+                        <div className="text-[10px] text-slate-500 flex items-center gap-2 font-medium">
+                          <div className="w-3 h-3 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
+                          {parsingProgress.active
+                            ? parsingProgress.message
+                            : "Обработка..."}
                         </div>
-                        <h3 className={`text-xl font-bold text-slate-900 dark:text-white`}>Нет данных</h3>
-                        <p className={`text-sm text-slate-500 dark:text-slate-400 mt-2 text-center max-w-sm px-6 leading-relaxed`}>
-                          Сначала выполните расчет потребности, загрузите остатки и планы поставок.
-                        </p>
-                      </div>
-                    ) : (
-                      <div className={`bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-[20px] sm:rounded-[32px] overflow-hidden flex flex-col shadow-xl shadow-slate-200/50 dark:shadow-none`}>
-                        <div className={`flex flex-col 2xl:flex-row 2xl:items-center justify-between gap-4 sm:gap-6 p-4 sm:p-5 xl:p-6 pb-2 sm:pb-3 xl:pb-6 bg-white dark:bg-[#1A1C19]`}>
-                           <div className={`flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 2xl:border-r border-slate-200 dark:border-slate-800 2xl:pr-6 w-full 2xl:w-auto`}>
-                             <h4 className={`text-sm sm:text-base font-black text-slate-900 dark:text-white uppercase tracking-widest`}>Расчет с учетом поставок</h4>
-                              <div className="flex flex-wrap gap-2 sm:gap-4 w-full 2xl:w-auto">
-                                <div className="flex items-baseline justify-between sm:justify-start px-3 sm:px-4 py-2 text-sky-600 font-black bg-sky-50/80 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800/30 rounded-xl sm:rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-                                  <span className="text-[10px] sm:text-[11px] mr-2 uppercase font-bold text-sky-600/80 tracking-widest">Обеспечено плановыми поставками</span>
-                                  <div>
-                                    <span className="text-lg sm:text-xl tracking-tight leading-none">
-                                      {supplyCalculationData.totals.allocated.toFixed(3)}
-                                    </span>
-                                    <span className="text-[9px] sm:text-[10px] ml-1 uppercase font-bold text-sky-600/70">тн</span>
-                                  </div>
-                                </div>
-                                <div className="flex items-baseline justify-between sm:justify-start px-3 sm:px-4 py-2 text-rose-600 font-black bg-rose-50/80 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800/30 rounded-xl sm:rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-                                  <span className="text-[10px] sm:text-[11px] mr-2 uppercase font-bold text-rose-600/80 tracking-widest">Дефицит</span>
-                                  <div>
-                                    <span className="text-lg sm:text-xl tracking-tight leading-none">
-                                      {supplyCalculationData.totals.deficit.toFixed(3)}
-                                    </span>
-                                    <span className="text-[9px] sm:text-[10px] ml-1 uppercase font-bold text-rose-600/70">тн</span>
-                                  </div>
-                                </div>
-                              </div>
-                           </div>
-                           <div className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full 2xl:w-auto flex-wrap`}>
-                             <div className="flex items-center bg-slate-50 dark:bg-slate-800 rounded-xl px-3 py-2 sm:w-64 border border-slate-200 dark:border-slate-700">
-                               <Search className="w-4 h-4 text-slate-400 mr-2 shrink-0" />
-                               <input 
-                                 type="text" 
-                                 placeholder="Поиск по заказу, клиенту..." 
-                                 value={searchQuery}
-                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                 className="bg-transparent border-none outline-none text-xs w-full text-slate-700 dark:text-slate-200 placeholder:text-slate-400"
-                               />
-                             </div>
-                             <button
-                               onClick={() => {
-                                 if (supplyCalculationData.matchedDemand.length === 0) return;
-                                 const headers = [
-                                   "Внутренняя нумерация", "Дата отгрузки", "№ Заказа", "Клиент", "Номенклатура", "Профиль", "Марка", "Размер мм.", "Длина", "Кол-во тн в заказе", "ИТОГО остаток к выполнению",
-                                   "Взято со склада (тн)", "Тех. отходы склад г/к", "Дел. Остатки склад г/к", "КИМ склад г/к", "ИТОГО ост. к завершению / после склада г/к",
-                                   "Номенклатура склад г/к", "Профиль наличия", "НТД", "Марка наличия", "Размер наличия", "Длина (склад г/к)", "Остаток на складе г/к. (тн)", "Взято со склада г/к (тн)", "Свободный остаток г/к склад (тн)",
-                                   "Тех. отходы / плановое поступление", "Дел. Остатки / плановое поступление", "КИМ / плановое поступление", "ИТОГО остаток выполнения заказа после расчета / плановое поступление",
-                                   "Номенклатура / плановое поступление", "Профиль / плановое поступление", "Марка / плановое поступление", "Размер / плановое поступление", "Кол-во тн. / плановое поступление", "Длина / плановое поступление", "Дата размещения", "Поставщик", "Ожидаемая дата поставки",
-                                   "Входящий остаток / плановое поступление", "Взято / плановое поступление", "Свободный остаток / плановое поступление"
-                                 ];
-                                 const rows: string[][] = [];
-                                 supplyCalculationData.matchedDemand.forEach((res: any) => {
-                                   const baseRow = [
-                                     res.internalNo || "",
-                                     res.shippingDate || "",
-                                     res.orderNo || "",
-                                     res.client || "",
-                                     res.nomenclature || "",
-                                     res.type || "",
-                                     res.grade || "",
-                                     String(res.diameter).replace(".", ","),
-                                     res.lengthType === "НД" ? "НД" : `МД ${res.length}`,
-                                     String(res.weightTons || 0).replace(".", ","),
-                                     String(res.remainingToProcess || 0).replace(".", ","),
+                      )}
 
-                                     String(res.allocatedFromStock || 0).replace(".", ","),
-                                     res.allocatedFromStock > 0 && res.combinedTechWaste2 > 0 ? String(res.combinedTechWaste2.toFixed(3)).replace(".", ",") : "0",
-                                     res.allocatedFromStock > 0 && res.combinedUsefulRem2 > 0 ? String(res.combinedUsefulRem2.toFixed(3)).replace(".", ",") : "0",
-                                     res.allocatedFromStock > 0 && res.combinedKim2 > 0 ? String(res.combinedKim2.toFixed(3)).replace(".", ",") : "0",
-                                     String(res.shortageAfterStock || 0).replace(".", ","),
-                                   ];
-                                   const maxRows = Math.max(1, res.stockItems?.length || 0, res.supplyItems?.length || 0);
-
-                                   const rowTemplate = Array(headers.length).fill("");
-                                   for(let i=0; i<16; i++) rowTemplate[i] = baseRow[i];
-                                   
-                                   const supplyBaseCols = [
-                                     res.allocatedFromSupply > 0 && res.combinedTechWaste3 > 0 ? String(res.combinedTechWaste3.toFixed(3)).replace(".", ",") : "0",
-                                     res.allocatedFromSupply > 0 && res.combinedUsefulRem3 > 0 ? String(res.combinedUsefulRem3.toFixed(3)).replace(".", ",") : "0",
-                                     res.allocatedFromSupply > 0 && res.combinedKim3 > 0 ? String(res.combinedKim3.toFixed(3)).replace(".", ",") : "0",
-                                     String(res.finalShortage || 0).replace(".", ",")
-                                   ];
-
-                                   for(let i=25; i<29; i++) rowTemplate[i] = supplyBaseCols[i-25];
-
-                                   for (let r = 0; r < maxRows; r++) {
-                                     const outRow = [...rowTemplate];
-                                     if (r > 0) {
-                                       for (let c = 0; c < 16; c++) outRow[c] = "";
-                                       for (let c = 25; c < 29; c++) outRow[c] = "";
-                                     }
-
-                                     const st = res.stockItems?.[r];
-                                     if (st) {
-                                       outRow[16] = st["Исходная Номенклатура"] || "";
-                                       outRow[17] = st["Профиль"] || "";
-                                       outRow[18] = st["НТД"] || "";
-                                       outRow[19] = st["Марка стали"] || "";
-                                       outRow[20] = String(st["Размер"] || "").replace(".", ",");
-                                       outRow[21] = st["Длина"] || "";
-                                       outRow[22] = String(st.stockBeforeTaking || 0).replace(".", ",");
-                                       outRow[23] = String(st.allocatedAmount || 0).replace(".", ",");
-                                       outRow[24] = String(st.stockAfterTaking || 0).replace(".", ",");
-                                     } else {
-                                       for (let c = 16; c <= 24; c++) outRow[c] = "";
-                                     }
-
-                                     const sp = res.supplyItems?.[r];
-                                     if (sp) {
-                                       outRow[29] = getSupplyNomenclature(sp);
-                                       outRow[30] = sp["Профиль"] || "";
-                                       outRow[31] = sp["Марка стали"] || "";
-                                       outRow[32] = String(sp["Размер"] || "").replace(".", ",");
-                                       outRow[33] = String(sp.allocatedAmount || 0).replace(".", ",");
-                                       outRow[34] = sp["Длина"] || "";
-                                       outRow[35] = sp["Дата размещения"] || "";
-                                       outRow[36] = sp["Поставщик"] || sp["ПОСТАВЩИК"] || "";
-                                       outRow[37] = sp["Ожидаемая дата поставки"] || sp["ПОСТАВКА"] || "";
-                                       outRow[38] = String(sp.stockBeforeTaking || 0).replace(".", ",");
-                                       outRow[39] = String(sp.allocatedAmount || 0).replace(".", ",");
-                                       outRow[40] = String(sp.stockAfterTaking || 0).replace(".", ",");
-                                     } else {
-                                       for (let c = 29; c <= 40; c++) outRow[c] = "";
-                                     }
-                                     
-                                     rows.push(outRow);
-                                   }
-                                 });
-                                 const tsv = [headers, ...rows].map(row => row.join("\t")).join("\n");
-                                 navigator.clipboard.writeText(tsv);
-                                 setIsCopied(true);
-                                 setTimeout(() => setIsCopied(false), 2000);
-                               }}
-                               className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-[#121411] sm:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
-                               title="Скопировать для Excel"
-                             >
-                               {isCopied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
-                             </button>
-                             <button
-                               onClick={() => {
-                                 if (supplyCalculationData.matchedDemand.length === 0) return;
-                                 const headers = [
-                                   "Внутренняя нумерация", "Дата отгрузки", "№ Заказа", "Клиент", "Номенклатура", "Профиль", "Марка", "Размер мм.", "Длина", "Кол-во тн в заказе", "ИТОГО остаток к выполнению",
-                                   "Взято со склада (тн)", "Тех. отходы склад г/к", "Дел. Остатки склад г/к", "КИМ склад г/к", "ИТОГО ост. к завершению / после склада г/к",
-                                   "Номенклатура склад г/к", "Профиль наличия", "НТД", "Марка наличия", "Размер наличия", "Длина (склад г/к)", "Остаток на складе г/к. (тн)", "Взято со склада г/к (тн)", "Свободный остаток г/к склад (тн)",
-                                   "Тех. отходы / плановое поступление", "Дел. Остатки / плановое поступление", "КИМ / плановое поступление", "ИТОГО остаток выполнения заказа после расчета / плановое поступление",
-                                   "Номенклатура / плановое поступление", "Профиль / плановое поступление", "Марка / плановое поступление", "Размер / плановое поступление", "Кол-во тн. / плановое поступление", "Длина / плановое поступление", "Дата размещения", "Поставщик", "Ожидаемая дата поставки",
-                                   "Входящий остаток / плановое поступление", "Взято / плановое поступление", "Свободный остаток / плановое поступление"
-                                 ];
-                                 const rows: any[][] = [];
-                                 supplyCalculationData.matchedDemand.forEach((res: any) => {
-                                   const baseRow = [
-                                     res.internalNo || "",
-                                     res.shippingDate || "",
-                                     res.orderNo || "",
-                                     res.client || "",
-                                     res.nomenclature || "",
-                                     res.type || "",
-                                     res.grade || "",
-                                     res.diameter,
-                                     res.lengthType === "НД" ? "НД" : `МД ${res.length}`,
-                                     Number(res.weightTons || 0),
-                                     Number(res.remainingToProcess || 0),
-                                     
-                                     Number(res.allocatedFromStock || 0),
-                                     res.allocatedFromStock > 0 && res.combinedTechWaste2 > 0 ? Number(res.combinedTechWaste2.toFixed(3)) : 0,
-                                     res.allocatedFromStock > 0 && res.combinedUsefulRem2 > 0 ? Number(res.combinedUsefulRem2.toFixed(3)) : 0,
-                                     res.allocatedFromStock > 0 && res.combinedKim2 > 0 ? Number(res.combinedKim2.toFixed(3)) : 0,
-                                     Number(res.shortageAfterStock || 0),
-                                   ];
-                                   const maxRows = Math.max(1, res.stockItems?.length || 0, res.supplyItems?.length || 0);
-
-                                   const rowTemplate = Array(headers.length).fill("");
-                                   for(let i=0; i<16; i++) rowTemplate[i] = baseRow[i];
-                                   
-                                   const supplyBaseCols = [
-                                     res.allocatedFromSupply > 0 && res.combinedTechWaste3 > 0 ? Number(res.combinedTechWaste3.toFixed(3)) : 0,
-                                     res.allocatedFromSupply > 0 && res.combinedUsefulRem3 > 0 ? Number(res.combinedUsefulRem3.toFixed(3)) : 0,
-                                     res.allocatedFromSupply > 0 && res.combinedKim3 > 0 ? Number(res.combinedKim3.toFixed(3)) : 0,
-                                     Number(res.finalShortage || 0)
-                                   ];
-
-                                   for(let i=25; i<29; i++) rowTemplate[i] = supplyBaseCols[i-25];
-
-                                   for (let r = 0; r < maxRows; r++) {
-                                     const outRow = [...rowTemplate];
-                                     if (r > 0) {
-                                       for (let c = 0; c < 16; c++) outRow[c] = "";
-                                       for (let c = 25; c < 29; c++) outRow[c] = "";
-                                     }
-
-                                     const st = res.stockItems?.[r];
-                                     if (st) {
-                                       outRow[16] = st["Исходная Номенклатура"] || "";
-                                       outRow[17] = st["Профиль"] || "";
-                                       outRow[18] = st["НТД"] || "";
-                                       outRow[19] = st["Марка стали"] || "";
-                                       outRow[20] = st["Размер"] || "";
-                                       outRow[21] = st["Длина"] || "";
-                                       outRow[22] = Number(st.stockBeforeTaking || 0);
-                                       outRow[23] = Number(st.allocatedAmount || 0);
-                                       outRow[24] = Number(st.stockAfterTaking || 0);
-                                     } else {
-                                       for (let c = 16; c <= 24; c++) outRow[c] = "";
-                                     }
-
-                                     const sp = res.supplyItems?.[r];
-                                     if (sp) {
-                                       outRow[29] = getSupplyNomenclature(sp);
-                                       outRow[30] = sp["Профиль"] || "";
-                                       outRow[31] = sp["Марка стали"] || "";
-                                       outRow[32] = sp["Размер"] || "";
-                                       outRow[33] = Number(sp.allocatedAmount || 0);
-                                       outRow[34] = sp["Длина"] || "";
-                                       outRow[35] = sp["Дата размещения"] || "";
-                                       outRow[36] = sp["Поставщик"] || sp["ПОСТАВЩИК"] || "";
-                                       outRow[37] = sp["Ожидаемая дата поставки"] || sp["ПОСТАВКА"] || "";
-                                       outRow[38] = Number(sp.stockBeforeTaking || 0);
-                                       outRow[39] = Number(sp.allocatedAmount || 0);
-                                       outRow[40] = Number(sp.stockAfterTaking || 0);
-                                     } else {
-                                       for (let c = 29; c <= 40; c++) outRow[c] = "";
-                                     }
-                                     
-                                     rows.push(outRow);
-                                   }
-                                 });
-
-                                 const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-                                 const numberCols = [9, 10, 11, 12, 13, 15, 22, 23, 24, 25, 26, 28, 33, 38, 39, 40];
-                                 const range = XLSX.utils.decode_range(worksheet['!ref'] || "A1:A1");
-                                 for (let R = 1; R <= range.e.r; ++R) {
-                                   for (let c of numberCols) {
-                                     const cellAddress = { c: c, r: R };
-                                     const cellRef = XLSX.utils.encode_cell(cellAddress);
-                                     if (worksheet[cellRef] && typeof worksheet[cellRef].v === 'number') {
-                                       worksheet[cellRef].t = 'n';
-                                       worksheet[cellRef].z = '#,##0.000" тн."';
-                                     }
-                                   }
-                                 }
-
-                                 const workbook = XLSX.utils.book_new();
-                                 XLSX.utils.book_append_sheet(workbook, worksheet, "Расчет_поставки");
-                                 XLSX.writeFile(workbook, "Расчет_с_учетом_поставок.xlsx");
-                               }}
-                               className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
-                               title="Скачать в Excel"
-                             >
-                               <Download className="w-4 h-4" />
-                             </button>
-                           </div>
-                        </div>
-                        <div 
-                          ref={supplyTableRef}
-                          onMouseDown={onSupplyMouseDown}
-                          onMouseLeave={handleMouseLeaveOrUp}
-                          onMouseUp={handleMouseLeaveOrUp}
-                          onMouseMove={handleMouseMove}
-                          className={`overflow-x-auto overflow-y-auto max-h-[600px] custom-scrollbar ${isSupplyDragging ? 'select-none cursor-grabbing' : 'cursor-grab'}`}
+                      {!isProcessingStock && processedStock.length > 0 && (
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => {
+                            if (activeTab === "supply")
+                              setSupplySection("stock");
+                            else {
+                              setProductionSection("stock");
+                            }
+                          }}
+                          className="bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 text-[10px] font-bold px-4 py-1.5 rounded-full hover:bg-sky-200 dark:hover:bg-sky-900/50 transition-all flex items-center gap-2"
                         >
-                          <table className="w-full text-left border-separate border-spacing-0">
-                            <thead className="bg-slate-50 dark:bg-slate-800/50 sticky top-0 z-20 shadow-sm">
-                              <tr>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Внутренняя нумерация</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Дата отгрузки</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">№ Заказа</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Клиент</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap border-r border-slate-200 dark:border-slate-700">Номенклатура</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Профиль</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Марка</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Размер мм.</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Длина</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Кол-во тн в заказе</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-sky-600 uppercase tracking-widest whitespace-nowrap border-r border-slate-200 dark:border-slate-700">ИТОГО остаток к выполнению</th>
-                                
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-emerald-500 uppercase tracking-widest whitespace-nowrap">Взято со склада (тн)</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-amber-500 uppercase tracking-widest whitespace-nowrap">Тех. отходы склад г/к</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-amber-500 uppercase tracking-widest whitespace-nowrap">Дел. Остатки склад г/к</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-amber-500 uppercase tracking-widest whitespace-nowrap">КИМ склад г/к</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-rose-500 uppercase tracking-widest whitespace-nowrap border-r border-slate-200 dark:border-slate-700">ИТОГО ост. к завершению /<br/>после склада г/к</th>
-                                
-                                <th className="px-5 py-4 text-left text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Номенклатура склад г/к</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Профиль наличия</th>
-                                <th className="px-5 py-4 text-left text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">НТД</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Марка наличия</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Размер наличия</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Длина (склад г/к)</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Остаток на складе г/к. (тн)</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-emerald-500 uppercase tracking-widest whitespace-nowrap">Взято со склада г/к (тн)</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-sky-500 uppercase tracking-widest whitespace-nowrap border-r border-slate-200 dark:border-slate-700">Свободный остаток г/к склад (тн)</th>
-
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-amber-500 uppercase tracking-widest whitespace-nowrap">Тех. отходы /<br/>плановое поступление</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-amber-500 uppercase tracking-widest whitespace-nowrap">Дел. Остатки /<br/>плановое поступление</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-amber-500 uppercase tracking-widest whitespace-nowrap">КИМ /<br/>плановое поступление</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-rose-500 uppercase tracking-widest whitespace-nowrap border-r border-slate-200 dark:border-slate-700">ИТОГО остаток выполнения заказа после расчета /<br/>плановое поступление</th>
-
-                                <th className="px-5 py-4 text-left text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Номенклатура /<br/>плановое поступление</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Профиль /<br/>плановое поступление</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Марка /<br/>плановое поступление</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Размер /<br/>плановое поступление</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Кол-во тн. /<br/>плановое поступление</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Длина /<br/>плановое поступление</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Дата размещения</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Поставщик</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Ожидаемая дата поставки</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap border-l border-slate-100 dark:border-slate-800">Входящий остаток /<br/>плановое поступление</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-emerald-500 uppercase tracking-widest whitespace-nowrap">Взято /<br/>плановое поступление</th>
-                                <th className="px-5 py-4 text-center text-[10px] font-bold text-sky-500 uppercase tracking-widest whitespace-nowrap">Свободный остаток /<br/>плановое поступление</th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-[11px]">
-                              {supplyCalculationData.matchedDemand
-                                .filter(res => {
-                                  if (!searchQuery) return true;
-                                  const q = searchQuery.toLowerCase();
-                                  return (res.orderNo || "").toLowerCase().includes(q) || 
-                                         (res.client || "").toLowerCase().includes(q) ||
-                                         (res.nomenclature || "").toLowerCase().includes(q);
-                                })
-                                .map((res: any, idx) => {
-                                  const maxRows = Math.max(1, res.stockItems?.length || 0, res.supplyItems?.length || 0);
-                                  const renderRows = [];
-                                  
-                                  for (let i = 0; i < maxRows; i++) {
-                                    const stockItem = res.stockItems?.[i];
-                                    const supplyItem = res.supplyItems?.[i];
-                                    const isSubRow = i > 0;
-
-                                    renderRows.push(
-                                      <tr key={`${res._dId}-${i}`} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
-                                        {!isSubRow && (
-                                          <>
-                                            <td className={`px-5 py-3 align-middle whitespace-nowrap text-center text-slate-600 dark:text-slate-400`} rowSpan={maxRows}>{res.internalNo || ""}</td>
-                                            <td className={`px-5 py-3 align-middle whitespace-nowrap text-center text-slate-600 dark:text-slate-400`} rowSpan={maxRows}>{res.shippingDate}</td>
-                                            <td className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-slate-600 dark:text-slate-400`} rowSpan={maxRows}>{res.orderNo}</td>
-                                            <td className={`px-5 py-3 align-middle text-center font-medium text-slate-800 dark:text-slate-200 whitespace-nowrap`} rowSpan={maxRows}>{res.client}</td>
-                                            <td className={`px-5 py-3 align-middle text-center max-w-[200px] border-r border-slate-100 dark:border-slate-800`} rowSpan={maxRows}>
-                                              <div className="max-w-[150px] mx-auto truncate font-mono text-[10px] text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors" title={res.nomenclature}>{res.nomenclature}</div>
-                                            </td>
-                                            <td className={`px-5 py-3 align-middle whitespace-nowrap text-center`} rowSpan={maxRows}>
-                                              <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">{res.type}</span>
-                                            </td>
-                                            <td className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-slate-700 dark:text-slate-200`} rowSpan={maxRows}>{res.grade}</td>
-                                            <td className={`px-5 py-3 align-middle whitespace-nowrap text-center`} rowSpan={maxRows}>
-                                              <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded">
-                                                {parseFloat(Number(res.diameter).toFixed(2))}
-                                              </span>
-                                            </td>
-                                            <td className={`px-5 py-3 align-middle whitespace-nowrap text-center`} rowSpan={maxRows}>
-                                              <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType === "НД" ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10' : 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'}`}>
-                                                {res.lengthType === "НД" ? "НД" : `МД ${res.length}`}
-                                              </span>
-                                            </td>
-                                            <td className={`px-5 py-3 align-middle whitespace-nowrap text-center font-black text-slate-900 dark:text-white`} rowSpan={maxRows}>{res.weightTons ? Number(res.weightTons).toFixed(3) : "0.000"}</td>
-                                            <td className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-sky-600 dark:text-sky-400 border-r border-slate-100 dark:border-slate-800`} rowSpan={maxRows}>{res.remainingToProcess ? Number(res.remainingToProcess).toFixed(3) : "0.000"}</td>
-
-                                            <td className={`px-5 py-3 align-middle whitespace-nowrap text-center font-black ${res.allocatedFromStock > 0 ? 'text-emerald-600 dark:text-emerald-500' : 'text-slate-400'}`} rowSpan={maxRows}>
-                                              {res.allocatedFromStock > 0 ? res.allocatedFromStock.toFixed(3) : "0.000"}
-                                            </td>
-                                            <td className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-amber-600`} rowSpan={maxRows}>
-                                              {(res.allocatedFromStock > 0 && res.combinedTechWaste2 > 0) ? res.combinedTechWaste2.toFixed(3) : "0.000"}
-                                            </td>
-                                            <td className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-amber-600`} rowSpan={maxRows}>
-                                              {(res.allocatedFromStock > 0 && res.combinedUsefulRem2 > 0) ? res.combinedUsefulRem2.toFixed(3) : "0.000"}
-                                            </td>
-                                            <td className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-amber-600`} rowSpan={maxRows}>
-                                              {(res.allocatedFromStock > 0 && res.combinedKim2 > 0) ? res.combinedKim2.toFixed(3) : "0.000"}
-                                            </td>
-                                            <td className={`px-5 py-3 align-middle whitespace-nowrap text-center font-black border-r border-slate-100 dark:border-slate-800 ${res.shortageAfterStock > 0.0005 ? 'text-rose-600 dark:text-rose-500' : 'text-slate-400'}`} rowSpan={maxRows}>
-                                              {res.shortageAfterStock > 0 ? res.shortageAfterStock.toFixed(3) : "0.000"}
-                                            </td>
-                                          </>
-                                        )}
-
-                                        {/* Stock Item details (per row) */}
-                                        <td className="px-5 py-3 align-middle whitespace-nowrap text-left text-slate-500">
-                                          {stockItem ? <div className="max-w-[150px] truncate font-medium text-[10px]" title={stockItem["Исходная Номенклатура"]}>{stockItem["Исходная Номенклатура"]}</div> : ""}
-                                        </td>
-                                        <td className="px-5 py-3 align-middle whitespace-nowrap text-center text-slate-500">
-                                          {stockItem && stockItem["Профиль"] ? <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-100 dark:bg-slate-800">{stockItem["Профиль"]}</span> : ""}
-                                        </td>
-                                        <td className="px-5 py-3 align-middle whitespace-nowrap text-left text-slate-500 font-mono text-[9px]">
-                                          {stockItem ? (stockItem["НТД"] || "") : ""}
-                                        </td>
-                                        <td className="px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-slate-500">
-                                          {stockItem ? (stockItem["Марка стали"] || "") : ""}
-                                        </td>
-                                        <td className="px-5 py-3 align-middle whitespace-nowrap text-center">
-                                          {stockItem && stockItem["Размер"] ? <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded">{stockItem["Размер"]}</span> : ""}
-                                        </td>
-                                        <td className="px-5 py-3 align-middle whitespace-nowrap text-center">
-                                          {stockItem && stockItem["Длина"] ? <span className={`inline-flex items-center px-2 py-1 rounded-md text-[9px] font-bold ${stockItem["Длина"] === "НД" ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10' : 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'}`}>{stockItem["Длина"]}</span> : ""}
-                                        </td>
-                                        <td className="px-5 py-3 align-middle whitespace-nowrap text-center font-black text-slate-400">
-                                          {stockItem ? Number(stockItem.stockBeforeTaking).toFixed(3) : ""}
-                                        </td>
-                                        <td className="px-5 py-3 align-middle whitespace-nowrap text-center font-black text-emerald-600 dark:text-emerald-500">
-                                          {stockItem ? Number(stockItem.allocatedAmount).toFixed(3) : ""}
-                                        </td>
-                                        <td className="px-5 py-3 align-middle whitespace-nowrap text-center font-black text-sky-500 border-r border-slate-100 dark:border-slate-800">
-                                          {stockItem ? Number(stockItem.stockAfterTaking).toFixed(3) : ""}
-                                        </td>
-
-                                        {/* Supply general metrics (rowSpan) */}
-                                        {!isSubRow && (
-                                          <>
-                                            <td className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-amber-600`} rowSpan={maxRows}>
-                                              {(res.allocatedFromSupply > 0 && res.combinedTechWaste3 > 0) ? res.combinedTechWaste3.toFixed(3) : "0.000"}
-                                            </td>
-                                            <td className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-amber-600`} rowSpan={maxRows}>
-                                              {(res.allocatedFromSupply > 0 && res.combinedUsefulRem3 > 0) ? res.combinedUsefulRem3.toFixed(3) : "0.000"}
-                                            </td>
-                                            <td className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-amber-600`} rowSpan={maxRows}>
-                                              {(res.allocatedFromSupply > 0 && res.combinedKim3 > 0) ? res.combinedKim3.toFixed(3) : "0.000"}
-                                            </td>
-                                            <td className={`px-5 py-3 align-middle whitespace-nowrap text-center font-black border-r border-slate-100 dark:border-slate-800 ${res.finalShortage > 0.0005 ? 'text-rose-600 dark:text-rose-500' : 'text-slate-400'}`} rowSpan={maxRows}>
-                                              {res.finalShortage > 0 ? res.finalShortage.toFixed(3) : "0.000"}
-                                            </td>
-                                          </>
-                                        )}
-
-                                        {/* Supply Item details (per row) */}
-                                        <td className="px-5 py-3 align-middle whitespace-nowrap text-left text-slate-500">
-                                          {supplyItem ? <div className="max-w-[150px] truncate font-medium text-[10px]" title={getSupplyNomenclature(supplyItem)}>{getSupplyNomenclature(supplyItem)}</div> : ""}
-                                        </td>
-                                        <td className="px-5 py-3 align-middle whitespace-nowrap text-center text-slate-500">
-                                          {supplyItem && supplyItem["Профиль"] ? <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-100 dark:bg-slate-800">{supplyItem["Профиль"]}</span> : ""}
-                                        </td>
-                                        <td className="px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-slate-500">
-                                          {supplyItem ? (supplyItem["Марка стали"] || "") : ""}
-                                        </td>
-                                        <td className="px-5 py-3 align-middle whitespace-nowrap text-center">
-                                          {supplyItem && supplyItem["Размер"] ? <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded">{supplyItem["Размер"]}</span> : ""}
-                                        </td>
-                                        <td className="px-5 py-3 align-middle whitespace-nowrap text-center font-black text-slate-400">
-                                          {supplyItem ? Number(supplyItem.allocatedAmount).toFixed(3) : ""}
-                                        </td>
-                                        <td className="px-5 py-3 align-middle whitespace-nowrap text-center">
-                                          {supplyItem && supplyItem["Длина"] ? <span className={`inline-flex items-center px-2 py-1 rounded-md text-[9px] font-bold ${supplyItem["Длина"] === "НД" ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10' : 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'}`}>{supplyItem["Длина"]}</span> : ""}
-                                        </td>
-                                        <td className="px-5 py-3 align-middle whitespace-nowrap text-center text-slate-500 font-mono text-[9px]">
-                                          {supplyItem ? (supplyItem["Дата размещения"] || "") : ""}
-                                        </td>
-                                        <td className="px-5 py-3 align-middle whitespace-nowrap text-center text-slate-500 font-medium text-[9px] truncate max-w-[120px]">
-                                          {supplyItem ? (supplyItem["Поставщик"] || supplyItem["ПОСТАВЩИК"] || "") : ""}
-                                        </td>
-                                        <td className="px-5 py-3 align-middle whitespace-nowrap text-center text-slate-500 font-mono text-[9px] font-bold">
-                                          {supplyItem ? (supplyItem["Ожидаемая дата поставки"] || supplyItem["ПОСТАВКА"] || "") : ""}
-                                        </td>
-                                        <td className="px-5 py-3 align-middle whitespace-nowrap text-center font-black text-slate-400 border-l border-slate-100 dark:border-slate-800">
-                                          {supplyItem ? Number(supplyItem.stockBeforeTaking).toFixed(3) : ""}
-                                        </td>
-                                        <td className="px-5 py-3 align-middle whitespace-nowrap text-center font-black text-emerald-600 dark:text-emerald-500">
-                                          {supplyItem ? Number(supplyItem.allocatedAmount).toFixed(3) : ""}
-                                        </td>
-                                        <td className="px-5 py-3 align-middle whitespace-nowrap text-center font-black text-sky-500">
-                                          {supplyItem ? Number(supplyItem.stockAfterTaking).toFixed(3) : ""}
-                                        </td>
-                                      </tr>
-                                    );
-                                  }
-                                  return <Fragment key={res.id || idx}>{renderRows}</Fragment>;
-                                })}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    )}
-                  </motion.div>
-                ) : supplySection === "supply-plans" ? (
-                  <motion.div
-                    key="supply-plans"
-                    initial={{ opacity: 0, x: 10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className={`flex flex-col gap-8`}
-                  >
-                    <div className="bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-[20px] sm:rounded-[32px] overflow-hidden flex flex-col shadow-xl">
-                      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 sm:gap-6 p-4 sm:p-5 xl:p-6 pb-2 sm:pb-3 xl:pb-6 bg-white dark:bg-[#1A1C19]">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 w-full xl:w-auto">
-                          <h4 className="text-sm sm:text-base font-black text-slate-900 dark:text-white uppercase tracking-widest">Планы поставок сырья</h4>
-                          <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-medium bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-300 px-2.5 py-1 rounded-full">{processedSupplyPlans.length} позиций</span>
-                            <span className="text-[10px] font-bold bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-300 px-2.5 py-1 rounded-full">
-                               {processedSupplyPlans.reduce((sum, row) => sum + (Number(row["Кол-во"]) || 0), 0).toFixed(3)} тн
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="overflow-auto custom-scrollbar max-h-[calc(100vh-300px)] min-h-[400px] relative cursor-auto">
-                        <table className="w-full text-left border-separate border-spacing-0">
-                          <thead className="text-[10px] uppercase font-black tracking-widest text-slate-400 dark:text-slate-500 sticky top-0 z-10 shadow-sm">
-                            <tr>
-                              <th className="px-4 py-3 bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Профиль</th>
-                              <th className="px-4 py-3 text-center bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Марка</th>
-                              <th className="px-4 py-3 text-center bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Размер</th>
-                              <th className="px-4 py-3 text-center bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Кол-во</th>
-                              <th className="px-4 py-3 text-center bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Длина</th>
-                              <th className="px-4 py-3 text-center bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Размещено</th>
-                              <th className="px-4 py-3 text-center bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Поставка</th>
-                              <th className="px-4 py-3 bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">Поставщик</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50 text-[11px] font-medium text-slate-600 dark:text-slate-300">
-                            {processedSupplyPlans.map((row, i) => (
-                              <tr key={i} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group">
-                                <td className="px-4 py-2.5">
-                                  <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">{row["Профиль"]}</span>
-                                </td>
-                                <td className="px-4 py-2.5 text-center font-bold text-slate-700 dark:text-slate-200">{row["Марка"]}</td>
-                                <td className="px-4 py-2.5 text-center">
-                                  <span className="inline-flex items-center gap-1 text-sky-600 dark:text-sky-400 font-mono font-bold bg-sky-50 dark:bg-sky-500/10 px-2 py-0.5 rounded">{row["Размер"]}</span>
-                                </td>
-                                <td className="px-4 py-2.5 text-center font-black text-slate-900 dark:text-white">
-                                  {row["Кол-во"]?.toFixed(3)} <span className="text-[10px] text-slate-400 font-bold ml-0.5">тн</span>
-                                </td>
-                                <td className="px-4 py-2.5 text-center">
-                                  <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50">{row["Длина"]}</span>
-                                </td>
-                                <td className="px-4 py-2.5 text-center text-slate-500 dark:text-slate-400 font-mono">{row["Дата размещения"]}</td>
-                                <td className="px-4 py-2.5 text-center">
-                                  <span className="font-bold text-emerald-600 dark:text-emerald-500">{row["Ожидаемая дата поставки"]}</span>
-                                </td>
-                                <td className="px-4 py-2.5 truncate max-w-[150px]" title={row["Поставщик"]}>{row["Поставщик"]}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                        {processedSupplyPlans.length === 0 && (
-                          <div className="flex flex-col items-center justify-center py-20 text-center px-4">
-                             <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800/50 rounded-2xl flex items-center justify-center text-slate-400 mb-4">
-                               <ShoppingCart className="w-8 h-8" />
-                             </div>
-                             <p className="text-slate-500 dark:text-slate-400 font-medium">Нет данных о поставках</p>
-                             <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Загрузите реестр поставок в разделе Файлы</p>
-                          </div>
-                        )}
-                      </div>
+                          <Layers className="w-3.5 h-3.5" />
+                          <span>Показать наличие</span>
+                        </motion.button>
+                      )}
                     </div>
-                  </motion.div>
-                ) : null}
-              </AnimatePresence>
-            </motion.div>
+                  </div>
+                  <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                    {stockFiles.map((file) => (
+                      <div
+                        key={file.id}
+                        className="p-4 sm:p-6 flex items-center justify-between hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors px-6"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 bg-sky-50 dark:bg-sky-900/30 rounded-xl flex items-center justify-center text-sky-600 dark:text-sky-400">
+                            <Layers className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">
+                              {file.name}
+                            </h4>
+                            <p className="text-[10px] font-medium text-slate-400 flex items-center gap-2 mt-0.5">
+                              <span>{file.size}</span>
+                              <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
+                              <span>{file.date}</span>
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeStockFile(file.id);
+                          }}
+                          className="text-slate-400 hover:text-red-500 transition-colors p-2"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Supply Plan Registry Section */}
+              <div className="flex items-center gap-2 px-1 mt-2">
+                <ShoppingCart className="w-5 h-5 text-slate-700 dark:text-slate-300" />
+                <h3 className="text-lg font-medium text-slate-900 dark:text-white">
+                  Реестр поставок
+                </h3>
+              </div>
+
+              <div className="relative">
+                <div
+                  onClick={() => supplyPlanFileInputRef.current?.click()}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const files = e.dataTransfer.files;
+                    if (files && files.length > 0) {
+                      const event = {
+                        target: { files },
+                      } as unknown as ChangeEvent<HTMLInputElement>;
+                      handleSupplyPlanFileUpload(event);
+                    }
+                  }}
+                  className="bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed border-sky-200 dark:border-sky-900/30 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-center sm:justify-start text-center sm:text-left gap-4 sm:gap-6 group cursor-pointer hover:border-sky-400 dark:hover:border-sky-700 transition-all shadow-sm"
+                >
+                  <input
+                    type="file"
+                    ref={supplyPlanFileInputRef}
+                    onChange={handleSupplyPlanFileUpload}
+                    className="hidden"
+                    multiple
+                    accept=".pdf,.xlsx,.csv,.txt,.docx"
+                  />
+                  <div className="w-14 h-14 bg-sky-50 dark:bg-sky-900/20 rounded-2xl shrink-0 flex items-center justify-center text-sky-400 group-hover:text-sky-600 transition-colors">
+                    <ShoppingCart className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="text-base font-bold text-slate-900 dark:text-white">
+                      Загрузить реестр с планом поставок сырья
+                    </p>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
+                      График ожидаемых поступлений металла
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {supplyPlanFiles.length > 0 && (
+                <div className="bg-white dark:bg-[#1A1C19] rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mt-6">
+                  <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                      Загруженные файлы поставок
+                    </span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-[10px] font-medium bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-300 px-2.5 py-1 rounded-full">
+                        {supplyPlanFiles.length} файлов
+                      </span>
+
+                      {isProcessingSupplyPlans && (
+                        <div className="text-[10px] text-slate-500 flex items-center gap-2 font-medium">
+                          <div className="w-3 h-3 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
+                          {parsingProgress.active
+                            ? parsingProgress.message
+                            : "Обработка..."}
+                        </div>
+                      )}
+
+                      {!isProcessingSupplyPlans &&
+                        processedSupplyPlans.length > 0 && (
+                          <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => {
+                              if (activeTab === "supply")
+                                setSupplySection("supply-plans");
+                            }}
+                            className="bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 text-[10px] font-bold px-4 py-1.5 rounded-full hover:bg-sky-200 dark:hover:bg-sky-900/50 transition-all flex items-center gap-2"
+                          >
+                            <ShoppingCart className="w-3.5 h-3.5" />
+                            <span>Показать поставки</span>
+                          </motion.button>
+                        )}
+                    </div>
+                  </div>
+                  <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                    {supplyPlanFiles.map((file) => (
+                      <div
+                        key={file.id}
+                        className="p-4 sm:p-6 flex items-center justify-between hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors px-6"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 bg-sky-50 dark:bg-sky-900/30 rounded-xl flex items-center justify-center text-sky-600 dark:text-sky-400">
+                            <ShoppingCart className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">
+                              {file.name}
+                            </h4>
+                            <p className="text-[10px] font-medium text-slate-400 flex items-center gap-2 mt-0.5">
+                              <span>{file.size}</span>
+                              <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
+                              <span>{file.date}</span>
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeSupplyPlanFile(file.id);
+                          }}
+                          className="text-slate-400 hover:text-red-500 transition-colors p-2"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+  return (
+    <div className="min-h-screen bg-[#F4F5F4] dark:bg-[#121411] flex flex-col md:flex-row transition-colors duration-300">
+      {/* Mobile App Navigation Bar */}
+      <div className="md:hidden fixed bottom-0 w-full bg-white/95 dark:bg-[#1A1C19]/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 flex items-center h-[72px] pb-4 px-2 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] overflow-x-auto [&::-webkit-scrollbar]:hidden gap-1">
+        {!isPurchasingMode && (
+          <button
+            onClick={() => setActiveTab("economy")}
+            className={`flex flex-col items-center justify-center min-w-[64px] shrink-0 h-full py-1 transition-all ${activeTab === "economy" ? "text-slate-900 dark:text-white" : "text-slate-400 dark:text-slate-500"}`}
+          >
+            <div
+              className={`px-3 py-1 rounded-full mb-1 transition-colors ${activeTab === "economy" ? "bg-slate-100 dark:bg-slate-800" : ""}`}
+            >
+              <TrendingUp className="w-5 h-5" />
+            </div>
+            <span className="text-[10px] font-bold tracking-tight">
+              Экономика
+            </span>
+          </button>
+        )}
+
+        <button
+          onClick={() => setActiveTab("production")}
+          className={`flex flex-col items-center justify-center min-w-[64px] shrink-0 h-full py-1 transition-all ${activeTab === "production" ? "text-slate-900 dark:text-white" : "text-slate-400 dark:text-slate-500"}`}
+        >
+          <div
+            className={`px-3 py-1 rounded-full mb-1 transition-colors ${activeTab === "production" ? "bg-slate-100 dark:bg-slate-800" : ""}`}
+          >
+            <Factory className="w-5 h-5" />
+          </div>
+          <span className="text-[10px] font-bold tracking-tight">Пр-во</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("supply")}
+          className={`flex flex-col items-center justify-center min-w-[64px] shrink-0 h-full py-1 transition-all ${activeTab === "supply" ? "text-slate-900 dark:text-white" : "text-slate-400 dark:text-slate-500"}`}
+        >
+          <div
+            className={`px-3 py-1 rounded-full mb-1 transition-colors ${activeTab === "supply" ? "bg-slate-100 dark:bg-slate-800" : ""}`}
+          >
+            <Package className="w-5 h-5" />
+          </div>
+          <span className="text-[10px] font-bold tracking-tight">
+            Снабжение
+          </span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("logistics")}
+          className={`flex flex-col items-center justify-center min-w-[64px] shrink-0 h-full py-1 transition-all ${activeTab === "logistics" ? "text-slate-900 dark:text-white" : "text-slate-400 dark:text-slate-500"}`}
+        >
+          <div
+            className={`px-3 py-1 rounded-full mb-1 transition-colors ${activeTab === "logistics" ? "bg-slate-100 dark:bg-slate-800" : ""}`}
+          >
+            <Truck className="w-5 h-5" />
+          </div>
+          <span className="text-[10px] font-bold tracking-tight">
+            Логистика
+          </span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("help")}
+          className={`flex flex-col items-center justify-center min-w-[64px] shrink-0 h-full py-1 transition-all ${activeTab === "help" ? "text-slate-900 dark:text-white" : "text-slate-400 dark:text-slate-500"}`}
+        >
+          <div
+            className={`px-3 py-1 rounded-full mb-1 transition-colors ${activeTab === "help" ? "bg-slate-100 dark:bg-slate-800" : ""}`}
+          >
+            <BookOpen className="w-5 h-5" />
+          </div>
+          <span className="text-[10px] font-bold tracking-tight">Справка</span>
+        </button>
+
+        <div className="w-[1px] h-8 bg-slate-100 dark:bg-slate-800 mx-1 shrink-0"></div>
+
+        <button
+          onClick={toggleTheme}
+          className="flex flex-col items-center justify-center min-w-[56px] shrink-0 h-full py-1 text-slate-400 dark:text-slate-500 active:scale-95 transition-all"
+        >
+          <div className="px-3 py-1 mb-1">
+            {isDarkMode ? (
+              <Sun className="w-5 h-5 text-amber-500" />
+            ) : (
+              <Moon className="w-5 h-5" />
+            )}
+          </div>
+          <span className="text-[10px] font-bold tracking-tight">Тема</span>
+        </button>
+
+        <button
+          onClick={onLogout}
+          className="flex flex-col items-center justify-center min-w-[56px] shrink-0 h-full py-1 text-slate-400 hover:text-red-500 dark:text-slate-500 dark:hover:text-red-400 transition-all"
+        >
+          <div className="px-3 py-1 mb-1">
+            <LogOut className="w-5 h-5" />
+          </div>
+          <span className="text-[10px] font-bold tracking-tight font-sans">
+            Выйти
+          </span>
+        </button>
+      </div>
+
+      {/* Desktop Navigation Rail */}
+      <div className="hidden md:flex flex-col w-[88px] bg-[#F0F4F4] dark:bg-[#1A1C19] border-r border-slate-200 dark:border-slate-800 items-center py-6 fixed h-full z-50">
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-12 h-12 bg-slate-700 dark:bg-slate-600 rounded-xl flex items-center justify-center text-white mb-2 shadow-sm">
+            <Calculator className="w-6 h-6" />
+          </div>
+        </div>
+        <div className="flex-1 flex flex-col gap-4 w-full px-3">
+          {!isPurchasingMode && (
+            <button
+              onClick={() => setActiveTab("economy")}
+              className={`w-full flex flex-col items-center justify-center py-4 transition-all active:scale-95 group ${activeTab === "economy" ? "text-slate-900 dark:text-white" : "text-slate-500 hover:text-slate-900 dark:hover:text-white"}`}
+            >
+              <div
+                className={`px-5 py-1.5 mb-1.5 rounded-full transition-colors ${activeTab === "economy" ? "bg-slate-200 dark:bg-slate-700" : "group-hover:bg-slate-100 dark:group-hover:bg-slate-800"}`}
+              >
+                <TrendingUp className="w-6 h-6" strokeWidth={2} />
+              </div>
+              <span className="text-[11px] font-medium tracking-wide">
+                Экономика
+              </span>
+            </button>
           )}
 
-          {/* Content tabs */}
+          <button
+            onClick={() => setActiveTab("production")}
+            className={`w-full flex flex-col items-center justify-center py-4 transition-all active:scale-95 group ${activeTab === "production" ? "text-slate-900 dark:text-white" : "text-slate-500 hover:text-slate-900 dark:hover:text-white"}`}
+          >
+            <div
+              className={`px-5 py-1.5 mb-1.5 rounded-full transition-colors ${activeTab === "production" ? "bg-slate-200 dark:bg-slate-700" : "group-hover:bg-slate-100 dark:group-hover:bg-slate-800"}`}
+            >
+              <Factory className="w-6 h-6" strokeWidth={2} />
+            </div>
+            <span className="text-[11px] font-medium tracking-wide">Пр-во</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("supply")}
+            className={`w-full flex flex-col items-center justify-center py-4 transition-all active:scale-95 group ${activeTab === "supply" ? "text-slate-900 dark:text-white" : "text-slate-500 hover:text-slate-900 dark:hover:text-white"}`}
+          >
+            <div
+              className={`px-5 py-1.5 mb-1.5 rounded-full transition-colors ${activeTab === "supply" ? "bg-slate-200 dark:bg-slate-700" : "group-hover:bg-slate-100 dark:group-hover:bg-slate-800"}`}
+            >
+              <Package className="w-6 h-6" strokeWidth={2} />
+            </div>
+            <span className="text-[11px] font-medium tracking-wide">
+              Снабжение
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("logistics")}
+            className={`w-full flex flex-col items-center justify-center py-4 transition-all active:scale-95 group ${activeTab === "logistics" ? "text-slate-900 dark:text-white" : "text-slate-500 hover:text-slate-900 dark:hover:text-white"}`}
+          >
+            <div
+              className={`px-5 py-1.5 mb-1.5 rounded-full transition-colors ${activeTab === "logistics" ? "bg-slate-200 dark:bg-slate-700" : "group-hover:bg-slate-100 dark:group-hover:bg-slate-800"}`}
+            >
+              <Truck className="w-6 h-6" strokeWidth={2} />
+            </div>
+            <span className="text-[11px] font-medium tracking-wide">
+              Логистика
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("help")}
+            className={`w-full flex flex-col items-center justify-center py-4 transition-all active:scale-95 group ${activeTab === "help" ? "text-slate-900 dark:text-white" : "text-slate-500 hover:text-slate-900 dark:hover:text-white"}`}
+          >
+            <div
+              className={`px-5 py-1.5 mb-1.5 rounded-full transition-colors ${activeTab === "help" ? "bg-slate-200 dark:bg-slate-700" : "group-hover:bg-slate-100 dark:group-hover:bg-slate-800"}`}
+            >
+              <BookOpen className="w-6 h-6" strokeWidth={2} />
+            </div>
+            <span className="text-[11px] font-medium tracking-wide">
+              Справка
+            </span>
+          </button>
+
+          <button
+            onClick={toggleTheme}
+            className="w-full flex flex-col items-center justify-center py-4 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all active:scale-95 group"
+          >
+            <div className="px-5 py-1.5 mb-1.5 transition-colors group-hover:bg-slate-100 dark:group-hover:bg-slate-800 rounded-full">
+              {isDarkMode ? (
+                <Sun className="w-6 h-6 text-amber-500" strokeWidth={2} />
+              ) : (
+                <Moon className="w-6 h-6" strokeWidth={2} />
+              )}
+            </div>
+            <span className="text-[11px] font-medium tracking-wide">
+              {isDarkMode ? "Светлая" : "Темная"}
+            </span>
+          </button>
+        </div>
+        <div className="w-full px-3">
+          <button
+            onClick={onLogout}
+            className="w-full flex flex-col items-center justify-center py-4 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+          >
+            <div className="px-5 py-1.5 mb-1.5">
+              <LogOut className="w-6 h-6" strokeWidth={2} />
+            </div>
+            <span className="text-[11px] font-medium tracking-wide">Выйти</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <motion.div className="flex-1 ml-0 md:ml-[88px] pb-32 md:pb-8 pt-6 sm:pt-8 px-3 sm:px-8 w-full min-w-0">
+        <AnimatePresence mode="wait">
+          {activeTab === "supply" && (
+          <AdminPanelSupplyTab
+            activeTab={activeTab}
+            formatCurrency={formatCurrency}
+            calculationResults={calculationResults}
+            setCalculationResults={setCalculationResults}
+            processedStock={processedStock}
+            processedSupplyPlans={processedSupplyPlans}
+            applyAllOptimizations={applyAllOptimizations}
+            tableContainerRef={tableContainerRef}
+            summaryContainerRef={summaryContainerRef}
+            supplyTableRef={supplyTableRef}
+            stockTableRef={stockTableRef}
+            freeStockTableRef={freeStockTableRef}
+            handleMouseDown={handleMouseDown}
+            onSummaryMouseDown={onSummaryMouseDown}
+            onSupplyMouseDown={onSupplyMouseDown}
+            onStockMouseDown={onStockMouseDown}
+            onFreeStockMouseDown={onFreeStockMouseDown}
+            handleMouseLeaveOrUp={handleMouseLeaveOrUp}
+            onSummaryMouseLeaveOrUp={onSummaryMouseLeaveOrUp}
+            handleMouseMove={handleMouseMove}
+            matchedDemand={matchedDemand}
+            supplyCalculationData={supplyCalculationData}
+            getSupplyNomenclature={getSupplyNomenclature}
+            handleCopyForSheets={handleCopyForSheets}
+            handleExportStock={handleExportStock}
+            tabs={tabs}
+            renderFilesContent={renderFilesContent}
+            setActiveTab={setActiveTab}
+            supplySection={supplySection}
+            setSupplySection={setSupplySection}
+            setProductionSection={setProductionSection}
+            isCopied={isCopied}
+            setIsCopied={setIsCopied}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            isProcessing={isProcessing}
+            isDragging={isDragging}
+            isSummaryDragging={isSummaryDragging}
+            isSupplyDragging={isSupplyDragging}
+            isStockDragging={isStockDragging}
+            isFreeStockDragging={isFreeStockDragging}
+            copySuccess={copySuccess}
+            setCopySuccess={setCopySuccess}
+            stockTotals={stockTotals}
+            isPurchasingMode={isPurchasingMode}
+            freeStock={freeStock}
+          />
+        )}
           {activeTab === "economy" && (
-            <motion.div
-              key="economy"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="flex flex-col gap-8"
-            >
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                  <h2 className="text-2xl sm:text-3xl font-normal tracking-tight text-[#1A1C19] dark:text-white">
-                    Экономика производства
-                  </h2>
-                  <p className="text-sm text-[#43483F] dark:text-slate-400 mt-2 max-w-2xl">
-                    Управление ценами заготовок, марками стали и прямыми затратами.
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                   <button
-                    onClick={handleSave}
-                    disabled={isSaving}
-                    className={`flex items-center justify-center gap-2 px-6 h-12 rounded-2xl text-sm font-bold transition-all shadow-sm ${
-                      saved ? "bg-emerald-500 text-white" : "bg-slate-900 dark:bg-slate-700 text-white hover:bg-slate-800"
-                    } ${isSaving ? "opacity-70" : ""}`}
-                  >
-                    {isSaving ? "Сохранение..." : saved ? "✓ Сохранено" : "Сохранить всё"}
-                  </button>
-                </div>
-              </div>
-
-              {/* Sub-navigation */}
-              <div className="flex items-center gap-1 bg-white dark:bg-[#1A1C19] p-1 rounded-2xl border border-slate-200 dark:border-slate-800 w-fit">
-                <button
-                  onClick={() => setAdminSection("direct")}
-                  className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                    adminSection === "direct" 
-                      ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white" 
-                      : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
-                  }`}
-                >
-                  Прямые затраты
-                </button>
-                <button
-                  onClick={() => setAdminSection("prices")}
-                  className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                    adminSection === "prices" 
-                      ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white" 
-                      : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
-                  }`}
-                >
-                  Цены
-                </button>
-                <button
-                  onClick={() => setAdminSection("grades")}
-                  className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                    adminSection === "grades" 
-                      ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white" 
-                      : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
-                  }`}
-                >
-                  Марки
-                </button>
-              </div>
-
-              <AnimatePresence mode="wait">
-                {adminSection === "direct" ? (
-                  <motion.div
-                    key="direct"
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 10 }}
-                    transition={{ duration: 0.2 }}
-                    className="flex flex-col gap-8"
-                  >
-                    {/* Direct Variable Costs */}
-                    <div className="flex flex-col gap-4">
-                      <div className="flex items-center gap-2 px-1">
-                        <TrendingUp className="w-5 h-5 text-slate-700 dark:text-slate-300" />
-                        <h3 className="text-lg font-medium text-slate-900 dark:text-white">Прямые затраты</h3>
-                      </div>
-                      <div className="bg-white dark:bg-[#1A1C19] rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                        <div className="overflow-x-auto">
-                          <table className="w-full text-left min-w-[300px]">
-                            <thead className="bg-slate-50/50 dark:bg-slate-800/50 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                              <tr>
-                                <th className="px-4 sm:px-6 py-4">Статья</th>
-                                <th className="px-4 sm:px-6 py-4 text-right">Норма на тн (руб)</th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                              {directItems.map(item => (
-                                <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
-                                  <td className="px-4 sm:px-6 py-4 text-sm font-medium text-slate-700 dark:text-slate-200">{item.name}</td>
-                                  <td className="px-4 sm:px-6 py-4">
-                                    <div className="relative w-full max-w-[140px] sm:max-w-[192px] ml-auto">
-                                      <input
-                                        type="text"
-                                        inputMode="decimal"
-                                        value={item.norm}
-                                        onChange={(e) => handleEconomyChange(item.id, 'norm', e.target.value)}
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-0 rounded-xl pl-3 pr-8 sm:pl-4 sm:pr-10 h-11 text-right text-sm font-bold focus:ring-2 focus:ring-slate-400 dark:text-white"
-                                      />
-                                      <span className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-bold text-xs pointer-events-none">₽</span>
-                                    </div>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/50 rounded-2xl p-6 flex flex-col sm:flex-row items-start gap-4">
-                      <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center shrink-0 motion-safe:animate-pulse">
-                         <Info className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <h4 className="text-sm font-bold text-blue-900 dark:text-blue-300">Как это работает?</h4>
-                        <p className="text-xs text-blue-800/70 dark:text-blue-400/70 leading-relaxed">
-                          Для <b>Прямых затрат</b> укажите норму расхода (абсолютную стоимость) на 1 тонну готовой продукции. Калькулятор автоматически вычислит влияние этих цифр на рентабельность заказов при расчете в основном интерфейсе.
-                        </p>
-                      </div>
-                    </div>
-                  </motion.div>
-                ) : adminSection === "prices" ? (
-                  <motion.div
-                    key="prices"
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 10 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <div className="flex flex-col md:grid md:grid-cols-12 gap-6 w-full">
-                      {/* Main settings column */}
-                      <div className="col-span-12 flex flex-col gap-6">
-
-                        {/* Empty Economy Warning Badge */}
-                        {allGrades.every(g => !rawPrices[g]?.md || Number(rawPrices[g].md) === 0) && (
-                          <div className="bg-gradient-to-r from-amber-50 to-amber-100/50 dark:from-amber-900/10 dark:to-orange-900/10 border border-amber-200 dark:border-amber-800/30 rounded-[28px] p-8 flex flex-col sm:flex-row items-center gap-6 shadow-sm">
-                            <div className="relative w-20 h-20 shrink-0 flex items-center justify-center">
-                              <div className="absolute inset-0 bg-white dark:bg-slate-800 rounded-3xl rotate-6 shadow-sm border border-slate-200 dark:border-slate-700"></div>
-                              <div className="absolute inset-0 bg-amber-100 dark:bg-amber-900/40 rounded-3xl -rotate-6"></div>
-                              <div className="font-black text-3xl text-amber-500/80 dark:text-amber-500/50 z-10 font-sans leading-none tracking-tighter">₽</div>
-                            </div>
-                            <div className="flex-1 text-center sm:text-left">
-                              <h3 className="text-xl font-bold text-amber-900 dark:text-amber-500 mb-2">
-                                Экономика не настроена!
-                              </h3>
-                              <p className="text-sm text-amber-800 dark:text-amber-400/80 leading-relaxed max-w-xl">
-                                Укажите маржинальную стоимость закупки, исходя из желаемой цены продажи, иначе калькулятор не сможет рассчитать рентабельность ваших сделок.
-                              </p>
-                            </div>
-                            <button 
-                              onClick={() => document.getElementById('price-table')?.scrollIntoView({ behavior: 'smooth' })}
-                              className="px-6 py-3 bg-white dark:bg-amber-500/10 hover:bg-amber-50 dark:hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-700/50 font-bold rounded-xl whitespace-nowrap transition-all shadow-sm active:mt-[1px]"
-                            >
-                              Настроить ценообразование
-                            </button>
-                          </div>
-                        )}
-                        
-                        {/* Pricing table */}
-                        <div id="price-table" className="bg-white dark:bg-[#1A1C19] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col transition-colors">
-                          <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
-                            <h3 className="text-base font-medium text-[#1A1C19] dark:text-white">
-                              Цены заготовки
-                            </h3>
-                          </div>
-                          <div className="overflow-x-auto p-0 m-0">
-                            <div className="inline-block min-w-full align-middle">
-                              <table className="w-full text-left whitespace-nowrap">
-                                <thead className="text-[#43483F] dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-transparent">
-                                  <tr>
-                                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider">Марка стали</th>
-                                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-right">Цена МД (руб/тн)</th>
-                                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-right">Цена НД (руб/тн)</th>
-                                    <th className="px-4 py-3 w-12"></th>
-                                  </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                                  {allGrades.map((grade) => {
-                                    const prices = rawPrices[grade] || { md: "", nd: "" };
-
-                                    return (
-                                      <tr key={grade} className="bg-white dark:bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
-                                        <td className="px-6 py-4 font-medium text-[#1A1C19] dark:text-slate-100 text-sm">
-                                          {grade}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                          <div className="relative w-[110px] sm:w-[130px] ml-auto">
-                                            <input
-                                              type="text"
-                                              inputMode="decimal"
-                                              placeholder="0"
-                                              value={formatInputValue(prices.md)}
-                                              onChange={(e) => handlePriceChange(grade, 'md', e.target.value)}
-                                              className="w-full bg-transparent border-b border-slate-300 dark:border-slate-700 focus:border-slate-800 dark:focus:border-slate-400 focus:outline-none text-right text-sm font-bold h-9 pl-1 pr-1 dark:text-white placeholder:text-slate-400"
-                                            />
-                                          </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                          <div className="relative w-[110px] sm:w-[130px] ml-auto">
-                                            <input
-                                              type="text"
-                                              inputMode="decimal"
-                                              placeholder="0"
-                                              value={formatInputValue(prices.nd)}
-                                              onChange={(e) => handlePriceChange(grade, 'nd', e.target.value)}
-                                              className="w-full bg-transparent border-b border-slate-300 dark:border-slate-700 focus:border-slate-800 dark:focus:border-slate-400 focus:outline-none text-right text-sm font-bold h-9 pl-1 pr-1 dark:text-white placeholder:text-slate-400"
-                                            />
-                                          </div>
-                                        </td>
-                                        <td className="px-4 py-4 text-center align-middle">
-                                            <button
-                                              onClick={() => handleRemoveGrade(grade)}
-                                              className="text-slate-400 hover:text-red-500 transition-colors p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20"
-                                              title="Удалить марку"
-                                            >
-                                              <Trash2 className="w-5 h-5" />
-                                            </button>
-                                        </td>
-                                      </tr>
-                                    );
-                                  })}
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Base prices */}
-                        <div className="bg-white dark:bg-[#1A1C19] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col transition-colors">
-                          <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
-                            <h3 className="text-base font-medium text-[#1A1C19] dark:text-white">
-                              Базовые цены
-                            </h3>
-                          </div>
-                          <div className="p-6 flex flex-col md:flex-row gap-6">
-                            <div className="flex-1">
-                              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                                Цена лома (руб/тн)
-                              </label>
-                              <div className="relative">
-                                <input
-                                  type="text"
-                                  inputMode="decimal"
-                                  placeholder="0"
-                                  value={formatInputValue(scrap)}
-                                  onChange={(e) => handleNumericInput(e, setScrap)}
-                                  className="w-full bg-slate-50 dark:bg-slate-800 border-0 rounded-xl px-4 h-12 text-lg font-bold focus:ring-2 focus:ring-slate-400 dark:text-white"
-                                />
-                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">₽</span>
-                              </div>
-                              <p className="text-xs text-slate-400 mt-2">
-                                Учитывается как возвратная стоимость технических отходов
-                              </p>
-                            </div>
-                            
-                            <div className="flex-1">
-                              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                                Цена делового остатка (руб/тн)
-                              </label>
-                              <div className="relative">
-                                <input
-                                  type="text"
-                                  inputMode="decimal"
-                                  placeholder="0"
-                                  value={formatInputValue(remnant)}
-                                  onChange={(e) => handleNumericInput(e, setRemnant)}
-                                  className="w-full bg-slate-50 dark:bg-slate-800 border-0 rounded-xl px-4 h-12 text-lg font-bold focus:ring-2 focus:ring-slate-400 dark:text-white"
-                                />
-                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">₽</span>
-                              </div>
-                              <p className="text-xs text-slate-400 mt-2">
-                                Учитывается для годных обрезков
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-
-                      </div>
-
-                    </div>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="grades"
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 10 }}
-                    transition={{ duration: 0.2 }}
-                    className="flex flex-col gap-8"
-                  >
-                    <div className="flex flex-col gap-4 mt-4">
-                      <div className="flex items-center gap-2 px-1">
-                        <Layers className="w-5 h-5 text-slate-700 dark:text-slate-300" />
-                        <h3 className="text-lg font-medium text-slate-900 dark:text-white">Параметры марок стали</h3>
-                      </div>
-                      <div className="bg-white dark:bg-[#1A1C19] rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                        <div className="overflow-x-auto">
-                          <table className="w-full text-left min-w-[400px]">
-                            <thead className="bg-slate-50/50 dark:bg-slate-800/50 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                              <tr>
-                                <th className="px-4 sm:px-6 py-4">Марка стали</th>
-                                <th className="px-4 sm:px-6 py-4 text-center">Политика (Круг) <RemnantPricingTooltip /></th>
-                                <th className="px-4 sm:px-6 py-4 text-center">Политика (Ш-гр) <RemnantPricingTooltip /></th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                              {allGrades.map(grade => {
-                                const pricing = remnantPricing[grade] || { round: "remnant", hex: "remnant" };
-                                return (
-                                  <tr key={grade} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
-                                    <td className="px-4 sm:px-6 py-4 text-sm font-bold text-slate-900 dark:text-white">{grade}</td>
-                                    <td className="px-4 sm:px-6 py-4">
-                                      <select
-                                        value={pricing.round}
-                                        onChange={(e) => handlePricingChange(grade, "round", e.target.value)}
-                                        className={`bg-slate-50 dark:bg-slate-800 text-xs font-bold rounded-xl px-2 sm:px-4 py-2.5 outline-none appearance-none cursor-pointer w-[120px] sm:w-[160px] mx-auto block border-0 focus:ring-2 focus:ring-slate-400 ${
-                                          pricing.round === "scrap" ? "text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/20" : "text-slate-900 dark:text-white"
-                                        }`}
-                                      >
-                                        <option value="remnant">Деловой остаток</option>
-                                        <option value="scrap">По цене лома</option>
-                                      </select>
-                                    </td>
-                                    <td className="px-4 sm:px-6 py-4">
-                                      <select
-                                        value={pricing.hex}
-                                        onChange={(e) => handlePricingChange(grade, "hex", e.target.value)}
-                                        className={`bg-slate-50 dark:bg-slate-800 text-xs font-bold rounded-xl px-2 sm:px-4 py-2.5 outline-none appearance-none cursor-pointer w-[120px] sm:w-[160px] mx-auto block border-0 focus:ring-2 focus:ring-slate-400 ${
-                                          pricing.hex === "scrap" ? "text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/20" : "text-slate-900 dark:text-white"
-                                        }`}
-                                      >
-                                        <option value="remnant">Деловой остаток</option>
-                                        <option value="scrap">По цене лома</option>
-                                      </select>
-                                    </td>
-                                  </tr>
-                                );
-                              })}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          )}
-
+          <AdminPanelEconomyTab
+            activeTab={activeTab}
+            handleSave={handleSave}
+            isSaving={isSaving}
+            saved={saved}
+            economyItems={economyItems}
+                                                saveError={saveError}
+            rawPrices={rawPrices}
+            handlePriceChange={handlePriceChange}
+            adminSection={adminSection}
+            setAdminSection={setAdminSection}
+                        scrap={scrap}
+            remnant={remnant}
+            customGrades={customGrades}
+            remnantPricing={remnantPricing}
+            newGrade={newGrade}
+            setNewGrade={setNewGrade}
+            handleAddGrade={handleAddGrade}
+                                    deletedGrades={deletedGrades}
+                        handlePricingChange={handlePricingChange}
+            formatDate={formatDate}
+            handleEconomyChange={handleEconomyChange}
+            allGrades={allGrades}
+            handleRemoveGrade={handleRemoveGrade}
+            setScrap={setScrap}
+            setRemnant={setRemnant}
+          />
+        )}
           {activeTab === "production" && (
-            <motion.div
-              key="production"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="flex flex-col gap-8 pb-24 md:pb-8"
-            >
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                  <h2 className="text-2xl sm:text-3xl font-normal tracking-tight text-[#1A1C19] dark:text-white">
-                    Производство
-                  </h2>
-                  <p className="text-sm text-[#43483F] dark:text-slate-400 mt-2 max-w-2xl">
-                    Управление производственными планами, очередью заданий и статусами оборудования.
-                  </p>
-                </div>
-              </div>
-              <div className="bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm flex flex-col items-center justify-center text-center gap-4 min-h-[400px]">
-                <Factory className="w-16 h-16 text-slate-300 dark:text-slate-700" />
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Модуль в разработке</h3>
-                <p className="text-sm text-slate-500 max-w-md">Функционал управления производством находится на стадии проектирования. Доступ будет открыт в следующих обновлениях.</p>
-              </div>
-            </motion.div>
-          )}
-
+          <AdminPanelProductionTab
+            activeTab={activeTab}
+            formatCurrency={formatCurrency}
+            planFiles={planFiles}
+            stockFiles={stockFiles}
+            calculationResults={calculationResults}
+            processedStock={processedStock}
+            processedSupplyPlans={processedSupplyPlans}
+            tableContainerRef={tableContainerRef}
+            summaryContainerRef={summaryContainerRef}
+            supplyTableRef={supplyTableRef}
+            stockTableRef={stockTableRef}
+            freeStockTableRef={freeStockTableRef}
+            handleMouseDown={handleMouseDown}
+            onSummaryMouseDown={onSummaryMouseDown}
+            onSupplyMouseDown={onSupplyMouseDown}
+            onStockMouseDown={onStockMouseDown}
+            onFreeStockMouseDown={onFreeStockMouseDown}
+            handleMouseLeaveOrUp={handleMouseLeaveOrUp}
+            onSummaryMouseLeaveOrUp={onSummaryMouseLeaveOrUp}
+            handleMouseMove={handleMouseMove}
+            matchedDemand={matchedDemand}
+            supplyCalculationData={supplyCalculationData}
+            filteredMatchedDemand={filteredMatchedDemand}
+            filteredTotals={filteredTotals}
+            getSupplyNomenclature={getSupplyNomenclature}
+            handleCopyForSheets={handleCopyForSheets}
+            handleExportStock={handleExportStock}
+            renderFilesContent={renderFilesContent}
+            setActiveTab={setActiveTab}
+            setSupplySection={setSupplySection}
+            productionSection={productionSection}
+            setProductionSection={setProductionSection}
+            isCopied={isCopied}
+            setIsCopied={setIsCopied}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            isProcessing={isProcessing}
+            isDragging={isDragging}
+            isSummaryDragging={isSummaryDragging}
+            isSupplyDragging={isSupplyDragging}
+            isStockDragging={isStockDragging}
+            isFreeStockDragging={isFreeStockDragging}
+            copySuccess={copySuccess}
+            setCopySuccess={setCopySuccess}
+            stockTotals={stockTotals}
+            freeStock={freeStock}
+          />
+        )}
           {activeTab === "logistics" && (
-            <motion.div
-              key="logistics"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="flex flex-col gap-8 pb-24 md:pb-8"
-            >
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                  <h2 className="text-2xl sm:text-3xl font-normal tracking-tight text-[#1A1C19] dark:text-white">
-                    Логистика
-                  </h2>
-                  <p className="text-sm text-[#43483F] dark:text-slate-400 mt-2 max-w-2xl">
-                    Управление отгрузками, транспортными накладными и графиком поставок.
-                  </p>
-                </div>
-              </div>
-               <div className="bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm flex flex-col items-center justify-center text-center gap-4 min-h-[400px]">
-                <Truck className="w-16 h-16 text-slate-300 dark:text-slate-700" />
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Модуль в разработке</h3>
-                <p className="text-sm text-slate-500 max-w-md">Функционал управления логистикой находится на стадии проектирования. Доступ будет открыт в следующих обновлениях.</p>
-              </div>
-            </motion.div>
-          )}
-
+          <AdminPanelLogisticsTab
+            activeTab={activeTab}
+          />
+        )}
           {activeTab === "help" && (
-            <motion.div
-              key="help"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="flex flex-col gap-8"
-            >
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                  <h2 className="text-2xl sm:text-3xl font-normal tracking-tight text-[#1A1C19] dark:text-white">
-                    Обучение и Инструкции
-                  </h2>
-                  <p className="text-sm text-[#43483F] dark:text-slate-400 mt-2 max-w-2xl">
-                    Руководство пользователя, алгоритмы работы и требования к форматам загружаемых данных.
-                  </p>
-                </div>
-              </div>
+          <AdminPanelHelpTab
+            activeTab={activeTab}
+            />
+        )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Intro & Benefits */}
-                <div className="bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm flex flex-col gap-4">
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <Info className="w-5 h-5 text-sky-500" />
-                    О Программном Комплексе
-                  </h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                    Данный программный комплекс предназначен для автоматизации процессов снабжения, расчетов потребности в заготовке и оценки экономической рентабельности.
-                    Система объединяет данные о заказах покупателей (Потребностях) и складских остатках, позволяя быстро и точно вычислять дефицит сырья.
-                  </p>
-                  
-                  <div className="mt-4">
-                    <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3 uppercase tracking-wider">Ключевые преимущества</h4>
-                    <ul className="space-y-3">
-                      <li className="flex items-start gap-3">
-                        <Check className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                        <span className="text-sm text-slate-600 dark:text-slate-400"><b>Мгновенный расчет КИМ:</b> автоматическое определение коэффициента использования металла на основе технологических нормативов.</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <Check className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                        <span className="text-sm text-slate-600 dark:text-slate-400"><b>Связь Потребности и Склада:</b> алгоритм сам подбирает подходящую заготовку из наличия (по марке, профилю, размеру и длине) и вычисляет дефицит.</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <Check className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                        <span className="text-sm text-slate-600 dark:text-slate-400"><b>Гибкий экспорт данных:</b> возможность в один клик скопировать результаты в Google Sheets или скачать XLSX файл.</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <Check className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                        <span className="text-sm text-slate-600 dark:text-slate-400"><b>Оптимизация свободных остатков:</b> прозрачно выделяет объем заготовки, который не покрывает существующие заказы и может быть реализован.</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-
-                {/* File Formats Detailed */}
-                <div className="bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm flex flex-col gap-4">
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-amber-500" />
-                    Какие Документы Загружать и Правила Загрузки (Подробно)
-                  </h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                    Для корректной работы системы, загружаемые Excel файлы (.xlsx, .xls) или CSV файлы должны содержать определенные заголовки столбцов. Порядок столбцов абсолютно не важен, программа ориентируется строго по названиям шапок. Вы можете добавлять в ваш рабочий файл любые другие столбцы, они будут просто проигнорированы.
-                  </p>
-                  
-                  <div className="mt-4 space-y-6">
-                    <div>
-                      <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-2 uppercase tracking-wider bg-slate-100 dark:bg-slate-800 w-fit px-3 py-1 rounded-lg">Документ 1: Файл Потребностей (Заказы Покупателей)</h4>
-                      <p className="text-xs text-slate-500 mb-3 leading-relaxed">
-                        Этот документ формируется из вашей учетной системы как список текущих заказов к выполнению. Обратите внимание, что система умеет распознавать несколько вариаций названий заголовков для одного и того же логического поля.
-                      </p>
-                      
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-amber-300 transition-colors">
-                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block mb-1">Номенклатура детали</span>
-                          <span className="text-[10px] text-slate-500 font-mono">Пример заголовка: Номенклатура</span>
-                        </div>
-                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-amber-300 transition-colors">
-                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block mb-1">Остаток к выполнению (вес)</span>
-                          <span className="text-[10px] text-slate-500 font-mono">Примеры заголовков: Остаток к выполнению, Количество, Кол-во</span>
-                        </div>
-                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-amber-300 transition-colors">
-                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block mb-1">Марка стали</span>
-                          <span className="text-[10px] text-slate-500 font-mono">Пример заголовка: Марка</span>
-                        </div>
-                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-amber-300 transition-colors">
-                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block mb-1">Клиент</span>
-                          <span className="text-[10px] text-slate-500 font-mono">Примеры: Клиент, Контрагент, Заказчик</span>
-                        </div>
-                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-amber-300 transition-colors">
-                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block mb-1">Номер заказа</span>
-                          <span className="text-[10px] text-slate-500 font-mono">Примеры: № заказа, Заказ, Документ</span>
-                        </div>
-                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-amber-300 transition-colors">
-                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block mb-1">Размер</span>
-                          <span className="text-[10px] text-slate-500 font-mono">Примеры: Размер, Диаметр</span>
-                        </div>
-                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-amber-300 transition-colors">
-                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block mb-1">Профиль</span>
-                          <span className="text-[10px] text-slate-500 font-mono">Примеры: Профиль, Тип</span>
-                        </div>
-                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-amber-300 transition-colors">
-                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block mb-1">Длина готовой продукции</span>
-                          <span className="text-[10px] text-slate-500 font-mono">Пример: Длина конечной продукции</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-2 uppercase tracking-wider bg-slate-100 dark:bg-slate-800 w-fit px-3 py-1 rounded-lg">Документ 2: Файл Складские Остатки (Наличие сырья)</h4>
-                      <p className="text-xs text-slate-500 mb-3 leading-relaxed">
-                        Этот документ отвечает за свободные остатки сырья в тоннах. <b>ВАЖНОЕ ПРАВИЛО:</b> Система сама анализирует общий столбец с Наименованием позиции на складе, чтобы автоматически выделить из него Профиль, Марку стали, Размер и Длину! Вам не нужно заводить для этих параметров отдельные колонки.
-                      </p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-sky-300 transition-colors">
-                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block mb-1">Наименование заготовки на складе</span>
-                          <span className="text-[10px] text-slate-500 font-mono">Варианты заголовков: Номенклатура, Наименование</span>
-                          <ul className="text-[10px] text-slate-400 mt-2 list-disc ml-3 space-y-1">
-                            <li>Пример: "Круг ст.35 12x2000"</li>
-                            <li>Пример: "Шестигранник 45Х 14 МД 6000"</li>
-                          </ul>
-                        </div>
-                        <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-sky-300 transition-colors">
-                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block mb-1">Количество или Вес на складе (в тоннах)</span>
-                          <span className="text-[10px] text-slate-500 font-mono">Варианты заголовков: Конечный остаток, Остаток, Кол-во</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Workflow Algorithm */}
-                <div className="bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm flex flex-col gap-4 md:col-span-2 mt-2">
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
-                    <Activity className="w-6 h-6 text-indigo-500" />
-                    Инструкция: "Быстрый старт" (От 0 к первому расчету снабжения)
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-                    {/* Step 1 */}
-                    <div className="flex flex-col gap-4 relative z-10 bg-slate-50 dark:bg-slate-800/30 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 hover:-translate-y-1 transition-transform">
-                      <div className="w-12 h-12 shrink-0 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center font-black text-indigo-600 dark:text-indigo-400 text-xl shadow-sm">
-                        1
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <h4 className="font-bold text-base text-slate-800 dark:text-slate-200">Подготовка и Загрузка Данных</h4>
-                        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                          Зайдите в раздел <span className="font-bold text-slate-800 dark:text-slate-200">Снабжение -&gt; Файлы</span>. Перетащите скачанные из вашей системы 1С/ERP два файла в формате Excel: сначала список текущих заказов (Потребности), затем запишите оставшиеся элементы на складе (Склад).
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Step 2 */}
-                    <div className="flex flex-col gap-4 relative z-10 bg-slate-50 dark:bg-slate-800/30 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 hover:-translate-y-1 transition-transform">
-                      <div className="w-12 h-12 shrink-0 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center font-black text-blue-600 dark:text-blue-400 text-xl shadow-sm">
-                        2
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <h4 className="font-bold text-base text-slate-800 dark:text-slate-200">Анализ потребностей в вакууме</h4>
-                        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                          Перейдите во вступление <span className="font-bold text-slate-800 dark:text-slate-200">Потребность</span>. Программа уже зачитала ваш файл: она сама нашла марку стали, профиль, размер и вычислила, сколько тонн металла необходимо закупить с учетом технологических припусков (КИМ).
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Step 3 */}
-                    <div className="flex flex-col gap-4 relative z-10 bg-slate-50 dark:bg-slate-800/30 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 hover:-translate-y-1 transition-transform">
-                      <div className="w-12 h-12 shrink-0 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center font-black text-emerald-600 dark:text-emerald-400 text-xl shadow-sm">
-                        3
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <h4 className="font-bold text-base text-slate-800 dark:text-slate-200">Сопоставление со складом (Найти дефицит)</h4>
-                        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                          Откройте раздел <span className="font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-1 py-0.5 rounded">Расчет с учетом наличия</span>. Нажмите на это место — и система автоматически вычтет складские запасы из ваших потребностей, оставив только чистый Дефицит (объем, который нужно заказать).
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </motion.div>
-          )}
         </AnimatePresence>
       </motion.div>
-      <BatchManualModal isOpen={isBatchManualOpen} onClose={() => setIsBatchManualOpen(false)} />
-      <StockManualModal isOpen={isStockManualOpen} onClose={() => setIsStockManualOpen(false)} />
+      <BatchManualModal
+        isOpen={isBatchManualOpen}
+        onClose={() => setIsBatchManualOpen(false)}
+      />
+      <StockManualModal
+        isOpen={isStockManualOpen}
+        onClose={() => setIsStockManualOpen(false)}
+      />
     </div>
   );
 }

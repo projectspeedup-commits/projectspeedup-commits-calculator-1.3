@@ -1,6 +1,7 @@
 # Security Specification
 
 ## 1. Data Invariants
+
 - `settings/prices`: Only authenticated administrators (those with verified email `project.speedup@gmail.com` or explicitly added to the `/admins` collection) can create or update global application settings. Ordinary users and anonymous users have zero write access.
 - `calculations/{calcId}`: Calculations can only be created by signed-in users. The `userId` field must exactly match the authenticated user's `uid`. Calculations can only be listed, read, updated, or deleted by the exact user who created them (`resource.data.userId == request.auth.uid`).
 - `admins/{userId}`: Administrator role definitions are strictly controlled by existing administrators. Users cannot escalate their own privileges. A globally approved bootstrapper email exists to ensure lockout prevention.
@@ -25,8 +26,8 @@
 ## 3. The Test Runner
 
 ```typescript
-import * as rulesUnitTesting from '@firebase/rules-unit-testing';
-import { readFileSync } from 'fs';
+import * as rulesUnitTesting from "@firebase/rules-unit-testing";
+import { readFileSync } from "fs";
 
 const PROJECT_ID = "gen-lang-client-security-test";
 const TEST_ENV = await rulesUnitTesting.initializeTestEnvironment({
@@ -36,40 +37,58 @@ const TEST_ENV = await rulesUnitTesting.initializeTestEnvironment({
 
 export async function runDirtyDozenTests() {
   const aliceId = "uid_alice";
-  const aliceAuth = { uid: aliceId, email: "alice@test.com", email_verified: true };
+  const aliceAuth = {
+    uid: aliceId,
+    email: "alice@test.com",
+    email_verified: true,
+  };
   const aliceDb = TEST_ENV.authenticatedContext(aliceId, aliceAuth).firestore();
-  
+
   const adminId = "uid_admin";
-  const adminAuth = { uid: adminId, email: "project.speedup@gmail.com", email_verified: true };
+  const adminAuth = {
+    uid: adminId,
+    email: "project.speedup@gmail.com",
+    email_verified: true,
+  };
   const adminDb = TEST_ENV.authenticatedContext(adminId, adminAuth).firestore();
 
   // Test 1: Alice creates calc correctly -> ALLOW
   await rulesUnitTesting.assertSucceeds(
     aliceDb.collection("calculations").doc("calc1").set({
-      userId: aliceId, createdAt: rulesUnitTesting.firestore.FieldValue.serverTimestamp()
-    })
+      userId: aliceId,
+      createdAt: rulesUnitTesting.firestore.FieldValue.serverTimestamp(),
+    }),
   );
 
   // Test 2: Alice creates calc with wrong user id -> DENY
   await rulesUnitTesting.assertFails(
     aliceDb.collection("calculations").doc("calc2").set({
-      userId: "uid_bob", createdAt: rulesUnitTesting.firestore.FieldValue.serverTimestamp()
-    })
+      userId: "uid_bob",
+      createdAt: rulesUnitTesting.firestore.FieldValue.serverTimestamp(),
+    }),
   );
-  
+
   // Test 3: Alice attempts to read settings -> ALLOW
   await rulesUnitTesting.assertSucceeds(aliceDb.doc("settings/prices").get());
 
   // Test 4: Alice attempts to write settings -> DENY
   await rulesUnitTesting.assertFails(
-    aliceDb.doc("settings/prices").set({ updatedAt: rulesUnitTesting.firestore.FieldValue.serverTimestamp() })
+    aliceDb
+      .doc("settings/prices")
+      .set({
+        updatedAt: rulesUnitTesting.firestore.FieldValue.serverTimestamp(),
+      }),
   );
 
   // Test 5: Admin attempts to write settings -> ALLOW
   await rulesUnitTesting.assertSucceeds(
-    adminDb.doc("settings/prices").set({ updatedAt: rulesUnitTesting.firestore.FieldValue.serverTimestamp() })
+    adminDb
+      .doc("settings/prices")
+      .set({
+        updatedAt: rulesUnitTesting.firestore.FieldValue.serverTimestamp(),
+      }),
   );
-  
+
   console.log("All 'Dirty Dozen' tests verified.");
 }
 ```

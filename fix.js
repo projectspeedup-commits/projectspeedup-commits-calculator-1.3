@@ -1,13 +1,25 @@
-const fs = require('fs');
-let lines = fs.readFileSync('src/components/AdminPanel.tsx', 'utf8').split('\n');
+const fs = require("fs");
+let lines = fs
+  .readFileSync("src/components/AdminPanel.tsx", "utf8")
+  .split("\n");
 
-const startIdx = lines.findIndex(l => l.includes('<h5 className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 sm:mb-4">Топ-5 по дефициту (тн)</h5>'));
-const endIdx = lines.findIndex((l, i) => i > startIdx && l.includes('<tbody className={`divide-y divide-slate-100 dark:divide-slate-800 text-[11px]`}>'));
+const startIdx = lines.findIndex((l) =>
+  l.includes(
+    '<h5 className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 sm:mb-4">Топ-5 по дефициту (тн)</h5>',
+  ),
+);
+const endIdx = lines.findIndex(
+  (l, i) =>
+    i > startIdx &&
+    l.includes(
+      "<tbody className={`divide-y divide-slate-100 dark:divide-slate-800 text-[11px]`}>",
+    ),
+);
 
 console.log("Start", startIdx, "End", endIdx);
 
 if (startIdx !== -1 && endIdx !== -1) {
-    const replacement = `                                  <div className="flex-1 min-h-[160px] w-full relative">
+  const replacement = `                                  <div className="flex-1 min-h-[160px] w-full relative">
                                     <ResponsiveContainer width="100%" height="100%">
                                       <BarChart data={filteredMatchedDemand.filter(d => d.shortageStock > 0).sort((a, b) => b.shortageStock - a.shortageStock).slice(0, 5)} layout="vertical" margin={{ top: 0, right: 0, bottom: 0, left: 30 }}>
                                         <XAxis type="number" hide />
@@ -70,11 +82,13 @@ if (startIdx !== -1 && endIdx !== -1) {
                                       </tr>
                                     </thead>`;
 
-    
-    const before = lines.slice(0, startIdx + 1);
-    const after = lines.slice(endIdx);
-    
-    fs.writeFileSync('src/components/AdminPanel.tsx', before.join('\n') + '\n' + replacement + '\n' + after.join('\n'));
+  const before = lines.slice(0, startIdx + 1);
+  const after = lines.slice(endIdx);
+
+  fs.writeFileSync(
+    "src/components/AdminPanel.tsx",
+    before.join("\n") + "\n" + replacement + "\n" + after.join("\n"),
+  );
 } else {
-    console.log("NOT FOUND");
+  console.log("NOT FOUND");
 }

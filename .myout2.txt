@@ -1,0 +1,22 @@
+src/components/AdminPanel.tsx:135:  const [processedSupplyPlansProd, setProcessedSupplyPlansProd] = useState<any[]>(() => { try { const s = localStorage.getItem('ais_prod_supply_plans'); return s ? JSON.parse(s) : []; } catch (e) { return []; } });
+src/components/AdminPanel.tsx:136:  const [processedSupplyPlansSup, setProcessedSupplyPlansSup] = useState<any[]>(() => { try { const s = localStorage.getItem('ais_sup_supply_plans'); return s ? JSON.parse(s) : []; } catch (e) { return []; } });
+src/components/AdminPanel.tsx:138:  const [processedStockProd, setProcessedStockProd] = useState<any[]>(() => { try { const s = localStorage.getItem('ais_prod_stock'); return s ? JSON.parse(s) : []; } catch (e) { return []; } });
+src/components/AdminPanel.tsx:139:  const [processedStockSup, setProcessedStockSup] = useState<any[]>(() => { try { const s = localStorage.getItem('ais_sup_stock'); return s ? JSON.parse(s) : []; } catch (e) { return []; } });
+src/components/AdminPanel.tsx:154:  const [calcResultsProd, setCalcResultsProd] = useState<CalculationResult[]>(() => { try { const s = localStorage.getItem('ais_prod_calc_results'); return s ? JSON.parse(s) : []; } catch (e) { return []; } });
+src/components/AdminPanel.tsx:155:  const [calcResultsSup, setCalcResultsSup] = useState<CalculationResult[]>(() => { try { const s = localStorage.getItem('ais_sup_calc_results'); return s ? JSON.parse(s) : []; } catch (e) { return []; } });
+src/components/AdminPanel.tsx:873:      const parsed = new Date(input);
+src/components/AdminPanel.tsx:874:      if (!isNaN(parsed.getTime())) {
+src/components/AdminPanel.tsx:875:        dateObj = parsed;
+src/components/AdminPanel.tsx:877:        // Handle DD.MM.YYYY strings manually if browser can't parse them
+src/components/AdminPanel.tsx:1067:                  if (!isNaN(parsedLen) && parsedLen > 0) {
+src/components/AdminPanel.tsx:1068:                    length = parsedLen;
+src/App.tsx:92:            loadedCustomGrades = JSON.parse(savedCustomGrades);
+src/App.tsx:102:            loadedDeletedGrades = JSON.parse(savedDeletedGrades);
+src/App.tsx:111:            setRemnantPricing(JSON.parse(savedRemnantPricing));
+src/App.tsx:119:            const parsed = JSON.parse(savedEconomy);
+src/App.tsx:120:            const initialMap = new Map(parsed.map((item: any) => [item.id, item]));
+src/App.tsx:129:            const parsed = JSON.parse(savedRaw);
+src/App.tsx:133:              if (parsed[grade] !== undefined) {
+src/App.tsx:134:                if (typeof parsed[grade] === 'string') {
+src/App.tsx:135:                  loadedPrices[grade] = { md: parsed[grade], nd: parsed[grade] };
+src/App.tsx:137:                  loadedPrices[grade] = parsed[grade];

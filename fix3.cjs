@@ -1,8 +1,8 @@
-const fs = require('fs');
-let code = fs.readFileSync('src/components/AdminPanel.tsx', 'utf8');
+const fs = require("fs");
+let code = fs.readFileSync("src/components/AdminPanel.tsx", "utf8");
 
 const anchorStart = `                                  const renderMainRow = (stockItem: any = null, isSubRow = false) => (`;
-const anchorEnd = `                                        {stockItem ? (`
+const anchorEnd = `                                        {stockItem ? (`;
 
 const idxStart = code.indexOf(anchorStart);
 const idxEnd = code.indexOf(anchorEnd, idxStart);
@@ -60,7 +60,7 @@ if (idxStart !== -1 && idxEnd !== -1) {
 `;
 
   code = code.substring(0, idxStart) + replacement + code.substring(idxEnd);
-  fs.writeFileSync('src/components/AdminPanel.tsx', code);
+  fs.writeFileSync("src/components/AdminPanel.tsx", code);
   console.log("Replaced");
 } else {
   console.log("Not found");

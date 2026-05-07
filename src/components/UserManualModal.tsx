@@ -1,5 +1,12 @@
 import React from "react";
-import { X, BookOpen, CheckCircle2, ChevronRight, Info, Lightbulb } from "lucide-react";
+import {
+  X,
+  BookOpen,
+  CheckCircle2,
+  ChevronRight,
+  Info,
+  Lightbulb,
+} from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 interface UserManualModalProps {
@@ -11,24 +18,28 @@ export function UserManualModal({ isOpen, onClose }: UserManualModalProps) {
   const steps = [
     {
       title: "1. Выбор параметров заготовки (Марка и Профиль)",
-      description: "Начните с выбора типа профиля (например, Круг или Шестигранник) и нужной марки стали. Это очень важный шаг, так как он определяет базовые коэффициенты плотности и привязывает расчет к нужным ГОСТам.",
-      icon: <Lightbulb className="w-5 h-5 text-amber-500" />
+      description:
+        "Начните с выбора типа профиля (например, Круг или Шестигранник) и нужной марки стали. Это очень важный шаг, так как он определяет базовые коэффициенты плотности и привязывает расчет к нужным ГОСТам.",
+      icon: <Lightbulb className="w-5 h-5 text-amber-500" />,
     },
     {
       title: "2. Настройка размеров и габаритов",
-      description: "Укажите 'Целевой размер' — это то, что просит клиент. Затем выберите 'Размер заготовки' — это металл, из которого будет производиться деталь. Чем точнее совпадают эти размеры, тем меньше металла уйдет в стружку и тем выше будет Выход годного.",
-      icon: <Info className="w-5 h-5 text-blue-500" />
+      description:
+        "Укажите 'Целевой размер' — это то, что просит клиент. Затем выберите 'Размер заготовки' — это металл, из которого будет производиться деталь. Чем точнее совпадают эти размеры, тем меньше металла уйдет в стружку и тем выше будет Выход годного.",
+      icon: <Info className="w-5 h-5 text-blue-500" />,
     },
     {
       title: "3. Оптимизация раскроя",
-      description: "Обратите внимание на блок 'Безотходный раскрой'. Программа сама высчитывает идеальную длину прутка. Просто кликните на одну из предложенных зеленых фишек с длиной, чтобы применить её и минимизировать некратные остатки (обрезки).",
-      icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+      description:
+        "Обратите внимание на блок 'Безотходный раскрой'. Программа сама высчитывает идеальную длину прутка. Просто кликните на одну из предложенных зеленых фишек с длиной, чтобы применить её и минимизировать некратные остатки (обрезки).",
+      icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" />,
     },
     {
       title: "4. Коммерческий расчет и выгода",
-      description: "Самый важный этап: введите цену продажи за 1 тонну и стоимость закупки. Калькулятор мгновенно рассчитает вашу чистую маржу с учетом всех производственных отходов. Если сделка убыточна, цифры станут красными — это сигнал быть осторожным!",
-      icon: <ChevronRight className="w-5 h-5 text-indigo-500" />
-    }
+      description:
+        "Самый важный этап: введите цену продажи за 1 тонну и стоимость закупки. Калькулятор мгновенно рассчитает вашу чистую маржу с учетом всех производственных отходов. Если сделка убыточна, цифры станут красными — это сигнал быть осторожным!",
+      icon: <ChevronRight className="w-5 h-5 text-indigo-500" />,
+    },
   ];
 
   return (
@@ -42,7 +53,7 @@ export function UserManualModal({ isOpen, onClose }: UserManualModalProps) {
             onClick={onClose}
             className="absolute inset-0 bg-black/60 backdrop-blur-md"
           />
-          
+
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -64,7 +75,7 @@ export function UserManualModal({ isOpen, onClose }: UserManualModalProps) {
                   </p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={onClose}
                 className="p-3 text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-all active:scale-90"
               >
@@ -106,31 +117,53 @@ export function UserManualModal({ isOpen, onClose }: UserManualModalProps) {
                   <li className="flex items-start gap-3">
                     <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
-                      <strong className="text-white">Кнопка "Копировать":</strong> Сразу формирует красивый текстовый отчет со всеми деталями (вес, отходы, экономика), который можно отправить клиенту или руководству в мессенджер.
+                      <strong className="text-white">
+                        Кнопка "Копировать":
+                      </strong>{" "}
+                      Сразу формирует красивый текстовый отчет со всеми деталями
+                      (вес, отходы, экономика), который можно отправить клиенту
+                      или руководству в мессенджер.
                     </p>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
-                      <strong className="text-white">Светофор рентабельности:</strong> Если маржа ниже 10 000 руб/т, калькулятор зажжет желтое предупреждение. Если сделка приносит убыток — загорится красная тревога.
+                      <strong className="text-white">
+                        Светофор рентабельности:
+                      </strong>{" "}
+                      Если маржа ниже 10 000 руб/т, калькулятор зажжет желтое
+                      предупреждение. Если сделка приносит убыток — загорится
+                      красная тревога.
                     </p>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
-                      <strong className="text-white">Волшебный чип (Реком. заготовка):</strong> Нажмите на зеленый чип в блоке "Размеры и Раскрой", чтобы в один клик применить оптимальную длину заготовки, при которой вообще не будет некратных обрезков.
+                      <strong className="text-white">
+                        Волшебный чип (Реком. заготовка):
+                      </strong>{" "}
+                      Нажмите на зеленый чип в блоке "Размеры и Раскрой", чтобы
+                      в один клик применить оптимальную длину заготовки, при
+                      которой вообще не будет некратных обрезков.
                     </p>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
-                      <strong className="text-white">Что такое "Прутков в 1 тн":</strong> Это справочный расчет: сколько целых прутков готовой длины содержится в 1 тонне физического веса металла.
+                      <strong className="text-white">
+                        Что такое "Прутков в 1 тн":
+                      </strong>{" "}
+                      Это справочный расчет: сколько целых прутков готовой длины
+                      содержится в 1 тонне физического веса металла.
                     </p>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
-                      <strong className="text-white">Мгновенная печать:</strong> Вы можете сразу распечатать коммерческое предложение или отправить его в PDF, нажав на иконку принтера в правом верхнем углу.
+                      <strong className="text-white">Мгновенная печать:</strong>{" "}
+                      Вы можете сразу распечатать коммерческое предложение или
+                      отправить его в PDF, нажав на иконку принтера в правом
+                      верхнем углу.
                     </p>
                   </li>
                 </ul>
@@ -142,25 +175,33 @@ export function UserManualModal({ isOpen, onClose }: UserManualModalProps) {
                   Автоматическая оптимизация (КИМ)
                 </h4>
                 <p className="text-sm text-slate-400 mb-4 font-medium">
-                  При расчете наличия на складе действуют правила улучшения коэффициента использования металла:
+                  При расчете наличия на складе действуют правила улучшения
+                  коэффициента использования металла:
                 </p>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
                     <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
-                      <strong className="text-white">Правило 1:</strong> Если заготовка МД (не 6000), приоритет заказам МД по максимальному КИМ.
+                      <strong className="text-white">Правило 1:</strong> Если
+                      заготовка МД (не 6000), приоритет заказам МД по
+                      максимальному КИМ.
                     </p>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
-                      <strong className="text-white">Правило 2:</strong> Заготовки МД 6000, НД в первую очередь отдаются заказам с НД.
+                      <strong className="text-white">Правило 2:</strong>{" "}
+                      Заготовки МД 6000, НД в первую очередь отдаются заказам с
+                      НД.
                     </p>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
-                      <strong className="text-white">Авто-применение:</strong> Оптимизация применяется автоматически в разделе "Потребность с учетом наличия" даже до нажатия кнопки "Применить улучшения КИМ".
+                      <strong className="text-white">Авто-применение:</strong>{" "}
+                      Оптимизация применяется автоматически в разделе
+                      "Потребность с учетом наличия" даже до нажатия кнопки
+                      "Применить улучшения КИМ".
                     </p>
                   </li>
                 </ul>

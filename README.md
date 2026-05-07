@@ -6,7 +6,7 @@ A specialized calculator for metallurgical production, focusing on steel grade p
 
 - **Profile Calculations**: Support for Round and Hexagonal profiles.
 - **Remnant Logic**: Advanced tracking of remnant lengths, technical ends, and pieces per bar.
-- **Economic Section**: 
+- **Economic Section**:
   - Manage Direct Costs (Прямые затраты) per ton of finished product.
   - Steel Grade Policies for different remnant pricing strategies.
 - **PDF Export**: Print-ready templates for commercial offers.
@@ -22,6 +22,7 @@ A specialized calculator for metallurgical production, focusing on steel grade p
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone <your-repo-url>
    cd arsenal-calculator
@@ -34,7 +35,8 @@ A specialized calculator for metallurgical production, focusing on steel grade p
 
 ### Configuration
 
-The application uses Firebase for data persistence. 
+The application uses Firebase for data persistence.
+
 - In AI Studio, this is managed automatically.
 - For local development, you should create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com/) and provide your configuration.
 - You can create a `.env.local` file based on `.env.example`.
@@ -42,6 +44,7 @@ The application uses Firebase for data persistence.
 ### Development
 
 To start the development server:
+
 ```bash
 npm run dev
 ```
@@ -49,6 +52,7 @@ npm run dev
 ### Build
 
 To create a production build in the `dist` folder:
+
 ```bash
 npm run build
 ```

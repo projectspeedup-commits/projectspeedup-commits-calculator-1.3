@@ -1,0 +1,50 @@
+                        });
+
+                        const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+                        const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
+                        
+                        for (let R = range.s.r; R <= range.e.r; ++R) {
+                          for (let C = range.s.c; C <= range.e.c; ++C) {
+                            const cell_address = { c: C, r: R };
+                            const cell_ref = XLSX.utils.encode_cell(cell_address);
+                            if (!worksheet[cell_ref]) continue;
+
+                            worksheet[cell_ref].s = {
+                              font: { sz: 8 },
+                              alignment: { 
+                                horizontal: "center", 
+                                vertical: "center"
+                              }
+                            };
+                            
+                            if (R === 0) {
+                              worksheet[cell_ref].s.font.bold = true;
+                            }
+                          }
+                        }
+
+                        worksheet["!views"] = [{ state: "frozen", ySplit: 1 }];
+                        const out_wcut = [
+                            { wch: 25 }, { wch: 15 }, { wch: 20 }, { wch: 20 }, { wch: 15 }, { wch: 20 }, { wch: 15 }
+                        ];
+                        worksheet["!cols"] = out_wcut;
+                        
+                        const workbook = XLSX.utils.book_new();
+                        XLSX.utils.book_append_sheet(workbook, worksheet, "Заявка");
+                        XLSX.writeFile(workbook, "Заявка_на_сырье.xlsx");
+                      }}
+                      className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
+                      title="Скачать в Excel"
+                    >
+                      <Download className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <AnimatePresence mode="wait">
+                {productionSection === "stock" ? (
+                  <motion.div
+                    key="supply-stock"
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}

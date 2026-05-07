@@ -1,11 +1,14 @@
-import { renderToString } from 'react-dom/server';
-import React from 'react';
-import { AdminPanel } from './src/components/AdminPanel.tsx';
-import { DEFAULT_RAW_PRICES, DEFAULT_ECONOMY_ITEMS } from "./src/lib/constants.ts";
+import { renderToString } from "react-dom/server";
+import React from "react";
+import { AdminPanel } from "./src/components/AdminPanel.tsx";
+import {
+  DEFAULT_RAW_PRICES,
+  DEFAULT_ECONOMY_ITEMS,
+} from "./src/lib/constants.ts";
 
 try {
   console.log("Rendering AdminPanel with items...");
-  
+
   const element = React.createElement(AdminPanel, {
     initialTab: "calc",
     initialRawPrices: DEFAULT_RAW_PRICES,
@@ -19,7 +22,7 @@ try {
     onLogout: () => {},
     isCloudActive: false,
     isDarkMode: false,
-    toggleTheme: () => {}
+    toggleTheme: () => {},
   });
 
   const html = renderToString(element);

@@ -34,7 +34,7 @@ export function ConfirmModal({
             onClick={onClose}
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
           />
-          
+
           {/* Modal Content */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -42,7 +42,7 @@ export function ConfirmModal({
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             className="relative w-full max-w-md bg-white dark:bg-[#1A1C19] rounded-[28px] shadow-2xl border border-slate-200 dark:border-slate-800 p-6 overflow-hidden"
           >
-            <button 
+            <button
               onClick={onClose}
               className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
@@ -53,11 +53,11 @@ export function ConfirmModal({
               <div className="w-16 h-16 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mb-4 border border-red-100 dark:border-red-900/30">
                 <AlertTriangle className="w-8 h-8 text-red-600 dark:text-red-400" />
               </div>
-              
+
               <h3 className="text-xl font-medium tracking-tight text-[#1A1C19] dark:text-white mb-2">
                 {title}
               </h3>
-              
+
               <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-8">
                 {message}
               </p>

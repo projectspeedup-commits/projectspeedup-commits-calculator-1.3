@@ -1,6 +1,11 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore, initializeFirestore, doc, getDocFromServer } from "firebase/firestore";
+import {
+  getFirestore,
+  initializeFirestore,
+  doc,
+  getDocFromServer,
+} from "firebase/firestore";
 import firebaseConfig from "../../firebase-applet-config.json";
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
@@ -10,26 +15,27 @@ const databaseId = (firebaseConfig as any).firestoreDatabaseId;
 let db: any;
 
 try {
-  // Try to initialize with long polling for better connectivity in restricted environments
-  db = initializeFirestore(app, { 
+  db = initializeFirestore(app, {
     experimentalForceLongPolling: true,
-    ignoreUndefinedProperties: true
+    ignoreUndefinedProperties: true,
   }, databaseId);
-} catch (e: any) {
-  // If initialization fails (e.g., already initialized), use getFirestore
+} catch (e) {
   db = getFirestore(app, databaseId);
 }
 
 // CRITICAL: Validate Connection to Firestore on boot
 async function testConnection() {
   try {
-    await getDocFromServer(doc(db, 'settings', 'prices'));
-    console.log("Firebase connection established successfully.");
+    // Only attempt the network connection check, ignore permission errors
+    await getDocFromServer(doc(db, "test", "connection"));
   } catch (error) {
-    if(error instanceof Error && error.message.includes('the client is offline')) {
-      console.error("Please check your Firebase configuration. The client is offline.");
-    } else {
-      console.warn("Initial connection test found issues, checking settings document:", error);
+    if (
+      error instanceof Error &&
+      error.message.includes("the client is offline")
+    ) {
+      console.error(
+        "Please check your Firebase configuration. The client is offline.",
+      );
     }
   }
 }
