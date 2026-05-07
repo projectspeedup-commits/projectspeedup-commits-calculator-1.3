@@ -361,6 +361,36 @@ export default function AdminPanelSupplyTab(props: any) {
                                 .toFixed(3)}{" "}
                               тн.
                             </span>
+                            <span className="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700"></span>
+                            <span className="text-amber-600 dark:text-amber-400 font-black">
+                              Тех. отходы:{" "}
+                              {processedStock
+                                .reduce(
+                                  (acc, curr) =>
+                                    acc +
+                                    (typeof curr["Тех. отходы"] === "number"
+                                      ? curr["Тех. отходы"]
+                                      : parseFloat(curr["Тех. отходы"] as any) || 0),
+                                  0,
+                                )
+                                .toFixed(3)}{" "}
+                              тн.
+                            </span>
+                            <span className="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700"></span>
+                            <span className="text-blue-600 dark:text-blue-400 font-black">
+                              Деловые остатки:{" "}
+                              {processedStock
+                                .reduce(
+                                  (acc, curr) =>
+                                    acc +
+                                    (typeof curr["Деловые остатки"] === "number"
+                                      ? curr["Деловые остатки"]
+                                      : parseFloat(curr["Деловые остатки"] as any) || 0),
+                                  0,
+                                )
+                                .toFixed(3)}{" "}
+                              тн.
+                            </span>
                           </div>
                         </div>
                       </div>
