@@ -4,8 +4,10 @@ import {
   DEFAULT_ECONOMY_ITEMS,
 } from "./lib/constants";
 import { app as firebaseApp, auth, db, appId } from "./lib/firebase";
+import { signInAnonymously } from "firebase/auth";
 import { doc, onSnapshot, setDoc } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import debounce from "lodash.debounce";
 import { AdminPanel } from "./components/AdminPanel";
 import { CalculatorApp } from "./components/CalculatorApp";
 import { LoginScreen } from "./components/LoginScreen";
@@ -56,6 +58,102 @@ export default function App() {
   const [economyItems, setEconomyItems] = useState<any[]>(
     DEFAULT_ECONOMY_ITEMS,
   );
+  const [isUserSettingsLoaded, setIsUserSettingsLoaded] = useState(false);
+  const isInitialLoad = useRef(true);
+
+  // Debounced save to Firestore
+  const debouncedSave = useCallback(
+    debounce(async (
+      user: any,
+      rawPrices: any,
+      scrap: string,
+      remnant: string,
+      cGrades: string[],
+      rPricing: any,
+      eItems?: any[],
+      dGrades?: string[]
+    ) => {
+      if (!user || !db) return;
+
+      const firestoreRawPricesV2: Record<string, { md: string; nd: string }> = {};
+      const firestoreRawPricesOld: Record<string, string> = {};
+
+      for (const [k, v] of Object.entries(rawPrices as Record<string, { md: string; nd: string }>)) {
+        const sanitized = sanitizeKey(k);
+        firestoreRawPricesV2[sanitized] = v;
+        firestoreRawPricesOld[sanitized] = v.nd || v.md || "0";
+      }
+
+      const payload: any = {
+        rawPrices: firestoreRawPricesOld,
+        rawPricesV2: firestoreRawPricesV2,
+        scrapPrice: scrap,
+        remnantPrice: remnant,
+        updatedAt: new Date().toISOString(),
+      };
+      if (cGrades) payload.customGrades = cGrades;
+      if (dGrades) payload.deletedGrades = dGrades;
+      if (rPricing) payload.remnantPricing = rPricing;
+      if (eItems) payload.economyItems = eItems;
+
+      // Try saving to global settings
+      try {
+        await setDoc(doc(db, "settings", "prices"), payload, { merge: true });
+      } catch (e) {
+        // Not an admin or global setting locked
+      }
+
+      // Always save to personal settings
+      try {
+        const sanitizedRawPrices: Record<string, { md: string; nd: string }> = {};
+        for (const [k, v] of Object.entries(rawPrices as Record<string, { md: string; nd: string }>)) {
+          sanitizedRawPrices[sanitizeKey(k)] = v;
+        }
+
+        await setDoc(doc(db, "users", user.uid, "settings", "preferences"), {
+          rawPrices: sanitizedRawPrices,
+          scrapPrice: scrap,
+          remnantPrice: remnant,
+          remnantPricing: rPricing,
+          customGrades: cGrades,
+          deletedGrades: dGrades,
+          economyItems: eItems,
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+      } catch (e) {
+        console.error("Personal settings save failed", e);
+      }
+    }, 2000),
+    []
+  );
+
+  // Autosave effect
+  useEffect(() => {
+    if (isInitialLoad.current) return;
+    if (!isUserSettingsLoaded) return;
+    if (!user) return;
+
+    debouncedSave(
+      user,
+      globalRawPrices,
+      globalScrapPrice,
+      globalRemnantPrice,
+      customGrades,
+      remnantPricing,
+      economyItems,
+      deletedGrades
+    );
+  }, [
+    globalRawPrices,
+    globalScrapPrice,
+    globalRemnantPrice,
+    customGrades,
+    remnantPricing,
+    economyItems,
+    deletedGrades,
+    user,
+    isUserSettingsLoaded
+  ]);
 
   useEffect(() => {
     const handleOnline = () => {
@@ -183,6 +281,8 @@ export default function App() {
       }
     } catch (e) {}
 
+    isInitialLoad.current = false;
+
     if (db && isCloudActive && user) {
       const pricesDocRef = doc(db, "settings", "prices");
       // Use a ref to hold latest local variables to avoid stale closures in onSnapshot
@@ -309,6 +409,68 @@ export default function App() {
     }
   }, [user, isCloudActive]);
 
+  // Load User Personal Settings
+  useEffect(() => {
+    if (db && isCloudActive && user) {
+      const userSettingsRef = doc(db, "users", user.uid, "settings", "preferences");
+      const unsubscribe = onSnapshot(
+        userSettingsRef,
+        (docSnap) => {
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            if (data.rawPrices) {
+              const loadedPrices = { ...DEFAULT_RAW_PRICES };
+              // Since keys might be sanitized, we match them against all possible grades
+              // Or better: just use the data.rawPrices keys if they don't have dots
+              // But we saved them sanitized. So we need to match them back.
+              // All known grades include DEFAULT + custom
+              // Or we can just iterate the keys and replace _ back to .?
+              // But grade names can have underscores originally? unlikely.
+
+              // Robust approach: match by comparing sanitized versions
+              const allPossibleGrades = [...DEFAULT_STEEL_GRADES, ...(data.customGrades || [])];
+              Object.entries(data.rawPrices).forEach(([dbKey, val]: [string, any]) => {
+                const match = allPossibleGrades.find(g => sanitizeKey(g) === dbKey);
+                if (match) {
+                  loadedPrices[match] = val;
+                } else {
+                  // If it doesn't match a known grade, we still keep it using dbKey as is (might be okay)
+                  loadedPrices[dbKey] = val;
+                }
+              });
+              setGlobalRawPrices(loadedPrices);
+            }
+            if (data.scrapPrice !== undefined) setGlobalScrapPrice(data.scrapPrice);
+            if (data.remnantPrice !== undefined) setGlobalRemnantPrice(data.remnantPrice);
+            if (data.remnantPricing) setRemnantPricing(data.remnantPricing);
+            if (data.customGrades) setCustomGrades(data.customGrades);
+            setIsUserSettingsLoaded(true);
+          } else {
+            setIsUserSettingsLoaded(true); // Document doesn't exist, we are done loading
+          }
+        },
+        (error) => {
+          console.warn("Ошибка загрузки пользовательских настроек:", error);
+          setIsUserSettingsLoaded(true);
+        }
+      );
+      return () => unsubscribe();
+    } else {
+      setIsUserSettingsLoaded(true);
+    }
+  }, [user, isCloudActive]);
+
+  const handleAnonymousLogin = async (targetView: "manager" | "purchasing" | "admin") => {
+    if (!user) {
+      try {
+        await signInAnonymously(auth);
+      } catch (error) {
+        console.error("Anonymous login failed:", error);
+      }
+    }
+    setView(targetView);
+  };
+
   const handleSaveGlobal = async (
     rawPricesObj: Record<string, { md: string; nd: string }>,
     scrapStr: string,
@@ -385,7 +547,28 @@ export default function App() {
       try {
         await setDoc(pricesDocRef, payload, { merge: true });
       } catch (error) {
-        handleFirestoreError(error, OperationType.WRITE, "settings/prices");
+        // Fallback for non-admins: save only to their personal settings
+        console.warn("Could not save to global settings, saving to personal only.");
+      }
+
+      // Always save to personal settings for the user
+      const userSettingsRef = doc(db, "users", user.uid, "settings", "preferences");
+      try {
+        const sanitizedRawPrices: Record<string, { md: string; nd: string }> = {};
+        for (const [k, v] of Object.entries(rawPricesObj)) {
+          sanitizedRawPrices[sanitizeKey(k)] = v;
+        }
+
+        await setDoc(userSettingsRef, {
+          rawPrices: sanitizedRawPrices,
+          scrapPrice: scrapStr,
+          remnantPrice: remnantStr,
+          remnantPricing: rPricing,
+          customGrades: cGrades,
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+      } catch (error) {
+        handleFirestoreError(error, OperationType.WRITE, `users/${user.uid}/settings/preferences`);
       }
     }
   };
@@ -418,9 +601,9 @@ export default function App() {
               className="flex-1 flex flex-col"
             >
               <LoginScreen
-                onManagerLogin={() => setView("manager")}
-                onPurchasingLogin={() => setView("purchasing")}
-                onAdminLogin={() => setView("admin")}
+                onManagerLogin={() => handleAnonymousLogin("manager")}
+                onPurchasingLogin={() => handleAnonymousLogin("purchasing")}
+                onAdminLogin={() => handleAnonymousLogin("admin")}
                 user={user}
                 isCloudActive={isCloudActive}
                 isConnecting={isConnecting}

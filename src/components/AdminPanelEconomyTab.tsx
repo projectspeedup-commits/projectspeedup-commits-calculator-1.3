@@ -8,7 +8,7 @@ import {
 
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 
 import { Download, ChevronDown, ChevronRight, Info, Layers, FileArchive, ArrowRightFromLine, Box, ArrowRight, Settings, Calculator, Database, Zap, Clock, Shield, Plus, X, Trash2, ArrowRightCircle, Check, Loader2, ArrowLeftRight, MinusCircle, PlusCircle, AlertCircle, RefreshCw, Archive, CheckCircle2, Factory, BarChart2, TrendingUp, RefreshCcw, DownloadCloud, Trash, CheckCircle } from 'lucide-react';
 
@@ -35,7 +35,6 @@ export default function AdminPanelEconomyTab(props: any) {
   );
 
 return (<>
-{activeTab === "economy" && (
             <motion.div
               key="economy"
               initial={{ opacity: 0, y: 10 }}
@@ -55,6 +54,15 @@ return (<>
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
+                  {saveError && (
+                    <motion.div
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="text-xs font-bold text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-900/20 px-4 py-2 rounded-xl border border-amber-200 dark:border-amber-800"
+                    >
+                      {saveError}
+                    </motion.div>
+                  )}
                   <button
                     onClick={handleSave}
                     disabled={isSaving}
@@ -62,13 +70,21 @@ return (<>
                       saved
                         ? "bg-emerald-500 text-white"
                         : "bg-slate-900 dark:bg-slate-700 text-white hover:bg-slate-800"
-                    } ${isSaving ? "opacity-70" : ""}`}
+                    } ${isSaving ? "opacity-70 cursor-not-allowed" : ""}`}
                   >
-                    {isSaving
-                      ? "Сохранение..."
-                      : saved
-                        ? "✓ Сохранено"
-                        : "Сохранить всё"}
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Сохранение...</span>
+                      </>
+                    ) : saved ? (
+                      <>
+                        <Check className="w-4 h-4" />
+                        <span>Сохранено</span>
+                      </>
+                    ) : (
+                      "Сохранить всё"
+                    )}
                   </button>
                 </div>
               </div>
@@ -507,7 +523,6 @@ return (<>
                 )}
               </AnimatePresence>
             </motion.div>
-          )}
 
 
 </>);

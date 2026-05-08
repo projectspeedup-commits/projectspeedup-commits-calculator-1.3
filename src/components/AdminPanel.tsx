@@ -57,9 +57,12 @@ import {
   Fragment,
 } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { db } from "../lib/firebase";
+import { doc, onSnapshot, setDoc } from "firebase/firestore";
 import * as XLSX from "xlsx-js-style";
 import { BatchManualModal } from "./BatchManualModal";
 import { StockManualModal } from "./StockManualModal";
+import { getTimestampedFilename } from "../lib/utils";
 import {
   BarChart,
   Bar,
@@ -179,6 +182,49 @@ export function AdminPanel({
   const [saved, setSaved] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
+
+  const skipCloudSave = useRef(false);
+
+  useEffect(() => {
+    if (!isCloudActive || !db) return;
+
+    const unsubProd = onSnapshot(doc(db, "admin_data", "prod_data"), (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        skipCloudSave.current = true;
+        if (data.processedSupplyPlans) setProcessedSupplyPlansProd(data.processedSupplyPlans);
+        if (data.processedStock) setProcessedStockProd(data.processedStock);
+        if (data.calculationResults) setCalcResultsProd(data.calculationResults);
+        setTimeout(() => { skipCloudSave.current = false; }, 500);
+      }
+    });
+
+    const unsubSup = onSnapshot(doc(db, "admin_data", "sup_data"), (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        skipCloudSave.current = true;
+        if (data.processedSupplyPlans) setProcessedSupplyPlansSup(data.processedSupplyPlans);
+        if (data.processedStock) setProcessedStockSup(data.processedStock);
+        if (data.calculationResults) setCalcResultsSup(data.calculationResults);
+        setTimeout(() => { skipCloudSave.current = false; }, 500);
+      }
+    });
+
+    return () => {
+      unsubProd();
+      unsubSup();
+    };
+  }, [isCloudActive]);
+
+  const saveToCloud = async (type: string, payload: any) => {
+    if (!isCloudActive || !db || skipCloudSave.current) return;
+    try {
+      await setDoc(doc(db, "admin_data", type), payload, { merge: true });
+    } catch (e) {
+      console.warn("Cloud save failed", e);
+    }
+  };
+
 
   const [adminSection, setAdminSection] = useState<
     "direct" | "prices" | "grades"
@@ -342,30 +388,30 @@ export function AdminPanel({
     : processedSupplyPlansSup;
 
   useEffect(() => {
-    localStorage.setItem(
-      "ais_prod_calc_results",
-      JSON.stringify(calcResultsProd),
-    );
-    localStorage.setItem(
-      "ais_sup_calc_results",
-      JSON.stringify(calcResultsSup),
-    );
+    localStorage.setItem("ais_prod_calc_results", JSON.stringify(calcResultsProd));
+    localStorage.setItem("ais_sup_calc_results", JSON.stringify(calcResultsSup));
+    if (!skipCloudSave.current) {
+      saveToCloud("prod_data", { calculationResults: calcResultsProd });
+      saveToCloud("sup_data", { calculationResults: calcResultsSup });
+    }
   }, [calcResultsProd, calcResultsSup]);
 
   useEffect(() => {
     localStorage.setItem("ais_prod_stock", JSON.stringify(processedStockProd));
     localStorage.setItem("ais_sup_stock", JSON.stringify(processedStockSup));
+    if (!skipCloudSave.current) {
+      saveToCloud("prod_data", { processedStock: processedStockProd });
+      saveToCloud("sup_data", { processedStock: processedStockSup });
+    }
   }, [processedStockProd, processedStockSup]);
 
   useEffect(() => {
-    localStorage.setItem(
-      "ais_prod_supply_plans",
-      JSON.stringify(processedSupplyPlansProd),
-    );
-    localStorage.setItem(
-      "ais_sup_supply_plans",
-      JSON.stringify(processedSupplyPlansSup),
-    );
+    localStorage.setItem("ais_prod_supply_plans", JSON.stringify(processedSupplyPlansProd));
+    localStorage.setItem("ais_sup_supply_plans", JSON.stringify(processedSupplyPlansSup));
+    if (!skipCloudSave.current) {
+      saveToCloud("prod_data", { processedSupplyPlans: processedSupplyPlansProd });
+      saveToCloud("sup_data", { processedSupplyPlans: processedSupplyPlansSup });
+    }
   }, [processedSupplyPlansProd, processedSupplyPlansSup]);
 
   const applyAllOptimizations = () => {
@@ -1313,10 +1359,16 @@ export function AdminPanel({
                 // Specific mappings requested by user
                 if (
                   cellStr === "внутренний номер" ||
-                  cellStr === "внутренняя нумерация"
+                  cellStr === "внутренняя нумерация" ||
+                  cellStr === "внутренний №" ||
+                  cellStr.includes("внутр. №")
                 )
                   colMap.internalNo = colIdx;
-                if (cellStr === "дата отгрузки") colMap.shippingDate = colIdx;
+                if (
+                  cellStr === "дата отгрузки" ||
+                  cellStr === "дата заказа" ||
+                  cellStr === "дата"
+                ) colMap.shippingDate = colIdx;
                 if (cellStr === "клиент") colMap.client = colIdx;
                 if (cellStr === "номенклатура") colMap.nomenclature = colIdx;
                 if (cellStr === "№ заказа") colMap.orderNo = colIdx;
@@ -2114,7 +2166,7 @@ export function AdminPanel({
     worksheet["!cols"] = wscols;
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Остатки_Склад");
-    XLSX.writeFile(workbook, "Остатки_обработанные.xlsx");
+    XLSX.writeFile(workbook, getTimestampedFilename("Остатки обработанные"));
   };
 
   const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {

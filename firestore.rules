@@ -33,10 +33,20 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin() && isValidId(userId);
     }
 
-    match /settings/prices {
+    match /settings/{docId} {
       allow get: if isVerified();
       allow list: if isVerified();
       allow create, update, delete: if isAdmin();
+    }
+
+    match /admin_data/{docId} {
+      allow get: if isVerified();
+      allow list: if isVerified();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /users/{userId}/settings/{docId} {
+      allow read, write: if isVerified() && request.auth.uid == userId;
     }
 
     match /calculations/{calcId} {

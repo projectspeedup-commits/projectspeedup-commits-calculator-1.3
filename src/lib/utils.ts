@@ -32,6 +32,18 @@ export interface FirestoreErrorInfo {
   };
 }
 
+export function getTimestampedFilename(baseName: string) {
+  const now = new Date();
+  const timestamp = now.toLocaleString("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).replace(",", "");
+  return `${baseName}, ${timestamp}.xlsx`;
+}
+
 export function handleFirestoreError(
   error: unknown,
   operationType: OperationType,

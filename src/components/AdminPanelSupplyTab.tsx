@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import * as XLSX from 'xlsx-js-style';
 import * as LucideIcons from 'lucide-react';
 import { getGostForGrade } from '../lib/constants';
+import { getTimestampedFilename } from '../lib/utils';
 import { BatchManualModal } from './BatchManualModal';
 import { StockManualModal } from './StockManualModal';
 
@@ -307,7 +308,7 @@ export default function AdminPanelSupplyTab(props: any) {
                           worksheet,
                           "Заявка",
                         );
-                        XLSX.writeFile(workbook, "Заявка_на_сырье.xlsx");
+                        XLSX.writeFile(workbook, getTimestampedFilename("Заявка на обеспечение"));
                       }}
                       className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
                       title="Скачать в Excel"
@@ -826,7 +827,7 @@ export default function AdminPanelSupplyTab(props: any) {
                                   );
                                   XLSX.writeFile(
                                     workbook,
-                                    "Сводка_заготовка.xlsx",
+                                    getTimestampedFilename("Заказ поставщику"),
                                   );
                                 }}
                                 className="flex items-center gap-1.5 px-3 py-1.5 bg-sky-50 dark:bg-sky-500/10 hover:bg-sky-100 dark:hover:bg-sky-500/20 text-sky-600 dark:text-sky-400 rounded-lg text-xs font-bold transition-colors border border-sky-200 dark:border-sky-500/20 shadow-sm"
@@ -1440,7 +1441,7 @@ export default function AdminPanelSupplyTab(props: any) {
                                   );
                                   XLSX.writeFile(
                                     workbook,
-                                    "Заказы_в_сырье.xlsx",
+                                    getTimestampedFilename("Расчет потребности в заготовке"),
                                   );
                                 }}
                                 className="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-colors shadow-sm w-[calc(50%-0.25rem)] sm:w-auto"
@@ -2529,7 +2530,7 @@ export default function AdminPanelSupplyTab(props: any) {
                                   );
                                   XLSX.writeFile(
                                     workbook,
-                                    "Расчет_с_учетом_наличия.xlsx",
+                                    getTimestampedFilename("Заявка на обеспечение"),
                                   );
                                 }}
                                 className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
@@ -3349,7 +3350,7 @@ export default function AdminPanelSupplyTab(props: any) {
                               );
                               XLSX.writeFile(
                                 workbook,
-                                "Свободный_остаток_заготовки.xlsx",
+                                getTimestampedFilename("Заявка на обеспечение"),
                               );
                             }}
                             className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
@@ -4006,7 +4007,7 @@ export default function AdminPanelSupplyTab(props: any) {
                                 );
                                 XLSX.writeFile(
                                   workbook,
-                                  "Расчет_с_учетом_поставок.xlsx",
+                                  getTimestampedFilename("Заявка на обеспечение"),
                                 );
                               }}
                               className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"

@@ -45,6 +45,7 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { PrintTemplate } from "./PrintTemplate";
 import { db } from "../lib/firebase";
 import {

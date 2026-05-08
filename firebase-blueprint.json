@@ -76,12 +76,28 @@
       "properties": {
         "email": { "type": "string" }
       }
+    },
+    "UserSettings": {
+      "title": "User Personal Settings",
+      "description": "User specific settings (overrides for global prices/grades/policy)",
+      "type": "object",
+      "properties": {
+        "rawPrices": { "type": "object" },
+        "scrapPrice": { "type": "string" },
+        "remnantPrice": { "type": "string" },
+        "remnantPricing": { "type": "object" },
+        "updatedAt": { "type": "string" }
+      }
     }
   },
   "firestore": {
     "/settings/prices": {
       "schema": "AppSettings",
       "description": "Single document holding all global application settings"
+    },
+    "/users/{userId}/settings/preferences": {
+      "schema": "UserSettings",
+      "description": "Personal settings for a specific user"
     },
     "/calculations/{calcId}": {
       "schema": "Calculation",

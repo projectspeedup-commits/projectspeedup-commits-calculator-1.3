@@ -29,7 +29,7 @@ export function LoginScreen({
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
 
-  const handleAdminSubmit = (e: React.FormEvent) => {
+  const handleAdminSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (username === "trushin" && password === "rfhectkm") {
       setError(false);
@@ -208,12 +208,12 @@ export function LoginScreen({
               }`}
             />
             <span
-              className={`text-[10px] font-bold uppercase tracking-widest ${isConnecting ? "text-amber-500 dark:text-amber-400" : isCloudActive ? "text-sky-500 dark:text-sky-400" : "text-slate-500 dark:text-slate-400"}`}
+              className={`text-[10px] font-bold uppercase tracking-widest ${isConnecting ? "text-amber-500 dark:text-amber-400" : isCloudActive ? "text-emerald-500 dark:text-emerald-400" : "text-slate-500 dark:text-slate-400"}`}
             >
               {isConnecting
                 ? "Подключение..."
                 : isCloudActive
-                  ? "CLOUD ACTIVE"
+                  ? (user?.isAnonymous ? "FIREBASE ACTIVE" : "ОНЛАЙН")
                   : "АВТОНОМНЫЙ РЕЖИМ"}
             </span>
           </div>
