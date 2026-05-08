@@ -273,9 +273,6 @@ return (<>
                                       Марка стали
                                     </th>
                                     <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-right">
-                                      Цена МД (руб/тн)
-                                    </th>
-                                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-right">
                                       Цена НД (руб/тн)
                                     </th>
                                     <th className="px-4 py-3 w-12"></th>
@@ -295,26 +292,6 @@ return (<>
                                       >
                                         <td className="px-6 py-4 font-medium text-[#1A1C19] dark:text-slate-100 text-sm">
                                           {grade}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                          <div className="relative w-[110px] sm:w-[130px] ml-auto">
-                                            <input
-                                              type="text"
-                                              inputMode="decimal"
-                                              placeholder="0"
-                                              value={formatInputValue(
-                                                prices.md,
-                                              )}
-                                              onChange={(e) =>
-                                                handlePriceChange(
-                                                  grade,
-                                                  "md",
-                                                  e.target.value,
-                                                )
-                                              }
-                                              className="w-full bg-transparent border-b border-slate-300 dark:border-slate-700 focus:border-slate-800 dark:focus:border-slate-400 focus:outline-none text-right text-sm font-bold h-9 pl-1 pr-1 dark:text-white placeholder:text-slate-400"
-                                            />
-                                          </div>
                                         </td>
                                         <td className="px-6 py-4">
                                           <div className="relative w-[110px] sm:w-[130px] ml-auto">

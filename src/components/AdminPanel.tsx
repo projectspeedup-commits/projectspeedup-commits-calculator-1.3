@@ -2285,24 +2285,41 @@ export function AdminPanel({
         ? prev
         : initialRawPrices,
     );
+  }, [initialRawPrices]);
+
+  useEffect(() => {
     setScrap((prev) => (prev === initialScrap ? prev : initialScrap));
+  }, [initialScrap]);
+
+  useEffect(() => {
     setRemnant((prev) => (prev === initialRemnant ? prev : initialRemnant));
+  }, [initialRemnant]);
+
+  useEffect(() => {
     setCustomGrades((prev) =>
       JSON.stringify(prev) === JSON.stringify(initialCustomGrades || [])
         ? prev
         : initialCustomGrades || [],
     );
+  }, [initialCustomGrades]);
+
+  useEffect(() => {
     setDeletedGrades((prev) =>
       JSON.stringify(prev) === JSON.stringify(initialDeletedGrades || [])
         ? prev
         : initialDeletedGrades || [],
     );
+  }, [initialDeletedGrades]);
+
+  useEffect(() => {
     setRemnantPricing((prev) =>
       JSON.stringify(prev) === JSON.stringify(initialRemnantPricing || {})
         ? prev
         : initialRemnantPricing || {},
     );
+  }, [initialRemnantPricing]);
 
+  useEffect(() => {
     if (initialEconomyItems && initialEconomyItems.length > 0) {
       setEconomyItems((prev) => {
         const initialMap = new Map(
@@ -2315,15 +2332,7 @@ export function AdminPanel({
         return merged;
       });
     }
-  }, [
-    initialRawPrices,
-    initialScrap,
-    initialRemnant,
-    initialCustomGrades,
-    initialDeletedGrades,
-    initialRemnantPricing,
-    initialEconomyItems,
-  ]);
+  }, [initialEconomyItems]);
 
   const allGrades = [...DEFAULT_STEEL_GRADES, ...customGrades].filter(
     (g) => !deletedGrades.includes(g),
@@ -3225,6 +3234,11 @@ export function AdminPanel({
             isSaving={isSaving}
             saved={saved}
             economyItems={economyItems}
+            handleEconomyChange={handleEconomyChange}
+            handleRemoveGrade={handleRemoveGrade}
+            setScrap={setScrap}
+            setRemnant={setRemnant}
+            allGrades={allGrades}
                                                 saveError={saveError}
             rawPrices={rawPrices}
             handlePriceChange={handlePriceChange}

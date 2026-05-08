@@ -2,6 +2,7 @@ import {
   DEFAULT_RAW_PRICES,
   sanitizeKey,
   DEFAULT_ECONOMY_ITEMS,
+  DEFAULT_STEEL_GRADES,
 } from "./lib/constants";
 import { app as firebaseApp, auth, db, appId } from "./lib/firebase";
 import { signInAnonymously } from "firebase/auth";
@@ -60,100 +61,6 @@ export default function App() {
   );
   const [isUserSettingsLoaded, setIsUserSettingsLoaded] = useState(false);
   const isInitialLoad = useRef(true);
-
-  // Debounced save to Firestore
-  const debouncedSave = useCallback(
-    debounce(async (
-      user: any,
-      rawPrices: any,
-      scrap: string,
-      remnant: string,
-      cGrades: string[],
-      rPricing: any,
-      eItems?: any[],
-      dGrades?: string[]
-    ) => {
-      if (!user || !db) return;
-
-      const firestoreRawPricesV2: Record<string, { md: string; nd: string }> = {};
-      const firestoreRawPricesOld: Record<string, string> = {};
-
-      for (const [k, v] of Object.entries(rawPrices as Record<string, { md: string; nd: string }>)) {
-        const sanitized = sanitizeKey(k);
-        firestoreRawPricesV2[sanitized] = v;
-        firestoreRawPricesOld[sanitized] = v.nd || v.md || "0";
-      }
-
-      const payload: any = {
-        rawPrices: firestoreRawPricesOld,
-        rawPricesV2: firestoreRawPricesV2,
-        scrapPrice: scrap,
-        remnantPrice: remnant,
-        updatedAt: new Date().toISOString(),
-      };
-      if (cGrades) payload.customGrades = cGrades;
-      if (dGrades) payload.deletedGrades = dGrades;
-      if (rPricing) payload.remnantPricing = rPricing;
-      if (eItems) payload.economyItems = eItems;
-
-      // Try saving to global settings
-      try {
-        await setDoc(doc(db, "settings", "prices"), payload, { merge: true });
-      } catch (e) {
-        // Not an admin or global setting locked
-      }
-
-      // Always save to personal settings
-      try {
-        const sanitizedRawPrices: Record<string, { md: string; nd: string }> = {};
-        for (const [k, v] of Object.entries(rawPrices as Record<string, { md: string; nd: string }>)) {
-          sanitizedRawPrices[sanitizeKey(k)] = v;
-        }
-
-        await setDoc(doc(db, "users", user.uid, "settings", "preferences"), {
-          rawPrices: sanitizedRawPrices,
-          scrapPrice: scrap,
-          remnantPrice: remnant,
-          remnantPricing: rPricing,
-          customGrades: cGrades,
-          deletedGrades: dGrades,
-          economyItems: eItems,
-          updatedAt: new Date().toISOString()
-        }, { merge: true });
-      } catch (e) {
-        console.error("Personal settings save failed", e);
-      }
-    }, 2000),
-    []
-  );
-
-  // Autosave effect
-  useEffect(() => {
-    if (isInitialLoad.current) return;
-    if (!isUserSettingsLoaded) return;
-    if (!user) return;
-
-    debouncedSave(
-      user,
-      globalRawPrices,
-      globalScrapPrice,
-      globalRemnantPrice,
-      customGrades,
-      remnantPricing,
-      economyItems,
-      deletedGrades
-    );
-  }, [
-    globalRawPrices,
-    globalScrapPrice,
-    globalRemnantPrice,
-    customGrades,
-    remnantPricing,
-    economyItems,
-    deletedGrades,
-    user,
-    isUserSettingsLoaded
-  ]);
 
   useEffect(() => {
     const handleOnline = () => {
@@ -444,6 +351,16 @@ export default function App() {
             if (data.remnantPrice !== undefined) setGlobalRemnantPrice(data.remnantPrice);
             if (data.remnantPricing) setRemnantPricing(data.remnantPricing);
             if (data.customGrades) setCustomGrades(data.customGrades);
+            if (data.deletedGrades) setDeletedGrades(data.deletedGrades);
+            if (data.economyItems) {
+              const initialMap = new Map(
+                data.economyItems.map((item: any) => [item.id, item]),
+              );
+              const merged = DEFAULT_ECONOMY_ITEMS.map(
+                (defaultItem) => initialMap.get(defaultItem.id) || defaultItem,
+              );
+              setEconomyItems(merged);
+            }
             setIsUserSettingsLoaded(true);
           } else {
             setIsUserSettingsLoaded(true); // Document doesn't exist, we are done loading
@@ -565,6 +482,8 @@ export default function App() {
           remnantPrice: remnantStr,
           remnantPricing: rPricing,
           customGrades: cGrades,
+          deletedGrades: dGrades,
+          economyItems: eItems,
           updatedAt: new Date().toISOString()
         }, { merge: true });
       } catch (error) {
