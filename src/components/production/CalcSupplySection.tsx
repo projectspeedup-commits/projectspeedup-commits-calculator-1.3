@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useMemo } from 'react';
 import { motion } from 'motion/react';
 import * as LucideIcons from 'lucide-react';
 import * as XLSX from 'xlsx';
@@ -15,6 +15,10 @@ export function CalcSupplySection(props: any) {
     handleMouseMove, isSupplyDragging, formatCurrency, getSupplyNomenclature
   } = props;
   
+  const validMatchedDemand = useMemo(() => {
+    return (supplyCalculationData?.matchedDemand || []).filter((r: any) => (r.remainingToProcess ?? 0) >= 0.300);
+  }, [supplyCalculationData?.matchedDemand]);
+  
   return (
     <React.Fragment>
       <motion.div
@@ -25,7 +29,7 @@ export function CalcSupplySection(props: any) {
                     transition={{ duration: 0.2 }}
                     className={`flex flex-col gap-8`}
                   >
-                    {supplyCalculationData.matchedDemand.length === 0 ? (
+                    {validMatchedDemand.length === 0 ? (
                       <div
                         className={`bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-[32px] p-12 flex flex-col items-center justify-center min-h-[400px]`}
                       >
@@ -110,7 +114,7 @@ export function CalcSupplySection(props: any) {
                             <button
                               onClick={() => {
                                 if (
-                                  supplyCalculationData.matchedDemand.length ===
+                                  validMatchedDemand.length ===
                                   0
                                 )
                                   return;
@@ -158,7 +162,7 @@ export function CalcSupplySection(props: any) {
                                   "Свободный остаток / плановое поступление",
                                 ];
                                 const rows: string[][] = [];
-                                supplyCalculationData.matchedDemand.forEach(
+                                validMatchedDemand.forEach(
                                   (res: any) => {
                                     const baseRow = [
                                       res.internalNo || "",
@@ -338,7 +342,7 @@ export function CalcSupplySection(props: any) {
                             <button
                               onClick={() => {
                                 if (
-                                  supplyCalculationData.matchedDemand.length ===
+                                  validMatchedDemand.length ===
                                   0
                                 )
                                   return;
@@ -386,7 +390,7 @@ export function CalcSupplySection(props: any) {
                                   "Свободный остаток / плановое поступление",
                                 ];
                                 const rows: any[][] = [];
-                                supplyCalculationData.matchedDemand.forEach(
+                                validMatchedDemand.forEach(
                                   (res: any) => {
                                     const baseRow = [
                                       res.internalNo || "",
@@ -728,7 +732,7 @@ export function CalcSupplySection(props: any) {
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-[11px]">
-                              {supplyCalculationData.matchedDemand
+                              {validMatchedDemand
                                 .filter((res) => {
                                   if (!searchQuery) return true;
                                   const q = searchQuery.toLowerCase();

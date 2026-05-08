@@ -10,11 +10,13 @@ import {
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 
-import { Download, ChevronDown, ChevronRight, Info, Layers, FileArchive, ArrowRightFromLine, Box, ArrowRight, Settings, Calculator, Database, Zap, Clock, Shield, Plus, X, Trash2, ArrowRightCircle, Check, Loader2, ArrowLeftRight, MinusCircle, PlusCircle, AlertCircle, RefreshCw, Archive, CheckCircle2, Factory, BarChart2, TrendingUp, RefreshCcw, DownloadCloud, Trash, CheckCircle } from 'lucide-react';
+import { Download, ChevronDown, ChevronRight, Info, Layers, FileArchive, ArrowRightFromLine, Box, ArrowRight, Settings, Calculator, Database, Zap, Clock, Shield, Plus, X, Trash2, ArrowRightCircle, Check, Loader2, ArrowLeftRight, MinusCircle, PlusCircle, AlertCircle, RefreshCw, Archive, CheckCircle2, Factory, BarChart2, TrendingUp, RefreshCcw, DownloadCloud, Trash, CheckCircle, Search } from 'lucide-react';
 
 export default function AdminPanelEconomyTab(props: any) {
   const { handleEconomyChange, allGrades, handleRemoveGrade, setScrap, setRemnant,  activeTab, handleSave, isSaving, saved, economyItems, saveError, rawPrices, handlePriceChange, adminSection, setAdminSection, scrap, remnant, customGrades, remnantPricing, newGrade, setNewGrade, handleAddGrade, deletedGrades, handlePricingChange, formatDate } = props;
   
+  const [gradeSearch, setGradeSearch] = useState("");
+  const filteredGrades = allGrades.filter((g: string) => g.toLowerCase().includes(gradeSearch.toLowerCase()));
   const directItems = economyItems.filter((i: any) => i.category === "direct");
   const overheadItems = economyItems.filter((i: any) => i.category === "overhead");
 
@@ -259,10 +261,20 @@ return (<>
                           id="price-table"
                           className="bg-white dark:bg-[#1A1C19] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col transition-colors"
                         >
-                          <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
-                            <h3 className="text-base font-medium text-[#1A1C19] dark:text-white">
+                          <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <h3 className="text-base font-medium text-[#1A1C19] dark:text-white shrink-0">
                               Цены заготовки
                             </h3>
+                            <div className="relative w-full sm:w-64">
+                              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                              <input
+                                type="text"
+                                placeholder="Поиск по марке..."
+                                value={gradeSearch}
+                                onChange={(e) => setGradeSearch(e.target.value)}
+                                className="w-full bg-white dark:bg-[#111310] border border-slate-300 dark:border-slate-700 focus:border-blue-500 dark:focus:border-blue-400 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none transition-colors"
+                              />
+                            </div>
                           </div>
                           <div className="overflow-x-auto overflow-y-auto max-h-[60vh] custom-scrollbar p-0 m-0">
                             <div className="inline-block min-w-full align-middle">
@@ -279,7 +291,7 @@ return (<>
                                   </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                                  {allGrades.map((grade) => {
+                                  {filteredGrades.map((grade: string) => {
                                     const prices = rawPrices[grade] || {
                                       md: "",
                                       nd: "",

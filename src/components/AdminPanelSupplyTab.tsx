@@ -11,6 +11,10 @@ export default function AdminPanelSupplyTab(props: any) {
   const { activeTab, formatCurrency, s, calculationResults, setCalculationResults, processedStock, processedSupplyPlans, applyAllOptimizations, newBilletLength, newDrawLen, newUsefulLen, newPcs, newActualUL, optLen, newKim, newTotalWeight, billetArea, wPerM, singleBMass, newBilletCount, tableContainerRef, summaryContainerRef, supplyTableRef, stockTableRef, freeStockTableRef, handleMouseDown, onSummaryMouseDown, onSupplyMouseDown, onStockMouseDown, onFreeStockMouseDown, handleMouseLeaveOrUp, onSummaryMouseLeaveOrUp, handleMouseMove, x, price, totalCost, res, stockBeforeTaking, matchedDemand, allocatedStock, matchedStockItems, shortageStock, combinedTechWaste, combinedUsefulRem, combinedKim, averageKim, supplyCalculationData, stockItems, supplyItems, allocatedFromStock, shortageAfterStock, allocatedFromSupply, finalShortage, combinedTechWaste2, combinedUsefulRem2, combinedKim2, combinedTechWaste3, combinedUsefulRem3, combinedKim3, filteredMatchedDemand, key, filteredTotals, getSupplyNomenclature, p, d, y, data, workbook, worksheet, row, orderNo, internalNo, shippingDate, client, nomenclature, weightTons, remainingToProcess, type, grade, diameter, length, billetDia, drawRatio, billetLength, drawLength, usefulLength, techEnds, optimizedBilletLength, optimizedKim, totalWeight, billetCount, c, weight, lengthType, handleCopyForSheets, rows, handleExportStock, wscols, files, tabs, renderFilesContent, setActiveTab, supplySection, setSupplySection, setProductionSection, isCopied, setIsCopied, searchQuery, setSearchQuery, statusFilter, setStatusFilter, isProcessing, isDragging, isSummaryDragging, isSupplyDragging, isStockDragging, isFreeStockDragging, copySuccess, setCopySuccess, stockTotals, isPurchasingMode, freeStock } = props;
   const { Activity, Info, TrendingUp, Layers, Package, Upload, Download, Copy, Check, ShoppingCart, Search, Filter, FolderSearch, ArrowRight, ClipboardList, HelpCircle } = LucideIcons;
 
+  const validSupplyResults = React.useMemo(() => {
+    return (calculationResults || []).filter((r: any) => (r.remainingToProcess ?? 0) >= 0.300);
+  }, [calculationResults]);
+
   return (
     <>
       {activeTab === "supply" && (
@@ -1043,7 +1047,7 @@ export default function AdminPanelSupplyTab(props: any) {
                                   Итого к обеспечению
                                 </span>
                                 <span className="text-sm font-black text-sky-600 dark:text-sky-400">
-                                  {calculationResults
+                                  {validSupplyResults
                                     .reduce(
                                       (sum, res) =>
                                         sum + (res.remainingToProcess || 0),
@@ -1058,7 +1062,7 @@ export default function AdminPanelSupplyTab(props: any) {
                             </div>
                             <div className="flex flex-wrap items-stretch sm:items-center gap-2 sm:gap-4 w-full xl:w-auto">
                               <div className="text-xs font-bold text-slate-400 dark:text-slate-500 hidden sm:block">
-                                {calculationResults.length} строк
+                                {validSupplyResults.length} строк
                               </div>
 
                               <button
@@ -1098,7 +1102,7 @@ export default function AdminPanelSupplyTab(props: any) {
                                   if (!isPurchasingMode)
                                     headers.push("Цена (руб)", "Сумма (руб)");
 
-                                  const tsvRows = calculationResults.map(
+                                  const tsvRows = validSupplyResults.map(
                                     (res) => {
                                       const row = [
                                         res.internalNo || "",
@@ -1142,17 +1146,17 @@ export default function AdminPanelSupplyTab(props: any) {
 
                                   // Add Totals for Sheets
                                   const totalWeightSh =
-                                    calculationResults.reduce(
+                                    validSupplyResults.reduce(
                                       (sum, r) => sum + r.remainingToProcess,
                                       0,
                                     );
-                                  const totalTechSh = calculationResults.reduce(
+                                  const totalTechSh = validSupplyResults.reduce(
                                     (sum, r) => sum + (r.drawLength > 0 ? (r.techEnds / r.drawLength) * r.totalWeight : 0), 0
                                   );
-                                  const totalDelovSh = calculationResults.reduce(
+                                  const totalDelovSh = validSupplyResults.reduce(
                                     (sum, r) => sum + (r.lengthType === "НД" || r.drawLength <= 0 ? 0 : ((r.usefulLength - r.pcsPerBillet * r.length) / r.drawLength) * r.totalWeight), 0
                                   );
-                                  const totalZagSh = calculationResults.reduce((sum, r) => sum + r.totalWeight, 0);
+                                  const totalZagSh = validSupplyResults.reduce((sum, r) => sum + r.totalWeight, 0);
 
                                   const totalRowSh = Array(headers.length).fill(
                                     "",
@@ -1235,7 +1239,7 @@ export default function AdminPanelSupplyTab(props: any) {
 
                               <button
                                 onClick={() => {
-                                  if (calculationResults.length === 0) return;
+                                  if (validSupplyResults.length === 0) return;
 
                                   const headers = [
                                     "Внутренняя нумерация",
@@ -1261,7 +1265,7 @@ export default function AdminPanelSupplyTab(props: any) {
                                   if (!isPurchasingMode)
                                     headers.push("Цена (руб)", "Сумма (руб)");
 
-                                  const rows = calculationResults.map((res) => {
+                                  const rows = validSupplyResults.map((res) => {
                                     const row: any[] = [
                                       res.internalNo || "",
                                       res.shippingDate || "",
@@ -1566,7 +1570,7 @@ export default function AdminPanelSupplyTab(props: any) {
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-[11px] block md:table-row-group">
-                                {calculationResults.map((res) => (
+                                {validSupplyResults.map((res) => (
                                   <tr
                                     key={res.id}
                                     className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors block md:table-row mb-4 md:mb-0 border border-slate-200 dark:border-slate-800 md:border-none p-2 md:p-0 rounded-xl md:rounded-none bg-white dark:bg-[#1A1C19] md:bg-transparent"

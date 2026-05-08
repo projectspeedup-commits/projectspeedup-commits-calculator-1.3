@@ -4,6 +4,7 @@ import {
   DEFAULT_ECONOMY_ITEMS,
   DEFAULT_STEEL_GRADES,
 } from "./lib/constants";
+import { useStore } from "./store";
 import { app as firebaseApp, auth, db, appId } from "./lib/firebase";
 import { signInAnonymously } from "firebase/auth";
 import { doc, onSnapshot, setDoc } from "firebase/firestore";
@@ -46,20 +47,27 @@ export default function App() {
     }
   }, [isDarkMode]);
 
-  // Global prices
-  const [globalRawPrices, setGlobalRawPrices] =
-    useState<Record<string, { md: string; nd: string }>>(DEFAULT_RAW_PRICES);
-  const [globalScrapPrice, setGlobalScrapPrice] = useState("20000");
-  const [globalRemnantPrice, setGlobalRemnantPrice] = useState("30000");
-  const [customGrades, setCustomGrades] = useState<string[]>([]);
-  const [deletedGrades, setDeletedGrades] = useState<string[]>([]);
-  const [remnantPricing, setRemnantPricing] = useState<
-    Record<string, { round: string; hex: string }>
-  >({});
-  const [economyItems, setEconomyItems] = useState<any[]>(
-    DEFAULT_ECONOMY_ITEMS,
-  );
-  const [isUserSettingsLoaded, setIsUserSettingsLoaded] = useState(false);
+  // Global state from Zustand
+  const {
+    globalRawPrices,
+    setGlobalRawPrices,
+    globalScrapPrice,
+    setGlobalScrapPrice,
+    globalRemnantPrice,
+    setGlobalRemnantPrice,
+    customGrades,
+    setCustomGrades,
+    deletedGrades,
+    setDeletedGrades,
+    remnantPricing,
+    setRemnantPricing,
+    economyItems,
+    setEconomyItems,
+    isUserSettingsLoaded,
+    setIsUserSettingsLoaded,
+    saveSettings
+  } = useStore();
+  
   const isInitialLoad = useRef(true);
 
   useEffect(() => {
