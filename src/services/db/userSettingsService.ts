@@ -4,6 +4,7 @@ export const subscribeToUserSettings = (
   db: Firestore | undefined | null,
   userId: string,
   onData: (data: any) => void,
+  onError?: (error: any) => void,
 ) => {
   if (!db || !userId) return () => {};
   return onSnapshot(
@@ -11,8 +12,11 @@ export const subscribeToUserSettings = (
     (docSnap) => {
       if (docSnap.exists()) {
         onData(docSnap.data());
+      } else {
+        onData(null);
       }
     },
+    onError,
   );
 };
 
@@ -36,13 +40,18 @@ export const subscribeToSystemData = (
   collectionName: string,
   type: string,
   onData: (data: any) => void,
+  onError?: (error: any) => void,
 ) => {
   if (!db) return () => {};
-  return onSnapshot(doc(db, collectionName, type), (docSnap) => {
-    if (docSnap.exists()) {
-      onData(docSnap.data());
-    }
-  });
+  return onSnapshot(
+    doc(db, collectionName, type),
+    (docSnap) => {
+      if (docSnap.exists()) {
+        onData(docSnap.data());
+      }
+    },
+    onError,
+  );
 };
 
 export const saveSystemDataToCloud = async (

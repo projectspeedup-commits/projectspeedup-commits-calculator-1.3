@@ -1,0 +1,32 @@
+export interface CalculationResult {
+  id: string;
+  grade: string;
+  diameter: number;
+  billetDia: number;
+  length: number;
+  lengthType: "НД" | "МД";
+  targetLength: number;
+  quantity: number;
+  billetLength: number;
+  drawLength: number;
+  usefulLength: number;
+  techEnds: number;
+  drawRatio: number;
+  wastePercent: number;
+  totalWeight: number;
+  billetCount: number;
+  pcsPerBillet: number;
+  client: string;
+  nomenclature: string;
+  type: string;
+  orderNo: string;
+  shippingDate: string;
+  internalNo: string;
+  weightTons: number;
+  remainingToProcess: number;
+  price: number;
+  totalCost: number;
+  optimizedBilletLength?: number;
+  optimizedKim?: number;
+  initialScrapTons?: number;
+}

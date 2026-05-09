@@ -81,38 +81,7 @@ import {
   Cell,
 } from "recharts";
 
-interface CalculationResult {
-  id: string;
-  grade: string;
-  diameter: number;
-  billetDia: number;
-  length: number;
-  lengthType: "НД" | "МД";
-  targetLength: number;
-  quantity: number;
-  billetLength: number;
-  drawLength: number;
-  usefulLength: number;
-  techEnds: number;
-  drawRatio: number;
-  wastePercent: number;
-  totalWeight: number;
-  billetCount: number;
-  pcsPerBillet: number;
-  client: string;
-  nomenclature: string;
-  type: string;
-  orderNo: string;
-  shippingDate: string;
-  internalNo: string;
-  weightTons: number;
-  remainingToProcess: number;
-  price: number;
-  totalCost: number;
-  optimizedBilletLength?: number;
-  optimizedKim?: number;
-  initialScrapTons?: number;
-}
+import { CalculationResult } from "../types";
 
 interface AdminPanelProps {
   initialRawPrices: Record<string, { md: string; nd: string }>;
@@ -161,22 +130,6 @@ export function AdminPanel({
   initialTab = "economy",
   isPurchasingMode = false,
 }: AdminPanelProps) {
-  const { handleProcessPlans, handleProcessSupplyPlans, handleProcessStock } =
-    useExcelProcessors({
-      rawPrices,
-      setIsProcessing,
-      setParsingProgress,
-      setUploadWarnings,
-      setCalcResultsProd,
-      setCalcResultsSup,
-      setIsProcessingSupplyPlans,
-      setProcessedSupplyPlansProd,
-      setProcessedSupplyPlansSup,
-      setIsProcessingStock,
-      setProcessedStockProd,
-      setProcessedStockSup,
-    });
-
   const [activeTab, setActiveTab] = useState<
     "files" | "economy" | "supply" | "production" | "logistics" | "help"
   >(initialTab as any);
@@ -193,6 +146,100 @@ export function AdminPanel({
   const [remnantPricing, setRemnantPricing] = useState<
     Record<string, { round: string; hex: string }>
   >(initialRemnantPricing || {});
+  
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
+  const [isSaving, setIsSaving] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isProcessingStock, setIsProcessingStock] = useState(false);
+  const [isProcessingSupplyPlans, setIsProcessingSupplyPlans] = useState(false);
+  const [parsingProgress, setParsingProgress] = useState({
+    active: false,
+    current: 0,
+    total: 0,
+    message: "",
+  });
+  const [uploadWarnings, setUploadWarnings] = useState<string[]>([]);
+  
+  const [calcResultsProd, setCalcResultsProd] = useState<CalculationResult[]>(
+    () => {
+      try {
+        const s = localStorage.getItem("ais_prod_calc_results");
+        return s ? JSON.parse(s) : [];
+      } catch (e) {
+        localStorage.removeItem("ais_prod_calc_results");
+        return [];
+      }
+    },
+  );
+  const [calcResultsSup, setCalcResultsSup] = useState<CalculationResult[]>(
+    () => {
+      try {
+        const s = localStorage.getItem("ais_sup_calc_results");
+        return s ? JSON.parse(s) : [];
+      } catch (e) {
+        localStorage.removeItem("ais_sup_calc_results");
+        return [];
+      }
+    },
+  );
+  const [processedSupplyPlansProd, setProcessedSupplyPlansProd] = useState<any[]>(
+    () => {
+      try {
+        const s = localStorage.getItem("ais_prod_supply_plans");
+        return s ? JSON.parse(s) : [];
+      } catch (e) {
+        localStorage.removeItem("ais_prod_supply_plans");
+        return [];
+      }
+    },
+  );
+  const [processedSupplyPlansSup, setProcessedSupplyPlansSup] = useState<any[]>(
+    () => {
+      try {
+        const s = localStorage.getItem("ais_sup_supply_plans");
+        return s ? JSON.parse(s) : [];
+      } catch (e) {
+        localStorage.removeItem("ais_sup_supply_plans");
+        return [];
+      }
+    },
+  );
+  const [processedStockProd, setProcessedStockProd] = useState<any[]>(() => {
+    try {
+      const s = localStorage.getItem("ais_prod_stock");
+      return s ? JSON.parse(s) : [];
+    } catch (e) {
+      localStorage.removeItem("ais_prod_stock");
+      return [];
+    }
+  });
+  const [processedStockSup, setProcessedStockSup] = useState<any[]>(() => {
+    try {
+      const s = localStorage.getItem("ais_sup_stock");
+      return s ? JSON.parse(s) : [];
+    } catch (e) {
+      localStorage.removeItem("ais_sup_stock");
+      return [];
+    }
+  });
+
+  const { handleProcessPlans, handleProcessSupplyPlans, handleProcessStock } =
+    useExcelProcessors({
+      rawPrices,
+      setIsProcessing,
+      setParsingProgress,
+      setUploadWarnings,
+      setCalcResultsProd,
+      setCalcResultsSup,
+      setIsProcessingSupplyPlans,
+      setProcessedSupplyPlansProd,
+      setProcessedSupplyPlansSup,
+      setIsProcessingStock,
+      setProcessedStockProd,
+      setProcessedStockSup,
+    });
   const [economyItems, setEconomyItems] = useState<EconomyItem[]>(() => {
     if (!initialEconomyItems || initialEconomyItems.length === 0)
       return DEFAULT_ECONOMY_ITEMS;
@@ -206,8 +253,17 @@ export function AdminPanel({
 
   const [newGrade, setNewGrade] = useState("");
   const [saved, setSaved] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const stockFileInputRef = useRef<HTMLInputElement>(null);
+  const supplyPlanFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Calculation state
+  const [calcLength, setCalcLength] = useState("6");
+  const [calcQuantity, setCalcQuantity] = useState("100");
+  const [calcWaste, setCalcWaste] = useState("3");
+  const [calcKIM, setCalcKIM] = useState("0.92");
 
   const skipCloudSave = useRef(false);
 
@@ -312,10 +368,6 @@ export function AdminPanel({
   // Search & Filters state
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
-  const [uploadWarnings, setUploadWarnings] = useState<string[]>([]);
-  const [validationErrors, setValidationErrors] = useState<
-    Record<string, string>
-  >({});
 
   const formatCurrency = (val: number) => {
     return (
@@ -357,89 +409,6 @@ export function AdminPanel({
   const setSupplyPlanFiles = isProduction
     ? setSupplyPlanFilesProd
     : setSupplyPlanFilesSup;
-
-  const [processedSupplyPlansProd, setProcessedSupplyPlansProd] = useState<
-    any[]
-  >(() => {
-    try {
-      const s = localStorage.getItem("ais_prod_supply_plans");
-      return s ? JSON.parse(s) : [];
-    } catch (e) {
-      localStorage.removeItem("ais_prod_supply_plans");
-      return [];
-    }
-  });
-  const [processedSupplyPlansSup, setProcessedSupplyPlansSup] = useState<any[]>(
-    () => {
-      try {
-        const s = localStorage.getItem("ais_sup_supply_plans");
-        return s ? JSON.parse(s) : [];
-      } catch (e) {
-        localStorage.removeItem("ais_sup_supply_plans");
-        return [];
-      }
-    },
-  );
-  const [isProcessingSupplyPlans, setIsProcessingSupplyPlans] = useState(false);
-  const [processedStockProd, setProcessedStockProd] = useState<any[]>(() => {
-    try {
-      const s = localStorage.getItem("ais_prod_stock");
-      return s ? JSON.parse(s) : [];
-    } catch (e) {
-      localStorage.removeItem("ais_prod_stock");
-      return [];
-    }
-  });
-  const [processedStockSup, setProcessedStockSup] = useState<any[]>(() => {
-    try {
-      const s = localStorage.getItem("ais_sup_stock");
-      return s ? JSON.parse(s) : [];
-    } catch (e) {
-      localStorage.removeItem("ais_sup_stock");
-      return [];
-    }
-  });
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const stockFileInputRef = useRef<HTMLInputElement>(null);
-  const supplyPlanFileInputRef = useRef<HTMLInputElement>(null);
-
-  // Calculation state
-  const [calcLength, setCalcLength] = useState("6");
-  const [calcQuantity, setCalcQuantity] = useState("100");
-  const [calcWaste, setCalcWaste] = useState("3");
-  const [calcKIM, setCalcKIM] = useState("0.92");
-
-  // Supply Calculation Logic & Mock Data Extraction
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [parsingProgress, setParsingProgress] = useState({
-    active: false,
-    current: 0,
-    total: 0,
-    message: "",
-  });
-  const [isProcessingStock, setIsProcessingStock] = useState(false);
-  const [calcResultsProd, setCalcResultsProd] = useState<CalculationResult[]>(
-    () => {
-      try {
-        const s = localStorage.getItem("ais_prod_calc_results");
-        return s ? JSON.parse(s) : [];
-      } catch (e) {
-        localStorage.removeItem("ais_prod_calc_results");
-        return [];
-      }
-    },
-  );
-  const [calcResultsSup, setCalcResultsSup] = useState<CalculationResult[]>(
-    () => {
-      try {
-        const s = localStorage.getItem("ais_sup_calc_results");
-        return s ? JSON.parse(s) : [];
-      } catch (e) {
-        localStorage.removeItem("ais_sup_calc_results");
-        return [];
-      }
-    },
-  );
 
   const calculationResults = isProduction ? calcResultsProd : calcResultsSup;
   const setCalculationResults = isProduction
@@ -1323,15 +1292,15 @@ export function AdminPanel({
     if (!table) return;
 
     const rows = Array.from(table.querySelectorAll("tbody tr")).map((tr) => {
-      const cells = tr.querySelectorAll("td");
+      const cells = (tr as HTMLElement).querySelectorAll("td");
       return Array.from(cells)
-        .map((td) => td.innerText.trim())
+        .map((td) => (td as HTMLElement).innerText.trim())
         .join("\t");
     });
 
     const header = table.querySelector("thead");
     const headerRow = Array.from(header?.querySelectorAll("th") || [])
-      .map((th) => th.innerText.trim())
+      .map((th) => (th as HTMLElement).innerText.trim())
       .join("\t");
 
     const tsvData = [headerRow, ...rows].join("\n");
@@ -1670,6 +1639,17 @@ export function AdminPanel({
       setTimeout(() => setSaveError(""), 4000);
     }
     setIsSaving(false);
+  };
+
+  const formatDate = (input: any) => {
+    if (!input) return "";
+    const date = new Date(input);
+    if (isNaN(date.getTime())) return String(input);
+    return date.toLocaleDateString("ru-RU", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
   };
 
   const handleEconomyChange = (

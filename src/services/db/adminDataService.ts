@@ -4,19 +4,24 @@ export const subscribeToAdminData = (
   db: Firestore | undefined | null,
   type: "prod_data" | "sup_data",
   onData: (data: any) => void,
+  onError?: (error: any) => void,
 ) => {
   if (!db) {
     onData(null);
     return () => {};
   }
 
-  return onSnapshot(doc(db, "admin_data", type), (docSnap) => {
-    if (docSnap.exists()) {
-      onData(docSnap.data());
-    } else {
-      onData(null);
-    }
-  });
+  return onSnapshot(
+    doc(db, "admin_data", type),
+    (docSnap) => {
+      if (docSnap.exists()) {
+        onData(docSnap.data());
+      } else {
+        onData(null);
+      }
+    },
+    onError,
+  );
 };
 
 export const saveAdminDataToCloud = async (

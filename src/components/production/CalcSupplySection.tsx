@@ -131,21 +131,21 @@ export function CalcSupplySection(props: any) {
                           <div
                             className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full 2xl:w-auto flex-wrap`}
                           >
-                            <div className="flex items-center bg-white dark:bg-slate-800/50 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 border border-slate-200 dark:border-slate-700 w-full sm:w-64 transition-colors focus-within:border-slate-300 dark:focus-within:border-slate-600 focus-within:ring-1 focus-within:ring-slate-200 dark:focus-within:ring-slate-700">
-                              <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 mr-1.5 sm:mr-2 shrink-0" />
+                            <div className="flex-1 relative group">
+                              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors shrink-0" />
                               <input
                                 type="text"
                                 placeholder="Поиск по заказу..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="bg-transparent border-none outline-none text-[11px] sm:text-xs w-full text-slate-700 dark:text-slate-200 placeholder:text-slate-400"
+                                className="w-full pl-10 pr-3 h-10 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 text-[11px] sm:text-xs text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400"
                               />
                             </div>
-                            <div className="flex items-center bg-white dark:bg-slate-800/50 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 border border-slate-200 dark:border-slate-700 w-full md:w-auto transition-colors focus-within:border-slate-300 dark:focus-within:border-slate-600 focus-within:ring-1 focus-within:ring-slate-200 dark:focus-within:ring-slate-700">
-                                <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 mr-1.5 sm:mr-2 shrink-0" />
+                            <div className="flex items-center h-10 px-3 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 w-full md:w-auto transition-all focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20">
+                                <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 mr-2 shrink-0" />
                                 <StatusDropdown
                                   value={statusFilter}
-                                  onChange={(val) => setStatusFilter(val)}
+                                  onChange={(val: any) => setStatusFilter(val)}
                                   className="w-28"
                                 />
                             </div>
@@ -369,11 +369,15 @@ export function CalcSupplySection(props: any) {
                                 setIsCopied(true);
                                 setTimeout(() => setIsCopied(false), 2000);
                               }}
-                              className="flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-[#1A1C19] text-slate-600 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
+                              className={`flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl transition-all active:scale-[0.9] shadow-sm border ${
+                                isCopied
+                                  ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30"
+                                  : "bg-white dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 hover:text-slate-900 dark:hover:bg-slate-700 dark:hover:text-white"
+                              }`}
                               title="Скопировать для Excel"
                             >
                               {isCopied ? (
-                                <Check className="w-4 h-4 text-emerald-500" />
+                                <Check className="w-4 h-4" />
                               ) : (
                                 <Copy className="w-4 h-4" />
                               )}
@@ -608,7 +612,7 @@ export function CalcSupplySection(props: any) {
                                   getTimestampedFilename("Расчет потребности в заготовке"),
                                 );
                               }}
-                              className="flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
+                              className="flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/20 hover:bg-emerald-100 dark:hover:bg-emerald-500/30 transition-all active:scale-[0.9] shadow-sm"
                               title="Скачать в Excel"
                             >
                               <Download className="w-4 h-4" />

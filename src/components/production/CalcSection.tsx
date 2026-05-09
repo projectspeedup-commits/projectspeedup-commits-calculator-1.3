@@ -58,10 +58,10 @@ export function CalcSection({
  setProductionSection("files");
  }
  }}
- className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-[0_4px_20px_rgba(37,99,235,0.2)] hover:shadow-[0_4px_24px_rgba(37,99,235,0.3)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center gap-2"
+ className="flex items-center gap-2.5 px-6 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-[0_4px_12px_rgba(37,99,235,0.25)] hover:shadow-[0_6px_16px_rgba(37,99,235,0.35)] active:scale-[0.97] transition-all group"
  >
- Перейти к загрузке файлов
- <ArrowRight className="w-4 h-4 ml-1" />
+ <span>Перейти к загрузке файлов</span>
+ <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
  </button>
 
  {isProcessing && (
@@ -134,56 +134,19 @@ export function CalcSection({
  setCopySuccess(true);
  setTimeout(() => setCopySuccess(false), 2000);
  }}
- className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm w-[calc(50%-0.25rem)] sm:w-auto ${
+ className={`flex items-center justify-center gap-2 px-4 h-10 rounded-xl text-xs font-bold transition-all shadow-sm w-[calc(50%-0.25rem)] sm:w-auto ${
  copySuccess
- ?"bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+ ?"bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/20"
  :"bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
  }`}
  title="Скопировать для вставки (Ctrl+V) в Google Таблицы"
  >
  {copySuccess ? (
- <>
- <svg
- xmlns="http://www.w3.org/2000/svg"
- width="14"
- height="14"
- viewBox="0 0 24 24"
- fill="none"
- stroke="currentColor"
- strokeWidth="3"
- strokeLinecap="round"
- strokeLinejoin="round"
- >
- <polyline points="20 6 9 17 4 12"></polyline>
- </svg>
- Скопировано!
- </>
+ <LucideIcons.Check className="w-4 h-4" />
  ) : (
- <>
- <svg
- xmlns="http://www.w3.org/2000/svg"
- width="14"
- height="14"
- viewBox="0 0 24 24"
- fill="none"
- stroke="currentColor"
- strokeWidth="2"
- strokeLinecap="round"
- strokeLinejoin="round"
- >
- <rect
- x="9"
- y="9"
- width="13"
- height="13"
- rx="2"
- ry="2"
- ></rect>
- <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
- </svg>
- <span className="whitespace-nowrap">Sheets</span>
- </>
+ <LucideIcons.Copy className="w-4 h-4 text-slate-400" />
  )}
+ <span className="whitespace-nowrap">{copySuccess ? "Скопировано!" : "Sheets"}</span>
  </button>
 
  <button
@@ -291,7 +254,7 @@ export function CalcSection({
  getTimestampedFilename("Заказы"),
  );
  }}
- className="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-colors shadow-sm w-[calc(50%-0.25rem)] sm:w-auto"
+ className="flex items-center justify-center gap-2 px-4 h-10 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/20 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-sm w-[calc(50%-0.25rem)] sm:w-auto hover:bg-emerald-100 dark:hover:bg-emerald-500/20"
  >
  <svg
  xmlns="http://www.w3.org/2000/svg"

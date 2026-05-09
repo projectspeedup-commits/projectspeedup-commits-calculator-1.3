@@ -1,5 +1,5 @@
 import * as XLSX from "xlsx-js-style";
-import { HEX_DATA, ROUND_DATA } from "../lib/constants";
+import { HEX_DATA, ROUND_DATA, getGostForGrade } from "../lib/constants";
 import { CalculationResult } from "../types";
 
 export const useExcelProcessors = (props: any) => {

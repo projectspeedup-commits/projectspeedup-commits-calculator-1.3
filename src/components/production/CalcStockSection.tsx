@@ -148,290 +148,296 @@ export function CalcStockSection({
               <div
                 className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full 2xl:w-auto flex-wrap`}
               >
-                <div className="flex items-center bg-white dark:bg-slate-800/50 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 border border-slate-200 dark:border-slate-700 w-full sm:w-64 transition-colors focus-within:border-slate-300 dark:focus-within:border-slate-600 focus-within:ring-1 focus-within:ring-slate-200 dark:focus-within:ring-slate-700">
-                  <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 mr-1.5 sm:mr-2 shrink-0" />
-                  <input
-                    type="text"
-                    placeholder="Поиск по заказу..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="bg-transparent border-none outline-none text-[11px] sm:text-xs w-full text-slate-700 dark:text-slate-200 placeholder:text-slate-400"
-                  />
+                <div className="flex items-center gap-2 group">
+                  <div className="flex-1 relative">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors shrink-0" />
+                    <input
+                      type="text"
+                      placeholder="Поиск по заказу..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-3 h-10 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 text-[11px] sm:text-xs text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400"
+                    />
+                  </div>
                 </div>
-                <div className="flex items-center bg-white dark:bg-slate-800/50 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 border border-slate-200 dark:border-slate-700 w-full sm:w-auto transition-colors focus-within:border-slate-300 dark:focus-within:border-slate-600 focus-within:ring-1 focus-within:ring-slate-200 dark:focus-within:ring-slate-700">
-                  <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 mr-1.5 sm:mr-2 shrink-0" />
+                <div className="flex items-center h-10 px-3 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 w-full sm:w-auto transition-all focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20">
+                  <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 mr-2 shrink-0" />
                   <StatusDropdown
                     value={statusFilter}
-                    onChange={(val) => setStatusFilter(val)}
+                    onChange={(val: any) => setStatusFilter(val)}
                     className="w-28"
                   />
                 </div>
                 <div className="flex flex-row items-center gap-2 w-full sm:w-auto shrink-0">
-                <button
-                  onClick={() => {
-                    if (filteredMatchedDemand.length === 0) return;
-                    const headers = [
-                      "Внутренний №",
-                      "Дата Заказа",
-                      "№ Заказа",
-                      "Клиент",
-                      "Номенклатура",
-                      "Профиль",
-                      "Марка",
-                      "Размер мм.",
-                      "Длина",
-                      "Кол-во тн в заказе",
-                      "ИТОГО остаток к выполнению",
-                      "Взято со склада (тн)",
-                      "ИТОГО остатка к завершению",
-                      "Тех. отходы склад г/к",
-                      "Дел. Остатки склад г/к",
-                      "КИМ склад г/к",
-                      "Исходная Номенклатура",
-                      "Профиль наличия",
-                      "НТД",
-                      "Марка стали наличия",
-                      "Размер наличия",
-                      "Длина (склад г/к)",
-                      "Остаток на складе г/к. (тн)",
-                      "Взято со склада г/к (тн)",
-                      "Свободный остаток г/к склад (тн)",
-                    ];
-                    const rows: string[][] = [];
-                    matchedDemand.forEach((res: any) => {
-                      const baseRow = [
-                        res.internalNo || "",
-                        res.shippingDate || "",
-                        res.orderNo || "",
-                        res.client || "",
-                        res.nomenclature || "",
-                        res.type || "",
-                        res.grade || "",
-                        String(res.diameter).replace(".", ","),
-                        res.lengthType === "НД" ? "НД" : `МД ${res.length}`,
-                        String(res.weightTons || 0).replace(".", ","),
-                        String(res.remainingToProcess || 0).replace(".", ","),
-                        String(res.allocatedStock || 0).replace(".", ","),
-                        String(res.shortageStock || 0).replace(".", ","),
-                        res.allocatedStock > 0 && res.combinedTechWaste > 0
-                          ? String(res.combinedTechWaste.toFixed(3)).replace(".", ",")
-                          : "0",
-                        res.allocatedStock > 0 && res.combinedUsefulRem > 0
-                          ? String(res.combinedUsefulRem.toFixed(3)).replace(".", ",")
-                          : "0",
-                        res.allocatedStock > 0 && res.combinedKim > 0
-                          ? String(res.combinedKim.toFixed(3)).replace(".", ",")
-                          : "0",
+                  <button
+                    onClick={() => {
+                      if (filteredMatchedDemand.length === 0) return;
+                      const headers = [
+                        "Внутренний №",
+                        "Дата Заказа",
+                        "№ Заказа",
+                        "Клиент",
+                        "Номенклатура",
+                        "Профиль",
+                        "Марка",
+                        "Размер мм.",
+                        "Длина",
+                        "Кол-во тн в заказе",
+                        "ИТОГО остаток к выполнению",
+                        "Взято со склада (тн)",
+                        "ИТОГО остатка к завершению",
+                        "Тех. отходы склад г/к",
+                        "Дел. Остатки склад г/к",
+                        "КИМ склад г/к",
+                        "Исходная Номенклатура",
+                        "Профиль наличия",
+                        "НТД",
+                        "Марка стали наличия",
+                        "Размер наличия",
+                        "Длина (склад г/к)",
+                        "Остаток на складе г/к. (тн)",
+                        "Взято со склада г/к (тн)",
+                        "Свободный остаток г/к склад (тн)",
                       ];
-                      const maxRows = Math.max(1, res.matchedStockItems?.length || 0);
-                      const rowTemplate = Array(headers.length).fill("");
-                      for (let i = 0; i < 16; i++) rowTemplate[i] = baseRow[i];
+                      const rows: string[][] = [];
+                      matchedDemand.forEach((res: any) => {
+                        const baseRow = [
+                          res.internalNo || "",
+                          res.shippingDate || "",
+                          res.orderNo || "",
+                          res.client || "",
+                          res.nomenclature || "",
+                          res.type || "",
+                          res.grade || "",
+                          String(res.diameter).replace(".", ","),
+                          res.lengthType === "НД" ? "НД" : `МД ${res.length}`,
+                          String(res.weightTons || 0).replace(".", ","),
+                          String(res.remainingToProcess || 0).replace(".", ","),
+                          String(res.allocatedStock || 0).replace(".", ","),
+                          String(res.shortageStock || 0).replace(".", ","),
+                          res.allocatedStock > 0 && res.combinedTechWaste > 0
+                            ? String(res.combinedTechWaste.toFixed(3)).replace(".", ",")
+                            : "0",
+                          res.allocatedStock > 0 && res.combinedUsefulRem > 0
+                            ? String(res.combinedUsefulRem.toFixed(3)).replace(".", ",")
+                            : "0",
+                          res.allocatedStock > 0 && res.combinedKim > 0
+                            ? String(res.combinedKim.toFixed(3)).replace(".", ",")
+                            : "0",
+                        ];
+                        const maxRows = Math.max(1, res.matchedStockItems?.length || 0);
+                        const rowTemplate = Array(headers.length).fill("");
+                        for (let i = 0; i < 16; i++) rowTemplate[i] = baseRow[i];
 
-                      for (let r = 0; r < maxRows; r++) {
-                        const outRow = [...rowTemplate];
-                        if (r > 0) {
-                          for (let c = 0; c < 16; c++) outRow[c] = "";
-                        }
-
-                        const st = res.matchedStockItems?.[r];
-                        if (st) {
-                          outRow[16] = st["Исходная Номенклатура"] || "";
-                          outRow[17] = st["Профиль"] || "";
-                          outRow[18] = st["НТД"] || "";
-                          outRow[19] = st["Марка стали"] || "";
-                          outRow[20] = String(st["Размер"] || "").replace(".", ",");
-                          outRow[21] = st["Длина"] || "";
-                          outRow[22] = String(st.stockBeforeTaking || 0).replace(".", ",");
-                          outRow[23] = String(st.allocatedAmount || 0).replace(".", ",");
-                          outRow[24] = String(st.stockAfterTaking || 0).replace(".", ",");
-                        }
-                        rows.push(outRow);
-                      }
-                    });
-
-                    const tsv = [headers, ...rows].map((row) => row.join("\t")).join("\n");
-
-                    let rowsHtml =
-                      '<table border="1"><thead><tr>' +
-                      headers
-                        .map((h) => '<th style="text-align:center;font-weight:bold;">' + h + "</th>")
-                        .join("") +
-                      "</tr></thead><tbody>";
-
-                    matchedDemand.forEach((res: any) => {
-                      const baseRow = [
-                        res.internalNo || "",
-                        res.shippingDate || "",
-                        res.orderNo || "",
-                        res.client || "",
-                        res.nomenclature || "",
-                        res.type || "",
-                        res.grade || "",
-                        String(res.diameter).replace(".", ","),
-                        res.lengthType === "НД" ? "НД" : "МД " + res.length,
-                        String(res.weightTons || 0).replace(".", ","),
-                        String(res.remainingToProcess || 0).replace(".", ","),
-                        String(res.allocatedStock || 0).replace(".", ","),
-                        String(res.shortageStock || 0).replace(".", ","),
-                        String(res.allocatedStock > 0 && res.combinedTechWaste > 0 ? res.combinedTechWaste.toFixed(3) : "0").replace(".", ","),
-                        String(res.allocatedStock > 0 && res.combinedUsefulRem > 0 ? res.combinedUsefulRem.toFixed(3) : "0").replace(".", ","),
-                        String(res.allocatedStock > 0 && res.combinedKim > 0 ? res.combinedKim.toFixed(3) : "0").replace(".", ","),
-                      ];
-                      const numRows = Math.max(1, res.matchedStockItems?.length || 0);
-                      if (res.matchedStockItems?.length === 0) {
-                        rowsHtml +=
-                          "<tr>" +
-                          baseRow
-                            .map((v) => '<td style="text-align:center;vertical-align:middle;">' + v + "</td>")
-                            .join("") +
-                          "<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>";
-                      } else {
-                        res.matchedStockItems?.forEach((stock: any, index: number) => {
-                          const stockRow = [
-                            stock["Исходная Номенклатура"] || "",
-                            stock["Профиль"] || "",
-                            stock["НТД"] || "",
-                            stock["Марка стали"] || "",
-                            String(stock["Размер"] || "").replace(".", ","),
-                            stock["Длина"] || "",
-                            String(stock.stockBeforeTaking || 0).replace(".", ","),
-                            String(stock.allocatedAmount || 0).replace(".", ","),
-                            String(stock.stockAfterTaking || 0).replace(".", ","),
-                          ];
-                          rowsHtml += "<tr>";
-                          if (index === 0) {
-                            baseRow.forEach((v) => {
-                              rowsHtml +=
-                                '<td rowspan="' + numRows + '" style="text-align:center;vertical-align:middle;">' + v + "</td>";
-                            });
+                        for (let r = 0; r < maxRows; r++) {
+                          const outRow = [...rowTemplate];
+                          if (r > 0) {
+                            for (let c = 0; c < 16; c++) outRow[c] = "";
                           }
-                          stockRow.forEach((v) => {
-                            rowsHtml += '<td style="text-align:center;vertical-align:middle;">' + v + "</td>";
-                          });
-                          rowsHtml += "</tr>";
-                        });
-                      }
-                    });
-                    rowsHtml += "</tbody></table>";
 
-                    try {
-                      const blobText = new Blob([tsv], { type: "text/plain" });
-                      const blobHtml = new Blob([rowsHtml], { type: "text/html" });
-                      const item = new ClipboardItem({
-                        "text/html": blobHtml,
-                        "text/plain": blobText,
+                          const st = res.matchedStockItems?.[r];
+                          if (st) {
+                            outRow[16] = st["Исходная Номенклатура"] || "";
+                            outRow[17] = st["Профиль"] || "";
+                            outRow[18] = st["НТД"] || "";
+                            outRow[19] = st["Марка стали"] || "";
+                            outRow[20] = String(st["Размер"] || "").replace(".", ",");
+                            outRow[21] = st["Длина"] || "";
+                            outRow[22] = String(st.stockBeforeTaking || 0).replace(".", ",");
+                            outRow[23] = String(st.allocatedAmount || 0).replace(".", ",");
+                            outRow[24] = String(st.stockAfterTaking || 0).replace(".", ",");
+                          }
+                          rows.push(outRow);
+                        }
                       });
-                      navigator.clipboard.write([item]).catch(() => navigator.clipboard.writeText(tsv));
-                    } catch (e) {
-                      navigator.clipboard.writeText(tsv);
-                    }
-                    setIsCopied(true);
-                    setTimeout(() => setIsCopied(false), 2000);
-                  }}
-                  className="flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-[#1A1C19] text-slate-600 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
-                  title="Скопировать для Excel"
-                >
-                  {isCopied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
-                </button>
-                <button
-                  onClick={() => {
-                    if (matchedDemand.length === 0) return;
-                    const headers = [
-                      "Внутренний №",
-                      "Дата Заказа",
-                      "№ Заказа",
-                      "Клиент",
-                      "Номенклатура",
-                      "Профиль",
-                      "Марка",
-                      "Размер мм.",
-                      "Длина",
-                      "Кол-во тн в заказе",
-                      "ИТОГО остаток к выполнению",
-                      "Взято со склада (тн)",
-                      "ИТОГО остатка к завершению",
-                      "Тех. отходы склад г/к",
-                      "Дел. Остатки склад г/к",
-                      "КИМ склад г/к",
-                      "Исходная Номенклатура",
-                      "Профиль наличия",
-                      "НТД",
-                      "Марка стали наличия",
-                      "Размер наличия",
-                      "Длина (склад г/к)",
-                      "Остаток на складе г/к. (тн)",
-                      "Взято со склада г/к (тн)",
-                      "Свободный остаток г/к склад (тн)",
-                    ];
-                    const rows: any[][] = [];
-                    matchedDemand.forEach((res: any) => {
-                      const baseRow = [
-                        res.internalNo || "",
-                        res.shippingDate || "",
-                        res.orderNo || "",
-                        res.client || "",
-                        res.nomenclature || "",
-                        res.type || "",
-                        res.grade || "",
-                        res.diameter,
-                        res.lengthType === "НД" ? "НД" : `МД ${res.length}`,
-                        Number(res.weightTons || 0),
-                        Number(res.remainingToProcess || 0),
-                        Number(res.allocatedStock || 0),
-                        Number(res.shortageStock || 0),
-                        res.allocatedStock > 0 && res.combinedTechWaste > 0 ? Number(res.combinedTechWaste.toFixed(3)) : 0,
-                        res.allocatedStock > 0 && res.combinedUsefulRem > 0 ? Number(res.combinedUsefulRem.toFixed(3)) : 0,
-                        res.allocatedStock > 0 && res.combinedKim > 0 ? Number(res.combinedKim.toFixed(3)) : 0,
+
+                      const tsv = [headers, ...rows].map((row) => row.join("\t")).join("\n");
+
+                      let rowsHtml =
+                        '<table border="1"><thead><tr>' +
+                        headers
+                          .map((h) => '<th style="text-align:center;font-weight:bold;">' + h + "</th>")
+                          .join("") +
+                        "</tr></thead><tbody>";
+
+                      matchedDemand.forEach((res: any) => {
+                        const baseRow = [
+                          res.internalNo || "",
+                          res.shippingDate || "",
+                          res.orderNo || "",
+                          res.client || "",
+                          res.nomenclature || "",
+                          res.type || "",
+                          res.grade || "",
+                          String(res.diameter).replace(".", ","),
+                          res.lengthType === "НД" ? "НД" : "МД " + res.length,
+                          String(res.weightTons || 0).replace(".", ","),
+                          String(res.remainingToProcess || 0).replace(".", ","),
+                          String(res.allocatedStock || 0).replace(".", ","),
+                          String(res.shortageStock || 0).replace(".", ","),
+                          String(res.allocatedStock > 0 && res.combinedTechWaste > 0 ? res.combinedTechWaste.toFixed(3) : "0").replace(".", ","),
+                          String(res.allocatedStock > 0 && res.combinedUsefulRem > 0 ? res.combinedUsefulRem.toFixed(3) : "0").replace(".", ","),
+                          String(res.allocatedStock > 0 && res.combinedKim > 0 ? res.combinedKim.toFixed(3) : "0").replace(".", ","),
+                        ];
+                        const numRows = Math.max(1, res.matchedStockItems?.length || 0);
+                        if (res.matchedStockItems?.length === 0) {
+                          rowsHtml +=
+                            "<tr>" +
+                            baseRow
+                              .map((v) => '<td style="text-align:center;vertical-align:middle;">' + v + "</td>")
+                              .join("") +
+                            "<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>";
+                        } else {
+                          res.matchedStockItems?.forEach((stock: any, index: number) => {
+                            const stockRow = [
+                              stock["Исходная Номенклатура"] || "",
+                              stock["Профиль"] || "",
+                              stock["НТД"] || "",
+                              stock["Марка стали"] || "",
+                              String(stock["Размер"] || "").replace(".", ","),
+                              stock["Длина"] || "",
+                              String(stock.stockBeforeTaking || 0).replace(".", ","),
+                              String(stock.allocatedAmount || 0).replace(".", ","),
+                              String(stock.stockAfterTaking || 0).replace(".", ","),
+                            ];
+                            rowsHtml += "<tr>";
+                            if (index === 0) {
+                              baseRow.forEach((v) => {
+                                rowsHtml +=
+                                  '<td rowspan="' + numRows + '" style="text-align:center;vertical-align:middle;">' + v + "</td>";
+                              });
+                            }
+                            stockRow.forEach((v) => {
+                              rowsHtml += '<td style="text-align:center;vertical-align:middle;">' + v + "</td>";
+                            });
+                            rowsHtml += "</tr>";
+                          });
+                        }
+                      });
+                      rowsHtml += "</tbody></table>";
+
+                      try {
+                        const blobText = new Blob([tsv], { type: "text/plain" });
+                        const blobHtml = new Blob([rowsHtml], { type: "text/html" });
+                        const item = new ClipboardItem({
+                          "text/html": blobHtml,
+                          "text/plain": blobText,
+                        });
+                        navigator.clipboard.write([item]).catch(() => navigator.clipboard.writeText(tsv));
+                      } catch (e) {
+                        navigator.clipboard.writeText(tsv);
+                      }
+                      setIsCopied(true);
+                      setTimeout(() => setIsCopied(false), 2000);
+                    }}
+                    className={`flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl transition-all active:scale-[0.9] shadow-sm border ${
+                      isCopied
+                        ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30"
+                        : "bg-white dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 hover:text-slate-900 dark:hover:bg-slate-700 dark:hover:text-white"
+                    }`}
+                    title="Скопировать для Excel"
+                  >
+                    {isCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (matchedDemand.length === 0) return;
+                      const headers = [
+                        "Внутренний №",
+                        "Дата Заказа",
+                        "№ Заказа",
+                        "Клиент",
+                        "Номенклатура",
+                        "Профиль",
+                        "Марка",
+                        "Размер мм.",
+                        "Длина",
+                        "Кол-во тн в заказе",
+                        "ИТОГО остаток к выполнению",
+                        "Взято со склада (тн)",
+                        "ИТОГО остатка к завершению",
+                        "Тех. отходы склад г/к",
+                        "Делов. Остатки склад г/к",
+                        "КИМ склад г/к",
+                        "Исходная Номенклатура",
+                        "Профиль наличия",
+                        "НТД",
+                        "Марка стали наличия",
+                        "Размер наличия",
+                        "Длина (склад г/к)",
+                        "Остаток на складе г/к. (тн)",
+                        "Взято со склада г/к (тн)",
+                        "Свободный остаток г/к склад (тн)",
                       ];
-                      const maxRows = Math.max(1, res.matchedStockItems?.length || 0);
-                      const rowTemplate = Array(headers.length).fill("");
-                      for (let i = 0; i < 16; i++) rowTemplate[i] = baseRow[i];
+                      const rows: any[][] = [];
+                      matchedDemand.forEach((res: any) => {
+                        const baseRow = [
+                          res.internalNo || "",
+                          res.shippingDate || "",
+                          res.orderNo || "",
+                          res.client || "",
+                          res.nomenclature || "",
+                          res.type || "",
+                          res.grade || "",
+                          res.diameter,
+                          res.lengthType === "НД" ? "НД" : `МД ${res.length}`,
+                          Number(res.weightTons || 0),
+                          Number(res.remainingToProcess || 0),
+                          Number(res.allocatedStock || 0),
+                          Number(res.shortageStock || 0),
+                          res.allocatedStock > 0 && res.combinedTechWaste > 0 ? Number(res.combinedTechWaste.toFixed(3)) : 0,
+                          res.allocatedStock > 0 && res.combinedUsefulRem > 0 ? Number(res.combinedUsefulRem.toFixed(3)) : 0,
+                          res.allocatedStock > 0 && res.combinedKim > 0 ? Number(res.combinedKim.toFixed(3)) : 0,
+                        ];
+                        const maxRows = Math.max(1, res.matchedStockItems?.length || 0);
+                        const rowTemplate = Array(headers.length).fill("");
+                        for (let i = 0; i < 16; i++) rowTemplate[i] = baseRow[i];
 
-                      for (let r = 0; r < maxRows; r++) {
-                        const outRow = [...rowTemplate];
-                        if (r > 0) {
-                          for (let c = 0; c < 16; c++) outRow[c] = "";
-                        }
+                        for (let r = 0; r < maxRows; r++) {
+                          const outRow = [...rowTemplate];
+                          if (r > 0) {
+                            for (let c = 0; c < 16; c++) outRow[c] = "";
+                          }
 
-                        const st = res.matchedStockItems?.[r];
-                        if (st) {
-                          outRow[16] = st["Исходная Номенклатура"] || "";
-                          outRow[17] = st["Профиль"] || "";
-                          outRow[18] = st["НТД"] || "";
-                          outRow[19] = st["Марка стали"] || "";
-                          outRow[20] = st["Размер"] || "";
-                          outRow[21] = st["Длина"] || "";
-                          outRow[22] = Number(st.stockBeforeTaking || 0);
-                          outRow[23] = Number(st.allocatedAmount || 0);
-                          outRow[24] = Number(st.stockAfterTaking || 0);
+                          const st = res.matchedStockItems?.[r];
+                          if (st) {
+                            outRow[16] = st["Исходная Номенклатура"] || "";
+                            outRow[17] = st["Профиль"] || "";
+                            outRow[18] = st["НТД"] || "";
+                            outRow[19] = st["Марка стали"] || "";
+                            outRow[20] = st["Размер"] || "";
+                            outRow[21] = st["Длина"] || "";
+                            outRow[22] = Number(st.stockBeforeTaking || 0);
+                            outRow[23] = Number(st.allocatedAmount || 0);
+                            outRow[24] = Number(st.stockAfterTaking || 0);
+                          }
+                          rows.push(outRow);
                         }
-                        rows.push(outRow);
+                      });
+
+                      const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+                      const numberCols = [9, 10, 11, 12, 13, 14, 15, 22, 23, 24];
+                      const range = XLSX.utils.decode_range(worksheet["!ref"] || "A1:A1");
+                      for (let R = 1; R <= range.e.r; ++R) {
+                        for (let c of numberCols) {
+                          const cellAddress = { c: c, r: R };
+                          const cellRef = XLSX.utils.encode_cell(cellAddress);
+                          if (worksheet[cellRef] && typeof worksheet[cellRef].v === "number") {
+                            worksheet[cellRef].t = "n";
+                            worksheet[cellRef].z = '#,##0.000" тн."';
+                          }
+                        }
                       }
-                    });
 
-                    const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-                    const numberCols = [9, 10, 11, 12, 13, 14, 15, 22, 23, 24];
-                    const range = XLSX.utils.decode_range(worksheet["!ref"] || "A1:A1");
-                    for (let R = 1; R <= range.e.r; ++R) {
-                      for (let c of numberCols) {
-                        const cellAddress = { c: c, r: R };
-                        const cellRef = XLSX.utils.encode_cell(cellAddress);
-                        if (worksheet[cellRef] && typeof worksheet[cellRef].v === "number") {
-                          worksheet[cellRef].t = "n";
-                          worksheet[cellRef].z = '#,##0.000" тн."';
-                        }
-                      }
-                    }
-
-                    const workbook = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(workbook, worksheet, "Расчет с наличием");
-                    XLSX.writeFile(workbook, getTimestampedFilename("Расчет потребности в заготовке"));
-                  }}
-                  className="flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
-                  title="Скачать в Excel"
-                >
-                  <Download className="w-4 h-4" />
-                </button>
+                      const workbook = XLSX.utils.book_new();
+                      XLSX.utils.book_append_sheet(workbook, worksheet, "Расчет с наличием");
+                      XLSX.writeFile(workbook, getTimestampedFilename("Расчет потребности в заготовке"));
+                    }}
+                    className="flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/20 hover:bg-emerald-100 dark:hover:bg-emerald-500/30 transition-all active:scale-[0.9] shadow-sm"
+                    title="Скачать в Excel"
+                  >
+                    <Download className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             </div>
