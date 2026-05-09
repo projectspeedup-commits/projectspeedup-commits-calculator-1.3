@@ -47,21 +47,9 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { subscribeToUserHistory, saveCalculationToCloud, deleteCalculationFromCloud, clearUserHistoryFromCloud } from '../services/db/calcHistoryService';
 import { PrintTemplate } from "./PrintTemplate";
 import { db } from "../lib/firebase";
-import {
-  collection,
-  addDoc,
-  serverTimestamp,
-  query,
-  where,
-  onSnapshot,
-  orderBy,
-  deleteDoc,
-  doc,
-  getDocs,
-  writeBatch,
-} from "firebase/firestore";
 import { handleFirestoreError, OperationType, validateNumeric, validateDimensions } from "../lib/utils";
 
 import { ConfirmModal } from "./ConfirmModal";
@@ -738,28 +726,11 @@ export function CalculatorApp({
 
     if (!db || !user) return;
 
-    const q = query(
-      collection(db, "calculations"),
-      where("userId", "==", user.uid),
-    );
-
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const calcs = snapshot.docs
-          .map((d) => ({ id: d.id, ...d.data() }))
-          .sort((a: any, b: any) => {
-            const timeA = a.createdAt?.toMillis?.() || 0;
-            const timeB = b.createdAt?.toMillis?.() || 0;
-            return timeB - timeA;
-          });
-        setSavedCalculations(calcs);
-      },
-      (error) => {
-        try {
-          handleFirestoreError(error, OperationType.GET, "calculations");
-        } catch (e) {}
-      },
+    const unsubscribe = subscribeToUserHistory(
+      db,
+      user.uid,
+      (calcs) => setSavedCalculations(calcs),
+      (error) => console.error(error)
     );
 
     return () => unsubscribe();
@@ -809,8 +780,7 @@ export function CalculatorApp({
       };
 
       if (isCloudActive && db && user) {
-        payload.createdAt = serverTimestamp();
-        await addDoc(collection(db, "calculations"), payload);
+        await saveCalculationToCloud(db, payload);
       } else {
         payload.id = Date.now().toString();
         payload.createdAt = { toDate: () => new Date() };
@@ -838,7 +808,7 @@ export function CalculatorApp({
     if (confirm("Удалить этот расчет?")) {
       try {
         if (isCloudActive && db) {
-          await deleteDoc(doc(db, "calculations", id));
+          await deleteCalculationFromCloud(db, id);
         } else {
           const newSaved = savedCalculations.filter(c => c.id !== id);
           setSavedCalculations(newSaved);
@@ -873,19 +843,7 @@ export function CalculatorApp({
     try {
       let deletedCount = savedCalculations.length;
       if (isCloudActive && db) {
-        const totalDocs = savedCalculations.length;
-        const BATCH_SIZE = 500;
-        deletedCount = 0;
-
-        for (let i = 0; i < totalDocs; i += BATCH_SIZE) {
-          const batch = writeBatch(db);
-          const chunk = savedCalculations.slice(i, i + BATCH_SIZE);
-          chunk.forEach((calc) => {
-            batch.delete(doc(db, "calculations", calc.id));
-            deletedCount++;
-          });
-          await batch.commit();
-        }
+        deletedCount = await clearUserHistoryFromCloud(db, savedCalculations);
       } else {
         setSavedCalculations([]);
         if (typeof window !== "undefined") {

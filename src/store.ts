@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { doc, setDoc } from "firebase/firestore";
+import { saveUserSettingsToCloud } from "./services/db/userSettingsService";
 import { db } from "./lib/firebase";
 import { DEFAULT_RAW_PRICES, DEFAULT_ECONOMY_ITEMS, sanitizeKey } from "./lib/constants";
 
@@ -55,7 +55,7 @@ export const useStore = create<StoreState>((set, get) => ({
         sanitizedRawPrices[sanitizeKey(k)] = v;
       }
 
-      await setDoc(doc(db, "users", user.uid, "settings", "preferences"), {
+      await saveUserSettingsToCloud(db, user.uid, {
         rawPrices: sanitizedRawPrices,
         scrapPrice: state.globalScrapPrice,
         remnantPrice: state.globalRemnantPrice,
@@ -64,7 +64,7 @@ export const useStore = create<StoreState>((set, get) => ({
         deletedGrades: state.deletedGrades,
         economyItems: state.economyItems,
         updatedAt: new Date().toISOString()
-      }, { merge: true });
+      });
     } catch (e) {
       console.error("Personal settings save failed", e);
     }

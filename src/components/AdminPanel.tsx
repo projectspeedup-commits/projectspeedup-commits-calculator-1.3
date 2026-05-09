@@ -1,8 +1,13 @@
-import AdminPanelHelpTab from './AdminPanelHelpTab';
-import AdminPanelLogisticsTab from './AdminPanelLogisticsTab';
-import AdminPanelProductionTab from './AdminPanelProductionTab';
-import AdminPanelSupplyTab from './AdminPanelSupplyTab';
-import AdminPanelEconomyTab from './AdminPanelEconomyTab';
+import { useExcelProcessors } from "../hooks/useExcelProcessors";
+import {
+  subscribeToAdminData,
+  saveAdminDataToCloud,
+} from "../services/db/adminDataService";
+import AdminPanelHelpTab from "./AdminPanelHelpTab";
+import AdminPanelLogisticsTab from "./AdminPanelLogisticsTab";
+import AdminPanelProductionTab from "./AdminPanelProductionTab";
+import AdminPanelSupplyTab from "./AdminPanelSupplyTab";
+import AdminPanelEconomyTab from "./AdminPanelEconomyTab";
 import {
   DEFAULT_STEEL_GRADES,
   formatInputValue,
@@ -58,7 +63,6 @@ import {
 } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { db } from "../lib/firebase";
-import { doc, onSnapshot, setDoc } from "firebase/firestore";
 import * as XLSX from "xlsx-js-style";
 import { BatchManualModal } from "./BatchManualModal";
 import { StockManualModal } from "./StockManualModal";
@@ -131,7 +135,13 @@ interface AdminPanelProps {
   isCloudActive: boolean;
   isDarkMode: boolean;
   toggleTheme: () => void;
-  initialTab?: "files" | "economy" | "supply" | "production" | "logistics" | "help";
+  initialTab?:
+    | "files"
+    | "economy"
+    | "supply"
+    | "production"
+    | "logistics"
+    | "help";
   isPurchasingMode?: boolean;
 }
 
@@ -151,6 +161,22 @@ export function AdminPanel({
   initialTab = "economy",
   isPurchasingMode = false,
 }: AdminPanelProps) {
+  const { handleProcessPlans, handleProcessSupplyPlans, handleProcessStock } =
+    useExcelProcessors({
+      rawPrices,
+      setIsProcessing,
+      setParsingProgress,
+      setUploadWarnings,
+      setCalcResultsProd,
+      setCalcResultsSup,
+      setIsProcessingSupplyPlans,
+      setProcessedSupplyPlansProd,
+      setProcessedSupplyPlansSup,
+      setIsProcessingStock,
+      setProcessedStockProd,
+      setProcessedStockSup,
+    });
+
   const [activeTab, setActiveTab] = useState<
     "files" | "economy" | "supply" | "production" | "logistics" | "help"
   >(initialTab as any);
@@ -188,25 +214,21 @@ export function AdminPanel({
   useEffect(() => {
     if (!isCloudActive || !db) return;
 
-    const unsubProd = onSnapshot(doc(db, "admin_data", "prod_data"), (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
+    const unsubProd = subscribeToAdminData(db, "prod_data", (data) => {
+      if (data) {
         skipCloudSave.current = true;
-        if (data.processedSupplyPlans) setProcessedSupplyPlansProd(data.processedSupplyPlans);
-        if (data.processedStock) setProcessedStockProd(data.processedStock);
-        if (data.calculationResults) setCalcResultsProd(data.calculationResults);
-        setTimeout(() => { skipCloudSave.current = false; }, 500);
+        setTimeout(() => {
+          skipCloudSave.current = false;
+        }, 500);
       }
     });
 
-    const unsubSup = onSnapshot(doc(db, "admin_data", "sup_data"), (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
+    const unsubSup = subscribeToAdminData(db, "sup_data", (data) => {
+      if (data) {
         skipCloudSave.current = true;
-        if (data.processedSupplyPlans) setProcessedSupplyPlansSup(data.processedSupplyPlans);
-        if (data.processedStock) setProcessedStockSup(data.processedStock);
-        if (data.calculationResults) setCalcResultsSup(data.calculationResults);
-        setTimeout(() => { skipCloudSave.current = false; }, 500);
+        setTimeout(() => {
+          skipCloudSave.current = false;
+        }, 500);
       }
     });
 
@@ -219,12 +241,11 @@ export function AdminPanel({
   const saveToCloud = async (type: string, payload: any) => {
     if (!isCloudActive || !db || skipCloudSave.current) return;
     try {
-      await setDoc(doc(db, "admin_data", type), payload, { merge: true });
+      await saveAdminDataToCloud(db, type as any, payload);
     } catch (e) {
       console.warn("Cloud save failed", e);
     }
   };
-
 
   const [adminSection, setAdminSection] = useState<
     "direct" | "prices" | "grades"
@@ -253,7 +274,7 @@ export function AdminPanel({
   // Real-time validation for Economy fields
   useEffect(() => {
     const errors: Record<string, string> = {};
-    
+
     // Validate scrap
     const scrapVal = parseFloat(scrap.replace(",", "."));
     if (isNaN(scrapVal) || scrapVal < 0) {
@@ -267,10 +288,11 @@ export function AdminPanel({
     }
 
     // Validate economy items
-    economyItems.forEach(item => {
+    economyItems.forEach((item) => {
       const val = parseFloat(String(item.norm).replace(",", "."));
       if (isNaN(val) || val < 0) {
-        errors[`economy_${item.id}`] = "Значение должно быть положительным числом";
+        errors[`economy_${item.id}`] =
+          "Значение должно быть положительным числом";
       }
     });
 
@@ -278,8 +300,10 @@ export function AdminPanel({
     Object.entries(rawPrices).forEach(([grade, p]: [string, any]) => {
       const md = parseFloat(p.md.replace(",", "."));
       const nd = parseFloat(p.nd.replace(",", "."));
-      if (isNaN(md) || md < 0) errors[`price_${grade}_md`] = "Некорректная цена МД";
-      if (isNaN(nd) || nd < 0) errors[`price_${grade}_nd`] = "Некорректная цена НД";
+      if (isNaN(md) || md < 0)
+        errors[`price_${grade}_md`] = "Некорректная цена МД";
+      if (isNaN(nd) || nd < 0)
+        errors[`price_${grade}_nd`] = "Некорректная цена НД";
     });
 
     setValidationErrors(errors);
@@ -289,7 +313,9 @@ export function AdminPanel({
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [uploadWarnings, setUploadWarnings] = useState<string[]>([]);
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
 
   const formatCurrency = (val: number) => {
     return (
@@ -425,30 +451,30 @@ export function AdminPanel({
     : processedSupplyPlansSup;
 
   useEffect(() => {
-    localStorage.setItem("ais_prod_calc_results", JSON.stringify(calcResultsProd));
-    localStorage.setItem("ais_sup_calc_results", JSON.stringify(calcResultsSup));
-    if (!skipCloudSave.current) {
-      saveToCloud("prod_data", { calculationResults: calcResultsProd });
-      saveToCloud("sup_data", { calculationResults: calcResultsSup });
-    }
+    localStorage.setItem(
+      "ais_prod_calc_results",
+      JSON.stringify(calcResultsProd),
+    );
+    localStorage.setItem(
+      "ais_sup_calc_results",
+      JSON.stringify(calcResultsSup),
+    );
   }, [calcResultsProd, calcResultsSup]);
 
   useEffect(() => {
     localStorage.setItem("ais_prod_stock", JSON.stringify(processedStockProd));
     localStorage.setItem("ais_sup_stock", JSON.stringify(processedStockSup));
-    if (!skipCloudSave.current) {
-      saveToCloud("prod_data", { processedStock: processedStockProd });
-      saveToCloud("sup_data", { processedStock: processedStockSup });
-    }
   }, [processedStockProd, processedStockSup]);
 
   useEffect(() => {
-    localStorage.setItem("ais_prod_supply_plans", JSON.stringify(processedSupplyPlansProd));
-    localStorage.setItem("ais_sup_supply_plans", JSON.stringify(processedSupplyPlansSup));
-    if (!skipCloudSave.current) {
-      saveToCloud("prod_data", { processedSupplyPlans: processedSupplyPlansProd });
-      saveToCloud("sup_data", { processedSupplyPlans: processedSupplyPlansSup });
-    }
+    localStorage.setItem(
+      "ais_prod_supply_plans",
+      JSON.stringify(processedSupplyPlansProd),
+    );
+    localStorage.setItem(
+      "ais_sup_supply_plans",
+      JSON.stringify(processedSupplyPlansSup),
+    );
   }, [processedSupplyPlansProd, processedSupplyPlansSup]);
 
   const applyAllOptimizations = () => {
@@ -1282,938 +1308,31 @@ export function AdminPanel({
     return sp["Номенклатура"] || sp["NOMENCLATURE"] || "";
   };
 
-  // Helper for date formatting
-  const formatDate = (input: any): string => {
-    if (!input) return "";
-    let dateObj: Date | null = null;
-
-    if (typeof input === "number") {
-      // Excel date serial conversion
-      dateObj = new Date(Math.round((input - 25569) * 86400 * 1000));
-    } else if (typeof input === "string" && input.trim()) {
-      const parsed = new Date(input);
-      if (!isNaN(parsed.getTime())) {
-        dateObj = parsed;
-      } else {
-        // Handle DD.MM.YYYY strings manually if browser can't parse them
-        const parts = input.trim().split(/[.-/]/);
-        if (parts.length === 3) {
-          const d = parseInt(parts[0]);
-          const m = parseInt(parts[1]) - 1;
-          const y = parseInt(parts[2]);
-          if (y > 1000 && m < 12 && d < 32) {
-            dateObj = new Date(y, m, d);
-          }
-        }
-      }
-    }
-
-    if (dateObj && !isNaN(dateObj.getTime())) {
-      const dd = String(dateObj.getDate()).padStart(2, "0");
-      const mm = String(dateObj.getMonth() + 1).padStart(2, "0");
-      const yyyy = dateObj.getFullYear();
-      return `${dd}.${mm}.${yyyy}`;
-    }
-    return String(input).trim();
-  };
-
-  const handleProcessPlans = async (
-    type: "production" | "supply",
-    filesToProcess: any[],
-  ) => {
-    if (filesToProcess.length === 0) return;
-
-    setIsProcessing(true);
-    setUploadWarnings([]);
-
-    // Give browser time to render loading state
-    await new Promise(resolve => setTimeout(resolve, 50));
-
-    try {
-      const allExtractedData: Omit<
-        CalculationResult,
-        | "billetDia"
-        | "billetLength"
-        | "drawRatio"
-        | "drawLength"
-        | "usefulLength"
-        | "techEnds"
-        | "wastePercent"
-        | "totalWeight"
-        | "billetCount"
-        | "pcsPerBillet"
-        | "targetLength"
-        | "quantity"
-        | "price"
-        | "totalCost"
-      >[] = [];
-
-      for (const fileObj of filesToProcess) {
-        if (!fileObj.file) continue;
-
-        const data = await fileObj.file.arrayBuffer();
-        const workbook = XLSX.read(data, { type: "array" });
-
-        for (const sheetName of workbook.SheetNames) {
-          const worksheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet, {
-            header: 1,
-            defval: "",
-          }) as any[][];
-
-          let startRow = 0;
-          let colMap = {
-            client: 1, // B
-            nomenclature: 2, // C
-            orderNo: 3, // D
-            type: 5, // F
-            grade: 6, // G
-            size: 7, // H
-            weight: 8, // I
-            remaining: -1,
-            shippingDate: -1,
-            internalNo: -1,
-            lengthIdx: -1,
-          };
-
-          // Dynamically find header row and map columns
-          for (let i = 0; i < Math.min(100, jsonData.length); i++) {
-            const row = jsonData[i] || [];
-            const rowStr = row.join(" ").toLowerCase();
-
-            if (
-              rowStr.includes("заказ") ||
-              rowStr.includes("клиент") ||
-              rowStr.includes("профиль") ||
-              rowStr.includes("марка") ||
-              rowStr.includes("размер") ||
-              rowStr.includes("кол-во") ||
-              rowStr.includes("вес") ||
-              rowStr.includes("номенклатура")
-            ) {
-              startRow = i + 1;
-
-              row.forEach((cell: any, colIdx: number) => {
-                const cellStr = String(cell).toLowerCase().trim();
-
-                // Specific mappings requested by user
-                if (
-                  cellStr === "внутренний номер" ||
-                  cellStr === "внутренняя нумерация" ||
-                  cellStr === "внутренний №" ||
-                  cellStr.includes("внутр. №")
-                )
-                  colMap.internalNo = colIdx;
-                if (
-                  cellStr === "дата отгрузки" ||
-                  cellStr === "дата заказа" ||
-                  cellStr === "дата"
-                ) colMap.shippingDate = colIdx;
-                if (cellStr === "клиент") colMap.client = colIdx;
-                if (cellStr === "номенклатура") colMap.nomenclature = colIdx;
-                if (cellStr === "№ заказа") colMap.orderNo = colIdx;
-                if (
-                  cellStr === "кол-во" || 
-                  cellStr === "кол-во тн" ||
-                  cellStr === "кол-во тн в заказе" ||
-                  cellStr === "кол-во ="
-                )
-                  colMap.weight = colIdx;
-                if (
-                  cellStr === "итого остаток к выполнению" ||
-                  cellStr === "итого остаток выполнения заказа после расчета / плановое поступление" ||
-                  cellStr.includes("итого остаток к выполнению") ||
-                  cellStr.includes("итого остаток выполнению") ||
-                  cellStr.includes("итог остаток к выполнению") ||
-                  cellStr.includes("итого ост. к выполнению") ||
-                  cellStr.includes("остаток к выполнению") ||
-                  cellStr.includes("остаток") ||
-                  cellStr.includes("после расчета / плановое поступление")
-                )
-                  colMap.remaining = colIdx;
-
-                // Fallbacks and other fields
-                if (
-                  colMap.internalNo === -1 &&
-                  cellStr.includes("внутр") &&
-                  (cellStr.includes("номер") || cellStr.includes("№"))
-                )
-                  colMap.internalNo = colIdx;
-                if (
-                  colMap.client === -1 &&
-                  (cellStr.includes("клиент") ||
-                    cellStr.includes("покупатель") ||
-                    cellStr.includes("партнер"))
-                )
-                  colMap.client = colIdx;
-                if (
-                  colMap.nomenclature === -1 &&
-                  (cellStr.includes("номенклатура") ||
-                    cellStr.includes("наименование") ||
-                    cellStr.includes("товар"))
-                )
-                  colMap.nomenclature = colIdx;
-                if (colMap.orderNo === -1 && cellStr.includes("заказ"))
-                  colMap.orderNo = colIdx;
-                if (cellStr.includes("профиль") || cellStr.includes("тип"))
-                  colMap.type = colIdx;
-                if (
-                  cellStr.includes("марка") ||
-                  cellStr.includes("сталь") ||
-                  cellStr.includes("материал")
-                )
-                  colMap.grade = colIdx;
-                if (cellStr.includes("размер") || cellStr.includes("диаметр"))
-                  colMap.size = colIdx;
-                if (
-                  colMap.weight === -1 &&
-                  (cellStr.includes("кол-во") ||
-                    cellStr.includes("количество") ||
-                    cellStr.includes("вес") ||
-                    cellStr.includes("масса") ||
-                    cellStr.includes("кг") ||
-                    cellStr.includes("тн"))
-                )
-                  colMap.weight = colIdx;
-                if (
-                  colMap.shippingDate === -1 &&
-                  (cellStr.includes("отгруз") || cellStr.includes("дата"))
-                )
-                  colMap.shippingDate = colIdx;
-                if (cellStr.includes("длина")) colMap.lengthIdx = colIdx;
-              });
-              break;
-            }
-          }
-
-          // Smart Mapping Validation
-          const missingColumns = [];
-          if (colMap.client === -1) missingColumns.push("Клиент");
-          if (colMap.nomenclature === -1) missingColumns.push("Номенклатура");
-          if (colMap.orderNo === -1) missingColumns.push("№ Заказа");
-          if (colMap.weight === -1) missingColumns.push("Кол-во (вес)");
-          if (colMap.remaining === -1)
-            missingColumns.push("Остаток к выполнению");
-
-          if (missingColumns.length > 0) {
-            setUploadWarnings((prev) => [
-              ...prev,
-              `Файл "${fileObj.name}": не найдены колонки: ${missingColumns.join(", ")}`,
-            ]);
-          }
-
-          for (let i = startRow; i < jsonData.length; i++) {
-            if (i % 25 === 0) {
-              setParsingProgress({
-                active: true,
-                current: i,
-                total: jsonData.length,
-                message: `Файл планов: Обрабатывается строка ${i} из ${jsonData.length}...`,
-              });
-              await new Promise((resolve) => setTimeout(resolve, 0));
-            }
-
-            const row = jsonData[i] || [];
-
-            // Stop parsing if we reach the "Total" (ИТОГО) row
-            const rowStrForTotal = row.join(" ").toLowerCase();
-            if (rowStrForTotal.includes("итого")) {
-              break;
-            }
-
-            if (
-              row.length === 0 ||
-              row.every((c: any) => !c || String(c).trim() === "")
-            )
-              continue;
-
-            const orderNo = String(row[colMap.orderNo] || "").trim();
-            const internalNo =
-              colMap.internalNo !== -1
-                ? String(row[colMap.internalNo] || "").trim()
-                : "";
-            const shippingDate = formatDate(
-              colMap.shippingDate !== -1 ? row[colMap.shippingDate] : "",
-            );
-
-            const client = String(row[colMap.client] || "").trim();
-            let nomenclature = String(row[colMap.nomenclature] || "");
-            nomenclature = nomenclature
-              .replace(/Прокат калиброванный/i, "")
-              .trim();
-
-            const rawWeight = row[colMap.weight];
-            let weightTons =
-              typeof rawWeight === "number"
-                ? rawWeight
-                : parseFloat(
-                    String(rawWeight || "0")
-                      .replace(/\s/g, "")
-                      .replace(",", "."),
-                  );
-            if (isNaN(weightTons) || weightTons < 0) {
-              weightTons = 0;
-              setUploadWarnings(prev => [...prev, `Строка ${i}: Некорректный вес (${rawWeight})`]);
-            }
-
-            const rawRemaining =
-              colMap.remaining !== -1 ? row[colMap.remaining] : null;
-            let remainingToProcess =
-              rawRemaining !== null
-                ? typeof rawRemaining === "number"
-                  ? rawRemaining
-                  : parseFloat(
-                      String(rawRemaining || "0")
-                        .replace(/\s/g, "")
-                        .replace(",", "."),
-                    )
-                : weightTons;
-            if (isNaN(remainingToProcess) || remainingToProcess < 0) {
-              remainingToProcess = weightTons;
-              if (rawRemaining !== null) {
-                setUploadWarnings(prev => [...prev, `Строка ${i}: Некорректный остаток к выполнению (${rawRemaining})`]);
-              }
-            }
-
-            let typeStr = String(
-              row[colMap.type] || nomenclature,
-            ).toLowerCase();
-            let type =
-              typeStr.includes("шестигранник") || typeStr.includes("шестиг")
-                ? "Шестигранник"
-                : "Круг";
-            let gradeStr = String(row[colMap.grade] || "").trim();
-            let grade = gradeStr || "ст.35";
-
-            // Fix for incorrect grade extraction
-            if (
-              grade.toUpperCase().includes("1050") ||
-              grade.toUpperCase().includes("1414") ||
-              grade.toUpperCase().includes("4543") ||
-              grade.toUpperCase().includes("ГОСТ") ||
-              gradeStr === ""
-            ) {
-              const gMatch = nomenclature.match(
-                /(?:^|[^а-яА-ЯёЁa-zA-Z])(?:ст\.?|сталь)\s*([0-9a-zA-Zа-яА-Я-]+)/i,
-              );
-              if (gMatch) {
-                grade = "ст." + gMatch[1].toUpperCase();
-              } else {
-                const alloyMatch = nomenclature.match(
-                  /\b(\d{2}[ХхНнМмТтВвГгДд]+[0-9a-zA-Zа-яА-Я-]*)\b/,
-                );
-                if (alloyMatch) {
-                  grade = "ст." + alloyMatch[1].toUpperCase();
-                } else {
-                  if (grade.includes("1050")) grade = "ст.35";
-                  else if (grade.includes("1414")) grade = "ст.А12";
-                  else if (grade.includes("4543")) grade = "ст.40Х";
-                  else grade = "ст.35";
-                }
-              }
-            } else if (grade.toUpperCase().startsWith("СТ.")) {
-              grade = "ст." + grade.substring(3).toUpperCase();
-            } else if (grade.toUpperCase().startsWith("СТ")) {
-              grade = "ст." + grade.substring(2).toUpperCase();
-            } else if (
-              grade.toUpperCase() !== "А12" &&
-              !grade.toLowerCase().startsWith("ст")
-            ) {
-              grade = "ст." + grade.toUpperCase();
-            } else if (grade.toUpperCase() === "А12") {
-              grade = "ст.А12";
-            }
-
-            grade = grade.replace(/[хХxX]\s*\d{3,}$/i, "");
-
-            const rawSize = row[colMap.size];
-            let diameter =
-              typeof rawSize === "number"
-                ? rawSize
-                : parseFloat(
-                    String(rawSize || "0")
-                      .replace(/\s/g, "")
-                      .replace(",", "."),
-                  );
-            if (isNaN(diameter) || diameter <= 0) {
-              const sizeMatch = nomenclature.match(
-                /(?:круг|шестигранник)\s*(?:калибровоченный|калибровочный|калиброванный|калибр\.?)?\s*(\d+(?:[.,]\d+)?)/i,
-              );
-              if (sizeMatch) {
-                diameter = parseFloat(sizeMatch[1].replace(",", "."));
-              } else {
-                setUploadWarnings(prev => [...prev, `Строка ${i}: Не удалось определить диаметр (${rawSize})`]);
-              }
-            }
-            if (isNaN(diameter) || diameter < 0) diameter = 0;
-
-            const nomCleanForLen = nomenclature
-              .toUpperCase()
-              .replace(/\s/g, "");
-            const isNomND =
-              nomCleanForLen.includes("НД") ||
-              nomCleanForLen.includes("Н.Д.") ||
-              nomCleanForLen.includes("Н/Д");
-
-            let length = 6000;
-            let lengthType: "НД" | "МД" = "МД";
-
-            if (isNomND) {
-              lengthType = "НД";
-              length = 6000;
-            } else if (colMap.lengthIdx !== -1 && row[colMap.lengthIdx]) {
-              const rawLength = String(row[colMap.lengthIdx])
-                .trim()
-                .toUpperCase();
-              if (
-                rawLength.includes("НД") ||
-                rawLength.includes("Н/Д") ||
-                rawLength.includes("Н.Д.")
-              ) {
-                lengthType = "НД";
-              } else {
-                const lengthMatch = rawLength.match(/\d+/);
-                if (lengthMatch) {
-                  const parsedLen = parseInt(lengthMatch[0], 10);
-                  if (!isNaN(parsedLen) && parsedLen > 0) {
-                    length = parsedLen;
-                    lengthType = "МД";
-                  }
-                }
-              }
-            } else {
-              const lengthMatch = nomenclature.match(/х\s*(\d+)/i);
-              if (lengthMatch) {
-                length = parseInt(lengthMatch[1]);
-                if (isNaN(length) || length <= 0) length = 6000;
-              }
-            }
-
-            allExtractedData.push({
-              id: Math.random().toString(36).substring(7),
-              client,
-              nomenclature,
-              type,
-              grade,
-              diameter,
-              length,
-              lengthType,
-              weightTons,
-              orderNo,
-              shippingDate,
-              internalNo,
-              remainingToProcess,
-            });
-          }
-        }
-      }
-
-      if (allExtractedData.length === 0) {
-        alert("Не удалось распознать данные.");
-        setIsProcessing(false);
-        return;
-      }
-
-      const processed: CalculationResult[] = allExtractedData.map((item) => {
-        const dataTable = item.type === "Шестигранник" ? HEX_DATA : ROUND_DATA;
-        const match = dataTable.find(
-          (d) => Math.abs(d.target - item.diameter) < 0.001,
-        );
-
-        let billetDia = item.diameter ? item.diameter + 2 : 0;
-        let drawRatio = match
-          ? match.coef
-          : item.diameter > 0
-            ? Math.pow(billetDia, 2) / Math.pow(item.diameter, 2)
-            : 1;
-
-        if (match) {
-          billetDia = match.raw;
-        } else if (item.diameter > 0) {
-          billetDia = item.diameter + 2;
-          drawRatio = Math.pow(billetDia, 2) / Math.pow(item.diameter, 2);
-        } else {
-          billetDia = 0;
-          drawRatio = 1;
-        }
-
-        let billetLength = 0;
-        const totalTechCoef =
-          item.type === "Шестигранник" ? 1.03 * 1.003 : 1.027 * 1.003;
-
-        if (item.lengthType === "НД") {
-          billetLength = 6000;
-        } else {
-          billetLength = 6000;
-        }
-
-        const drawLength = billetLength * drawRatio;
-        const usefulLength = drawLength / totalTechCoef;
-        const techEnds = drawLength - usefulLength;
-
-        let piecesCount = 0;
-        let actualUsefulLength = 0;
-
-        if (item.lengthType === "НД") {
-          for (let i = 1; i <= 20; i++) {
-            const optLen = Math.floor(usefulLength / i) - 5;
-            if (optLen >= 3000 && optLen <= 6000) {
-              piecesCount = i;
-              actualUsefulLength = piecesCount * optLen;
-              break;
-            }
-          }
-          if (piecesCount === 0) actualUsefulLength = usefulLength;
-        } else {
-          piecesCount = Math.floor(usefulLength / item.length);
-          actualUsefulLength = piecesCount * item.length;
-        }
-
-        // --- Optimization Step for KIM improvement ---
-        let optimizedBilletLength = billetLength;
-        let optimizedKim = drawLength > 0 ? actualUsefulLength / drawLength : 0;
-
-        if (item.lengthType === "МД" && item.length > 0) {
-          const MIN_B = 4000;
-          const MAX_B = Math.floor(8400 / drawRatio);
-          const STEP = 100;
-
-          for (let l = MIN_B; l <= MAX_B; l += STEP) {
-            const dL = l * drawRatio;
-            const uL = dL / totalTechCoef;
-            const pCount = Math.floor(uL / item.length);
-            if (pCount <= 0) continue;
-            const aUL = pCount * item.length;
-            const k = dL > 0 ? aUL / dL : 0;
-
-            if (k > optimizedKim + 0.005) {
-              // Suggest only if improvement > 0.5%
-              optimizedKim = k;
-              optimizedBilletLength = l;
-            }
-          }
-        } else if (item.lengthType === "НД") {
-          const MIN_B = 4000;
-          const MAX_B = 6000;
-          const STEP = 100;
-
-          for (let l = MIN_B; l <= MAX_B; l += STEP) {
-            const dL = l * drawRatio;
-            const uL = dL / totalTechCoef;
-            let pCount = 0;
-            let aUL = 0;
-            for (let i = 1; i <= 20; i++) {
-              const optLen = Math.floor(uL / i) - 5;
-              if (optLen >= 3000 && optLen <= 6000) {
-                pCount = i;
-                aUL = pCount * optLen;
-                break;
-              }
-            }
-            if (pCount === 0) continue;
-            const k = dL > 0 ? aUL / dL : 0;
-
-            if (k > optimizedKim + 0.005) {
-              // Suggest only if improvement > 0.5%
-              optimizedKim = k;
-              optimizedBilletLength = l;
-            }
-          }
-        }
-        // ----------------------------------------------
-
-        const billetArea = (Math.PI * Math.pow(billetDia, 2)) / 4;
-        const weightPerMBillet = billetArea * 0.00000785 * 1000;
-
-        const kim = drawLength > 0 ? actualUsefulLength / drawLength : 0;
-        const totalWeight =
-          kim > 0 ? item.remainingToProcess / kim : item.remainingToProcess;
-
-        const singleBilletMass = (billetLength / 1000) * weightPerMBillet;
-        const billetCount =
-          singleBilletMass > 0
-            ? Math.ceil((totalWeight * 1000) / singleBilletMass)
-            : 0;
-
-        const gradePrices = rawPrices[item.grade] || { md: "0", nd: "0" };
-        const basePrice = parseFloat(gradePrices.nd || "0");
-        const price = item.lengthType === "МД" ? basePrice * 1.06 : basePrice;
-        const totalCost = totalWeight * price;
-        const initialLeftovers =
-          item.lengthType === "НД"
-            ? 0
-            : usefulLength - (piecesCount || 0) * item.length;
-        const initialScrapTons =
-          drawLength > 0 ? (initialLeftovers / drawLength) * totalWeight : 0;
-
-        return {
-          ...item,
-          billetDia,
-          billetLength,
-          drawRatio,
-          drawLength,
-          usefulLength,
-          techEnds,
-          wastePercent: (1 - kim) * 100,
-          totalWeight,
-          billetCount,
-          pcsPerBillet: piecesCount || 0,
-          targetLength: item.length,
-          quantity: billetCount,
-          price,
-          totalCost,
-          optimizedBilletLength,
-          optimizedKim,
-          initialScrapTons,
-        } as CalculationResult;
-      });
-
-      setCalculationResults(processed);
-    } catch (err) {
-      console.error("Error processing files:", err);
-    } finally {
-      setIsProcessing(false);
-      setParsingProgress({ active: false, current: 0, total: 0, message: "" });
-    }
-  };
-
-  const handleProcessSupplyPlans = async (
-    type: "production" | "supply",
-    filesToProcess: any[],
-  ) => {
-    if (filesToProcess.length === 0) return;
-    setIsProcessingSupplyPlans(true);
-
-    // Give browser time to render loading state
-    await new Promise(resolve => setTimeout(resolve, 50));
-
-    try {
-      const extractedPlans: any[] = [];
-
-      for (const fileObj of filesToProcess) {
-        if (!fileObj.file) continue;
-
-        const data = await fileObj.file.arrayBuffer();
-        const workbook = XLSX.read(data, { type: "array" });
-
-        for (const sheetName of workbook.SheetNames) {
-          const worksheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet, {
-            header: 1,
-            defval: "",
-          }) as any[][];
-
-          let startRow = 0;
-          let cols: Record<string, number> = {};
-
-          for (let i = 0; i < Math.min(100, jsonData.length); i++) {
-            const rowStr = jsonData[i].join(" ").toLowerCase();
-            if (
-              rowStr.includes("профиль") ||
-              rowStr.includes("марка") ||
-              rowStr.includes("размер") ||
-              rowStr.includes("поставщик")
-            ) {
-              startRow = i + 1;
-              jsonData[i].forEach((cell: any, idx: number) => {
-                const c = String(cell).toLowerCase().trim();
-                if (c.includes("профиль")) cols.profile = idx;
-                if (c.includes("марка")) cols.grade = idx;
-                if (c.includes("размер")) cols.size = idx;
-                if (
-                  c.includes("кол-во") ||
-                  c.includes("количество") ||
-                  c.includes("колличество") ||
-                  c.includes("вес")
-                )
-                  cols.qty = idx;
-                if (c.includes("длина")) cols.length = idx;
-                if (c.includes("дата разм")) cols.datePlaced = idx;
-                if (c.includes("ожид") && c.includes("дата"))
-                  cols.dateExpected = idx;
-                if (c.includes("поставщик")) cols.supplier = idx;
-              });
-              break;
-            }
-          }
-
-          if (
-            cols.profile === undefined ||
-            cols.grade === undefined ||
-            cols.size === undefined ||
-            cols.qty === undefined ||
-            cols.length === undefined ||
-            cols.datePlaced === undefined ||
-            cols.dateExpected === undefined ||
-            cols.supplier === undefined
-          ) {
-            setUploadWarnings((prev) => [
-              ...prev,
-              `Файл "${fileObj.name}" (Поставки): не найдены или не распознаны все обязательные колонки (Профиль, Марка, Размер, Кол-во, Длина, Дата размещения, Ожидаемая дата поставки, Поставщик)!`,
-            ]);
-            continue;
-          }
-
-          for (let i = startRow; i < jsonData.length; i++) {
-            if (i % 25 === 0) {
-              setParsingProgress({
-                active: true,
-                current: i,
-                total: jsonData.length,
-                message: `Файл поставок: Обрабатывается строка ${i} из ${jsonData.length}...`,
-              });
-              await new Promise((resolve) => setTimeout(resolve, 0));
-            }
-
-            const row = jsonData[i] || [];
-            
-            // Stop parsing if we reach the "Total" (ИТОГО) row
-            const rowStrForTotal = row.join(" ").toLowerCase();
-            if (rowStrForTotal.includes("итого")) {
-              break;
-            }
-
-            if (!row[cols.profile] && !row[cols.grade]) continue;
-
-            const rawQty = row[cols.qty];
-            let qty =
-              typeof rawQty === "number"
-                ? rawQty
-                : parseFloat(
-                    String(rawQty || "0")
-                      .replace(/\s/g, "")
-                      .replace(",", "."),
-                  );
-            if (isNaN(qty) || qty <= 0) {
-              setUploadWarnings(prev => [...prev, `Строка ${i}: Некорректное количество (${rawQty})`]);
-              continue;
-            }
-
-            const excelDateToJS = (serial: number | string | undefined) => {
-              if (!serial) return "";
-              if (typeof serial === "number") {
-                const date = new Date((serial - 25569) * 86400 * 1000);
-                return date.toLocaleDateString("ru-RU");
-              }
-              return String(serial).trim();
-            };
-
-            extractedPlans.push({
-              Профиль: String(row[cols.profile] || "").trim(),
-              Марка: String(row[cols.grade] || "").trim(),
-              Размер: String(row[cols.size] || "").trim(),
-              "Кол-во": qty,
-              Длина: String(row[cols.length] || "").trim(),
-              "Дата размещения": excelDateToJS(row[cols.datePlaced]),
-              "Ожидаемая дата поставки": excelDateToJS(row[cols.dateExpected]),
-              Поставщик: String(row[cols.supplier] || "").trim(),
-            });
-          }
-        }
-      }
-
-      if (type === "production") setProcessedSupplyPlansProd(extractedPlans);
-      else setProcessedSupplyPlansSup(extractedPlans);
-    } catch (err) {
-      console.error("Error processing supply plans files:", err);
-    } finally {
-      setIsProcessingSupplyPlans(false);
-      setParsingProgress({ active: false, current: 0, total: 0, message: "" });
-    }
-  };
-
-  const handleProcessStock = async (
-    type: "production" | "supply",
-    filesToProcess: any[],
-  ) => {
-    if (filesToProcess.length === 0) return;
-    setIsProcessingStock(true);
-
-    // Give browser time to render loading state
-    await new Promise(resolve => setTimeout(resolve, 50));
-
-    try {
-      const extractedStock: any[] = [];
-
-      for (const fileObj of filesToProcess) {
-        if (!fileObj.file) continue;
-
-        const data = await fileObj.file.arrayBuffer();
-        const workbook = XLSX.read(data, { type: "array" });
-
-        for (const sheetName of workbook.SheetNames) {
-          const worksheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet, {
-            header: 1,
-            defval: "",
-          }) as any[][];
-
-          let startRow = 0;
-          let nomCol = -1;
-          let weightCol = -1;
-
-          for (let i = 0; i < Math.min(100, jsonData.length); i++) {
-            const rowStr = jsonData[i].join(" ").toLowerCase();
-            if (rowStr.includes("номенклатура") || rowStr.includes("остаток")) {
-              startRow = i + 1;
-              jsonData[i].forEach((cell: any, idx: number) => {
-                const c = String(cell).toLowerCase().trim();
-                if (c.includes("номенклатура") || c.includes("наименование"))
-                  nomCol = idx;
-                if (
-                  c.includes("конечный остаток") ||
-                  c.includes("остаток") ||
-                  c.includes("кол-во")
-                )
-                  weightCol = idx;
-              });
-              break;
-            }
-          }
-
-          if (nomCol === -1 || weightCol === -1) {
-            setUploadWarnings((prev) => [
-              ...prev,
-              `Файл "${fileObj.name}" (Склад): не найдены ${nomCol === -1 ? "Номенклатура " : ""}${weightCol === -1 ? "Конечный остаток" : ""}`,
-            ]);
-            continue;
-          }
-
-          for (let i = startRow; i < jsonData.length; i++) {
-            if (i % 25 === 0) {
-              setParsingProgress({
-                active: true,
-                current: i,
-                total: jsonData.length,
-                message: `Файл склада: Обрабатывается строка ${i} из ${jsonData.length}...`,
-              });
-              await new Promise((resolve) => setTimeout(resolve, 0));
-            }
-
-            const row = jsonData[i] || [];
-
-            // Stop parsing if we reach the "Total" (ИТОГО) row
-            const rowStrForTotal = row.join(" ").toLowerCase();
-            if (rowStrForTotal.includes("итого")) {
-              break;
-            }
-
-            if (!row[nomCol]) continue;
-
-            const rawNom = String(row[nomCol]).trim();
-            const rawWeight = row[weightCol];
-            let weight =
-              typeof rawWeight === "number"
-                ? rawWeight
-                : parseFloat(
-                    String(rawWeight || "0")
-                      .replace(/\s/g, "")
-                      .replace(",", "."),
-                  );
-            if (isNaN(weight) || weight <= 0.0001) {
-              if (rawWeight !== undefined && rawWeight !== "") {
-                setUploadWarnings(prev => [...prev, `Строка ${i}: Некорректный остаток (${rawWeight})`]);
-              }
-              continue;
-            }
-
-            let profile = "круг";
-            if (rawNom.toLowerCase().includes("шестиг"))
-              profile = "шестигранник";
-
-            let grade = "ст.35";
-            const gMatch = rawNom.match(
-              /(?:^|[^а-яА-ЯёЁa-zA-Z])(?:ст\.?|сталь)\s*([0-9a-zA-Zа-яА-Я-]+)/i,
-            );
-            if (gMatch) {
-              grade = "ст." + gMatch[1].toUpperCase();
-            } else {
-              const alloyMatch = rawNom.match(
-                /\b(\d{2}[ХхНнМмТтВвГгДд]+[0-9a-zA-Zа-яА-Я-]*)\b/,
-              );
-              if (alloyMatch) grade = "ст." + alloyMatch[1].toUpperCase();
-            }
-            grade = grade.replace(/[хХxX]\s*\d{3,}$/i, "");
-
-            let diameter = "";
-            const sizeMatch = rawNom.match(
-              /(?:круг|шестигранник)\s*(?:калибровоченный|калибровочный|калиброванный|калибр\.?)?\s*(\d+(?:[.,]\d+)?)/i,
-            );
-            if (sizeMatch) {
-              diameter = sizeMatch[1];
-            } else {
-              const sizeFallback = rawNom.match(
-                /\s+(\d+(?:[.,]\d+)?)\s*(?:мм)?\s*/i,
-              );
-              if (
-                sizeFallback &&
-                !sizeFallback[1].includes("1050") &&
-                !sizeFallback[1].includes("7417") &&
-                !sizeFallback[1].includes("2590")
-              ) {
-                diameter = sizeFallback[1];
-              }
-            }
-
-            const nomUpper = rawNom.toUpperCase();
-            const nomClean = nomUpper.replace(/\s/g, "");
-
-            let lengthType = "НД";
-
-            // Парсинг М/Д, МД, Н/Д
-            const mdMatch = nomClean.match(/(?:М\/Д|МД)(\d+)?/);
-            const ndSlashMatch = nomClean.match(/Н\/Д(\d+)?/);
-            const ndMatch = nomClean.includes("НД");
-
-            if (mdMatch) {
-              const val =
-                mdMatch[1] === "6000" || !mdMatch[1] ? "6000" : mdMatch[1];
-              lengthType = "МД " + val;
-            }
-
-            extractedStock.push({
-              "Исходная Номенклатура": rawNom,
-              Профиль: profile,
-              НТД: getGostForGrade(grade) + " / ГОСТ 2590-2006",
-              "Марка стали": grade,
-              Размер: diameter,
-              Длина: lengthType,
-              "Конечный остаток тн.": weight,
-            });
-          }
-        }
-      }
-
-      if (extractedStock.length === 0) {
-        alert("Не удалось извлечь остатки из загруженных файлов.");
-        return;
-      }
-
-      if (type === "production") setProcessedStockProd(extractedStock);
-      else setProcessedStockSup(extractedStock);
-    } catch (err) {
-      console.error("Error processing stock files:", err);
-    } finally {
-      setIsProcessingStock(false);
-      setParsingProgress({ active: false, current: 0, total: 0, message: "" });
-    }
-  };
-
   const handleCopyForSheets = async () => {
-    if (processedStock.length === 0) return;
+    let container = tableContainerRef.current;
+    if (
+      activeTab === "supply" &&
+      supplySection === "calc" &&
+      supplyTableRef.current
+    ) {
+      container = supplyTableRef.current;
+    }
+    if (!container) return;
 
-    const keys = Object.keys(processedStock[0]);
-    const headerRow = keys.join("[&_th]");
-    const rows = processedStock.map((row) =>
-      keys
-        .map((key) => {
-          const val = row[key];
-          return String(val ?? "")
-            .replace(/[&_th]/g, " ")
-            .replace(/\n/g, " ");
-        })
-        .join("[&_th]"),
-    );
+    const table = container.querySelector("table");
+    if (!table) return;
+
+    const rows = Array.from(table.querySelectorAll("tbody tr")).map((tr) => {
+      const cells = tr.querySelectorAll("td");
+      return Array.from(cells)
+        .map((td) => td.innerText.trim())
+        .join("\t");
+    });
+
+    const header = table.querySelector("thead");
+    const headerRow = Array.from(header?.querySelectorAll("th") || [])
+      .map((th) => th.innerText.trim())
+      .join("\t");
 
     const tsvData = [headerRow, ...rows].join("\n");
 
@@ -2587,229 +1706,88 @@ export function AdminPanel({
   };
 
   const renderFilesContent = (hideExtraBlocks = false) => {
-    const isAnyProcessing = isProcessing || isProcessingStock || isProcessingSupplyPlans;
+    const isAnyProcessing =
+      isProcessing || isProcessingStock || isProcessingSupplyPlans;
     return (
-    <div className="relative">
-      {isAnyProcessing && (
-        <div className="absolute inset-0 bg-white/50 dark:bg-[#121411]/50 backdrop-blur-sm z-50 flex flex-col items-center justify-center min-h-[400px] rounded-3xl">
-          <div className="bg-white dark:bg-[#1A1C19] p-8 rounded-[24px] shadow-xl border border-slate-200 dark:border-slate-800 flex flex-col items-center gap-6">
-            <div className="relative w-16 h-16">
-              <div className="absolute inset-0 border-4 border-slate-100 dark:border-slate-800 rounded-full" />
-              <div className="absolute inset-0 border-4 border-blue-500 rounded-full border-t-transparent animate-spin" />
+      <div className="relative">
+        {isAnyProcessing && (
+          <div className="absolute inset-0 bg-white/50 dark:bg-[#121411]/50 backdrop-blur-sm z-50 flex flex-col items-center justify-center min-h-[400px] rounded-3xl">
+            <div className="bg-white dark:bg-[#1A1C19] p-8 rounded-[24px] shadow-xl border border-slate-200 dark:border-slate-800 flex flex-col items-center gap-6">
+              <div className="relative w-16 h-16">
+                <div className="absolute inset-0 border-4 border-slate-100 dark:border-slate-800 rounded-full" />
+                <div className="absolute inset-0 border-4 border-blue-500 rounded-full border-t-transparent animate-spin" />
+              </div>
+              <div className="flex flex-col items-center gap-2 text-center">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                  Обработка файлов
+                </h3>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                  {isProcessing
+                    ? "Анализируем планы и заявки..."
+                    : isProcessingStock
+                      ? "Обрабатываем складские остатки..."
+                      : "Загружаем реестры..."}
+                </p>
+              </div>
             </div>
-            <div className="flex flex-col items-center gap-2 text-center">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                Обработка файлов
-              </h3>
-              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                {isProcessing ? "Анализируем планы и заявки..." : isProcessingStock ? "Обрабатываем складские остатки..." : "Загружаем реестры..."}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-    <motion.div
-      key="files"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={{ duration: 0.2 }}
-      className="flex flex-col gap-8 h-full"
-    >
-      <div className="flex flex-col gap-2">
-        <h2 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-          Файлы данных
-        </h2>
-        <p className="text-slate-500 dark:text-slate-400">
-          {hideExtraBlocks
-            ? "Расчет потребности в сырье."
-            : "Расчет потребности в сырье, наличия на складе и реестров поставок."}
-        </p>
-      </div>
-
-      <div className="flex flex-col gap-8">
-        {uploadWarnings.length > 0 && (
-          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 p-4 rounded-2xl flex flex-col gap-2">
-            <div className="flex items-center gap-2 mb-1">
-              <AlertCircle className="w-5 h-5 text-amber-500" />
-              <h4 className="font-bold text-amber-800 dark:text-amber-400">
-                Предупреждения при маппинге файлов
-              </h4>
-            </div>
-            <ul className="list-disc list-inside space-y-1">
-              {uploadWarnings.map((warn, i) => (
-                <li
-                  key={i}
-                  className="text-sm text-amber-700 dark:text-amber-500"
-                >
-                  {warn}
-                </li>
-              ))}
-            </ul>
           </div>
         )}
-        {/* File Upload Section */}
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-2 px-1">
-            <FileText className="w-5 h-5 text-slate-700 dark:text-slate-300" />
-            <h3 className="text-lg font-medium text-slate-900 dark:text-white">
-              {activeTab === "supply"
-                ? "Заявка на обеспечение"
-                : "Планы производства"}
-            </h3>
+        <motion.div
+          key="files"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.2 }}
+          className="flex flex-col gap-8 h-full"
+        >
+          <div className="flex flex-col gap-2">
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+              Файлы данных
+            </h2>
+            <p className="text-slate-500 dark:text-slate-400">
+              {hideExtraBlocks
+                ? "Расчет потребности в сырье."
+                : "Расчет потребности в сырье, наличия на складе и реестров поставок."}
+            </p>
           </div>
 
-          <div className="relative group/dropzone">
-            <motion.div
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
-              onClick={() => fileInputRef.current?.click()}
-              onDragOver={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-              }}
-              onDrop={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const files = e.dataTransfer.files;
-                if (files && files.length > 0) {
-                  const event = {
-                    target: { files },
-                  } as unknown as ChangeEvent<HTMLInputElement>;
-                  handleFileUpload(event);
-                }
-              }}
-              className={`relative bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed ${planFiles.length === 0 ? "border-blue-400 dark:border-blue-500 animate-pulse-border shadow-[0_0_15px_rgba(59,130,246,0.2)]" : "border-slate-200 dark:border-slate-800"} p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-center sm:justify-start text-center sm:text-left gap-4 sm:gap-5 group cursor-pointer hover:border-slate-400 dark:hover:border-slate-600 transition-all z-10 w-full`}
-            >
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileUpload}
-                className="hidden"
-                multiple
-                accept=".pdf,.xlsx,.csv,.txt,.docx"
-              />
-              <div className="relative w-14 h-14 bg-slate-50 dark:bg-slate-800 rounded-2xl shrink-0 flex items-center justify-center text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">
-                <Upload className="w-6 h-6" />
-                {planFiles.length === 0 && (
-                  <div className="absolute inset-0 rounded-2xl border-2 border-blue-400 animate-ping opacity-75"></div>
-                )}
-              </div>
-              <div>
-                <p className="text-base font-bold text-slate-900 dark:text-white">
-                  Нажмите или перетащите файл
-                </p>
-                <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
-                  {activeTab === "supply"
-                    ? "Excel или CSV файлы заявок"
-                    : "Excel или CSV файлы планов"}
-                </p>
-              </div>
-            </motion.div>
-            {/* Tooltip */}
-            {planFiles.length === 0 && (
-              <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-lg whitespace-nowrap opacity-0 group-hover/dropzone:opacity-100 transition-opacity pointer-events-none z-20">
-                Загрузите выгрузку из 1С в формате Excel (.xlsx). Важен столбец
-                «Остаток к выполнению» или «Количество».
-                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-blue-600 rotate-45"></div>
+          <div className="flex flex-col gap-8">
+            {uploadWarnings.length > 0 && (
+              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 p-4 rounded-2xl flex flex-col gap-2">
+                <div className="flex items-center gap-2 mb-1">
+                  <AlertCircle className="w-5 h-5 text-amber-500" />
+                  <h4 className="font-bold text-amber-800 dark:text-amber-400">
+                    Предупреждения при маппинге файлов
+                  </h4>
+                </div>
+                <ul className="list-disc list-inside space-y-1">
+                  {uploadWarnings.map((warn, i) => (
+                    <li
+                      key={i}
+                      className="text-sm text-amber-700 dark:text-amber-500"
+                    >
+                      {warn}
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsBatchManualOpen(true);
-              }}
-              className="absolute top-4 right-4 flex items-center justify-center w-9 h-9 bg-white dark:bg-[#1A1C19] hover:bg-slate-100 dark:hover:bg-[#252824] text-slate-600 dark:text-[#E2E3DE] rounded-xl transition-all focus:outline-none border border-slate-200 dark:border-[#2C2F2B] shadow-sm z-10"
-              title="Инструкция по расчетам"
-            >
-              <BookOpen className="w-5 h-5" />
-            </button>
-          </div>
-
-          {planFiles.length > 0 && (
-            <div className="bg-white dark:bg-[#1A1C19] rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-              <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                  Загруженные файлы
-                </span>
-                <div className="flex items-center gap-3">
-                  <span className="text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-full">
-                    {planFiles.length} файлов
-                  </span>
-                  {isProcessing && (
-                    <div className="text-[10px] text-slate-500 flex items-center gap-2 font-medium">
-                      <div className="w-3 h-3 border-2 border-sky-500/20 border-t-sky-500 rounded-full animate-spin" />
-                      {parsingProgress.active
-                        ? parsingProgress.message
-                        : "Расчет..."}
-                    </div>
-                  )}
-                  {!isProcessing && calculationResults.length > 0 && (
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => {
-                        if (activeTab === "supply") setSupplySection("calc");
-                        else {
-                          setProductionSection("calc");
-                        }
-                      }}
-                      className="bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 text-[10px] font-bold px-4 py-1.5 rounded-full hover:bg-sky-200 dark:hover:bg-sky-900/50 transition-all flex items-center gap-2"
-                    >
-                      <Activity className="w-3.5 h-3.5" />
-                      <span>Показать расчеты</span>
-                    </motion.button>
-                  )}
-                </div>
-              </div>
-              <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                {planFiles.map((file) => (
-                  <div
-                    key={file.id}
-                    className="p-4 sm:p-6 flex items-center justify-between hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors px-6"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400">
-                        <FileText className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">
-                          {file.name}
-                        </h4>
-                        <p className="text-[10px] font-medium text-slate-400 flex items-center gap-2 mt-0.5">
-                          <span>{file.size}</span>
-                          <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
-                          <span>{file.date}</span>
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => removeFile(file.id)}
-                      className="text-slate-400 hover:text-red-500 transition-colors p-2"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Stock Inventory Section */}
-          {!hideExtraBlocks && (
-            <>
-              <div className="flex items-center gap-2 px-1 mt-2">
-                <Layers className="w-5 h-5 text-slate-700 dark:text-slate-300" />
+            {/* File Upload Section */}
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-2 px-1">
+                <FileText className="w-5 h-5 text-slate-700 dark:text-slate-300" />
                 <h3 className="text-lg font-medium text-slate-900 dark:text-white">
-                  Наличие на складе (г/к прокат)
+                  {activeTab === "supply"
+                    ? "Заявка на обеспечение"
+                    : "Планы производства"}
                 </h3>
               </div>
 
-              <div className="relative">
+              <div className="relative group/dropzone">
                 <motion.div
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
-                  onClick={() => stockFileInputRef.current?.click()}
+                  onClick={() => fileInputRef.current?.click()}
                   onDragOver={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -2822,100 +1800,102 @@ export function AdminPanel({
                       const event = {
                         target: { files },
                       } as unknown as ChangeEvent<HTMLInputElement>;
-                      handleStockFileUpload(event);
+                      handleFileUpload(event);
                     }
                   }}
-                  className="bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed border-sky-200 dark:border-sky-900/30 p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-center sm:justify-start text-center sm:text-left gap-4 sm:gap-5 group cursor-pointer hover:border-sky-400 dark:hover:border-sky-700 transition-all shadow-sm w-full"
+                  className={`relative bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed ${planFiles.length === 0 ? "border-blue-400 dark:border-blue-500 animate-pulse-border shadow-[0_0_15px_rgba(59,130,246,0.2)]" : "border-slate-200 dark:border-slate-800"} p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-center sm:justify-start text-center sm:text-left gap-4 sm:gap-5 group cursor-pointer hover:border-slate-400 dark:hover:border-slate-600 transition-all z-10 w-full`}
                 >
                   <input
                     type="file"
-                    ref={stockFileInputRef}
-                    onChange={handleStockFileUpload}
+                    ref={fileInputRef}
+                    onChange={handleFileUpload}
                     className="hidden"
                     multiple
                     accept=".pdf,.xlsx,.csv,.txt,.docx"
                   />
-                  <div className="w-14 h-14 bg-sky-50 dark:bg-sky-900/20 rounded-2xl shrink-0 flex items-center justify-center text-sky-400 group-hover:text-sky-600 transition-colors">
-                    <Layers className="w-6 h-6" />
+                  <div className="relative w-14 h-14 bg-slate-50 dark:bg-slate-800 rounded-2xl shrink-0 flex items-center justify-center text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">
+                    <Upload className="w-6 h-6" />
+                    {planFiles.length === 0 && (
+                      <div className="absolute inset-0 rounded-2xl border-2 border-blue-400 animate-ping opacity-75"></div>
+                    )}
                   </div>
                   <div>
                     <p className="text-base font-bold text-slate-900 dark:text-white">
-                      Загрузить реестр склада
+                      Нажмите или перетащите файл
                     </p>
                     <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
-                      Остатки горячекатаного проката в любом формате
+                      {activeTab === "supply"
+                        ? "Excel или CSV файлы заявок"
+                        : "Excel или CSV файлы планов"}
                     </p>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsStockManualOpen(true);
-                      }}
-                      className="text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300 font-medium text-sm mt-2 underline"
-                    >
-                      Как правильно подготовить файл склада?
-                    </button>
                   </div>
                 </motion.div>
+                {/* Tooltip */}
+                {planFiles.length === 0 && (
+                  <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-lg whitespace-nowrap opacity-0 group-hover/dropzone:opacity-100 transition-opacity pointer-events-none z-20">
+                    Загрузите выгрузку из 1С в формате Excel (.xlsx). Важен
+                    столбец «Остаток к выполнению» или «Количество».
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-blue-600 rotate-45"></div>
+                  </div>
+                )}
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    setIsStockManualOpen(true);
+                    setIsBatchManualOpen(true);
                   }}
                   className="absolute top-4 right-4 flex items-center justify-center w-9 h-9 bg-white dark:bg-[#1A1C19] hover:bg-slate-100 dark:hover:bg-[#252824] text-slate-600 dark:text-[#E2E3DE] rounded-xl transition-all focus:outline-none border border-slate-200 dark:border-[#2C2F2B] shadow-sm z-10"
-                  title="Инструкция по складу"
+                  title="Инструкция по расчетам"
                 >
                   <BookOpen className="w-5 h-5" />
                 </button>
               </div>
 
-              {stockFiles.length > 0 && (
+              {planFiles.length > 0 && (
                 <div className="bg-white dark:bg-[#1A1C19] rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                   <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
                     <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                      Загруженные файлы склада
+                      Загруженные файлы
                     </span>
                     <div className="flex items-center gap-3">
-                      <span className="text-[10px] font-medium bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-300 px-2.5 py-1 rounded-full">
-                        {stockFiles.length} файлов
+                      <span className="text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-full">
+                        {planFiles.length} файлов
                       </span>
-
-                      {isProcessingStock && (
+                      {isProcessing && (
                         <div className="text-[10px] text-slate-500 flex items-center gap-2 font-medium">
-                          <div className="w-3 h-3 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
+                          <div className="w-3 h-3 border-2 border-sky-500/20 border-t-sky-500 rounded-full animate-spin" />
                           {parsingProgress.active
                             ? parsingProgress.message
-                            : "Обработка..."}
+                            : "Расчет..."}
                         </div>
                       )}
-
-                      {!isProcessingStock && processedStock.length > 0 && (
+                      {!isProcessing && calculationResults.length > 0 && (
                         <motion.button
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => {
                             if (activeTab === "supply")
-                              setSupplySection("stock");
+                              setSupplySection("calc");
                             else {
-                              setProductionSection("stock");
+                              setProductionSection("calc");
                             }
                           }}
                           className="bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 text-[10px] font-bold px-4 py-1.5 rounded-full hover:bg-sky-200 dark:hover:bg-sky-900/50 transition-all flex items-center gap-2"
                         >
-                          <Layers className="w-3.5 h-3.5" />
-                          <span>Показать наличие</span>
+                          <Activity className="w-3.5 h-3.5" />
+                          <span>Показать расчеты</span>
                         </motion.button>
                       )}
                     </div>
                   </div>
                   <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                    {stockFiles.map((file) => (
+                    {planFiles.map((file) => (
                       <div
                         key={file.id}
                         className="p-4 sm:p-6 flex items-center justify-between hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors px-6"
                       >
                         <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 bg-sky-50 dark:bg-sky-900/30 rounded-xl flex items-center justify-center text-sky-600 dark:text-sky-400">
-                            <Layers className="w-6 h-6" />
+                          <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400">
+                            <FileText className="w-6 h-6" />
                           </div>
                           <div>
                             <h4 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">
@@ -2929,10 +1909,7 @@ export function AdminPanel({
                           </div>
                         </div>
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removeStockFile(file.id);
-                          }}
+                          onClick={() => removeFile(file.id)}
                           className="text-slate-400 hover:text-red-500 transition-colors p-2"
                         >
                           <X className="w-5 h-5" />
@@ -2943,135 +1920,283 @@ export function AdminPanel({
                 </div>
               )}
 
-              {/* Supply Plan Registry Section */}
-              <div className="flex items-center gap-2 px-1 mt-2">
-                <ShoppingCart className="w-5 h-5 text-slate-700 dark:text-slate-300" />
-                <h3 className="text-lg font-medium text-slate-900 dark:text-white">
-                  Реестр поставок
-                </h3>
-              </div>
-
-              <div className="relative">
-                <div
-                  onClick={() => supplyPlanFileInputRef.current?.click()}
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const files = e.dataTransfer.files;
-                    if (files && files.length > 0) {
-                      const event = {
-                        target: { files },
-                      } as unknown as ChangeEvent<HTMLInputElement>;
-                      handleSupplyPlanFileUpload(event);
-                    }
-                  }}
-                  className="bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed border-sky-200 dark:border-sky-900/30 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-center sm:justify-start text-center sm:text-left gap-4 sm:gap-6 group cursor-pointer hover:border-sky-400 dark:hover:border-sky-700 transition-all shadow-sm"
-                >
-                  <input
-                    type="file"
-                    ref={supplyPlanFileInputRef}
-                    onChange={handleSupplyPlanFileUpload}
-                    className="hidden"
-                    multiple
-                    accept=".pdf,.xlsx,.csv,.txt,.docx"
-                  />
-                  <div className="w-14 h-14 bg-sky-50 dark:bg-sky-900/20 rounded-2xl shrink-0 flex items-center justify-center text-sky-400 group-hover:text-sky-600 transition-colors">
-                    <ShoppingCart className="w-6 h-6" />
+              {/* Stock Inventory Section */}
+              {!hideExtraBlocks && (
+                <>
+                  <div className="flex items-center gap-2 px-1 mt-2">
+                    <Layers className="w-5 h-5 text-slate-700 dark:text-slate-300" />
+                    <h3 className="text-lg font-medium text-slate-900 dark:text-white">
+                      Наличие на складе (г/к прокат)
+                    </h3>
                   </div>
-                  <div>
-                    <p className="text-base font-bold text-slate-900 dark:text-white">
-                      Загрузить реестр с планом поставок сырья
-                    </p>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
-                      График ожидаемых поступлений металла
-                    </p>
+
+                  <div className="relative">
+                    <motion.div
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
+                      onClick={() => stockFileInputRef.current?.click()}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const files = e.dataTransfer.files;
+                        if (files && files.length > 0) {
+                          const event = {
+                            target: { files },
+                          } as unknown as ChangeEvent<HTMLInputElement>;
+                          handleStockFileUpload(event);
+                        }
+                      }}
+                      className="bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed border-sky-200 dark:border-sky-900/30 p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-center sm:justify-start text-center sm:text-left gap-4 sm:gap-5 group cursor-pointer hover:border-sky-400 dark:hover:border-sky-700 transition-all shadow-sm w-full"
+                    >
+                      <input
+                        type="file"
+                        ref={stockFileInputRef}
+                        onChange={handleStockFileUpload}
+                        className="hidden"
+                        multiple
+                        accept=".pdf,.xlsx,.csv,.txt,.docx"
+                      />
+                      <div className="w-14 h-14 bg-sky-50 dark:bg-sky-900/20 rounded-2xl shrink-0 flex items-center justify-center text-sky-400 group-hover:text-sky-600 transition-colors">
+                        <Layers className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <p className="text-base font-bold text-slate-900 dark:text-white">
+                          Загрузить реестр склада
+                        </p>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
+                          Остатки горячекатаного проката в любом формате
+                        </p>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsStockManualOpen(true);
+                          }}
+                          className="text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300 font-medium text-sm mt-2 underline"
+                        >
+                          Как правильно подготовить файл склада?
+                        </button>
+                      </div>
+                    </motion.div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsStockManualOpen(true);
+                      }}
+                      className="absolute top-4 right-4 flex items-center justify-center w-9 h-9 bg-white dark:bg-[#1A1C19] hover:bg-slate-100 dark:hover:bg-[#252824] text-slate-600 dark:text-[#E2E3DE] rounded-xl transition-all focus:outline-none border border-slate-200 dark:border-[#2C2F2B] shadow-sm z-10"
+                      title="Инструкция по складу"
+                    >
+                      <BookOpen className="w-5 h-5" />
+                    </button>
                   </div>
-                </div>
-              </div>
 
-              {supplyPlanFiles.length > 0 && (
-                <div className="bg-white dark:bg-[#1A1C19] rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mt-6">
-                  <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                      Загруженные файлы поставок
-                    </span>
-                    <div className="flex items-center gap-3">
-                      <span className="text-[10px] font-medium bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-300 px-2.5 py-1 rounded-full">
-                        {supplyPlanFiles.length} файлов
-                      </span>
+                  {stockFiles.length > 0 && (
+                    <div className="bg-white dark:bg-[#1A1C19] rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                      <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                        <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                          Загруженные файлы склада
+                        </span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-[10px] font-medium bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-300 px-2.5 py-1 rounded-full">
+                            {stockFiles.length} файлов
+                          </span>
 
-                      {isProcessingSupplyPlans && (
-                        <div className="text-[10px] text-slate-500 flex items-center gap-2 font-medium">
-                          <div className="w-3 h-3 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
-                          {parsingProgress.active
-                            ? parsingProgress.message
-                            : "Обработка..."}
+                          {isProcessingStock && (
+                            <div className="text-[10px] text-slate-500 flex items-center gap-2 font-medium">
+                              <div className="w-3 h-3 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
+                              {parsingProgress.active
+                                ? parsingProgress.message
+                                : "Обработка..."}
+                            </div>
+                          )}
+
+                          {!isProcessingStock && processedStock.length > 0 && (
+                            <motion.button
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={() => {
+                                if (activeTab === "supply")
+                                  setSupplySection("stock");
+                                else {
+                                  setProductionSection("stock");
+                                }
+                              }}
+                              className="bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 text-[10px] font-bold px-4 py-1.5 rounded-full hover:bg-sky-200 dark:hover:bg-sky-900/50 transition-all flex items-center gap-2"
+                            >
+                              <Layers className="w-3.5 h-3.5" />
+                              <span>Показать наличие</span>
+                            </motion.button>
+                          )}
                         </div>
-                      )}
-
-                      {!isProcessingSupplyPlans &&
-                        processedSupplyPlans.length > 0 && (
-                          <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={() => {
-                              if (activeTab === "supply")
-                                setSupplySection("supply-plans");
-                            }}
-                            className="bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 text-[10px] font-bold px-4 py-1.5 rounded-full hover:bg-sky-200 dark:hover:bg-sky-900/50 transition-all flex items-center gap-2"
+                      </div>
+                      <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                        {stockFiles.map((file) => (
+                          <div
+                            key={file.id}
+                            className="p-4 sm:p-6 flex items-center justify-between hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors px-6"
                           >
-                            <ShoppingCart className="w-3.5 h-3.5" />
-                            <span>Показать поставки</span>
-                          </motion.button>
-                        )}
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 bg-sky-50 dark:bg-sky-900/30 rounded-xl flex items-center justify-center text-sky-600 dark:text-sky-400">
+                                <Layers className="w-6 h-6" />
+                              </div>
+                              <div>
+                                <h4 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">
+                                  {file.name}
+                                </h4>
+                                <p className="text-[10px] font-medium text-slate-400 flex items-center gap-2 mt-0.5">
+                                  <span>{file.size}</span>
+                                  <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
+                                  <span>{file.date}</span>
+                                </p>
+                              </div>
+                            </div>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeStockFile(file.id);
+                              }}
+                              className="text-slate-400 hover:text-red-500 transition-colors p-2"
+                            >
+                              <X className="w-5 h-5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Supply Plan Registry Section */}
+                  <div className="flex items-center gap-2 px-1 mt-2">
+                    <ShoppingCart className="w-5 h-5 text-slate-700 dark:text-slate-300" />
+                    <h3 className="text-lg font-medium text-slate-900 dark:text-white">
+                      Реестр поставок
+                    </h3>
+                  </div>
+
+                  <div className="relative">
+                    <div
+                      onClick={() => supplyPlanFileInputRef.current?.click()}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const files = e.dataTransfer.files;
+                        if (files && files.length > 0) {
+                          const event = {
+                            target: { files },
+                          } as unknown as ChangeEvent<HTMLInputElement>;
+                          handleSupplyPlanFileUpload(event);
+                        }
+                      }}
+                      className="bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed border-sky-200 dark:border-sky-900/30 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-center sm:justify-start text-center sm:text-left gap-4 sm:gap-6 group cursor-pointer hover:border-sky-400 dark:hover:border-sky-700 transition-all shadow-sm"
+                    >
+                      <input
+                        type="file"
+                        ref={supplyPlanFileInputRef}
+                        onChange={handleSupplyPlanFileUpload}
+                        className="hidden"
+                        multiple
+                        accept=".pdf,.xlsx,.csv,.txt,.docx"
+                      />
+                      <div className="w-14 h-14 bg-sky-50 dark:bg-sky-900/20 rounded-2xl shrink-0 flex items-center justify-center text-sky-400 group-hover:text-sky-600 transition-colors">
+                        <ShoppingCart className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <p className="text-base font-bold text-slate-900 dark:text-white">
+                          Загрузить реестр с планом поставок сырья
+                        </p>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
+                          График ожидаемых поступлений металла
+                        </p>
+                      </div>
                     </div>
                   </div>
-                  <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                    {supplyPlanFiles.map((file) => (
-                      <div
-                        key={file.id}
-                        className="p-4 sm:p-6 flex items-center justify-between hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors px-6"
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 bg-sky-50 dark:bg-sky-900/30 rounded-xl flex items-center justify-center text-sky-600 dark:text-sky-400">
-                            <ShoppingCart className="w-6 h-6" />
-                          </div>
-                          <div>
-                            <h4 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">
-                              {file.name}
-                            </h4>
-                            <p className="text-[10px] font-medium text-slate-400 flex items-center gap-2 mt-0.5">
-                              <span>{file.size}</span>
-                              <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
-                              <span>{file.date}</span>
-                            </p>
-                          </div>
+
+                  {supplyPlanFiles.length > 0 && (
+                    <div className="bg-white dark:bg-[#1A1C19] rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mt-6">
+                      <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                        <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                          Загруженные файлы поставок
+                        </span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-[10px] font-medium bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-300 px-2.5 py-1 rounded-full">
+                            {supplyPlanFiles.length} файлов
+                          </span>
+
+                          {isProcessingSupplyPlans && (
+                            <div className="text-[10px] text-slate-500 flex items-center gap-2 font-medium">
+                              <div className="w-3 h-3 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
+                              {parsingProgress.active
+                                ? parsingProgress.message
+                                : "Обработка..."}
+                            </div>
+                          )}
+
+                          {!isProcessingSupplyPlans &&
+                            processedSupplyPlans.length > 0 && (
+                              <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => {
+                                  if (activeTab === "supply")
+                                    setSupplySection("supply-plans");
+                                }}
+                                className="bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 text-[10px] font-bold px-4 py-1.5 rounded-full hover:bg-sky-200 dark:hover:bg-sky-900/50 transition-all flex items-center gap-2"
+                              >
+                                <ShoppingCart className="w-3.5 h-3.5" />
+                                <span>Показать поставки</span>
+                              </motion.button>
+                            )}
                         </div>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removeSupplyPlanFile(file.id);
-                          }}
-                          className="text-slate-400 hover:text-red-500 transition-colors p-2"
-                        >
-                          <X className="w-5 h-5" />
-                        </button>
                       </div>
-                    ))}
-                  </div>
-                </div>
+                      <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                        {supplyPlanFiles.map((file) => (
+                          <div
+                            key={file.id}
+                            className="p-4 sm:p-6 flex items-center justify-between hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors px-6"
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 bg-sky-50 dark:bg-sky-900/30 rounded-xl flex items-center justify-center text-sky-600 dark:text-sky-400">
+                                <ShoppingCart className="w-6 h-6" />
+                              </div>
+                              <div>
+                                <h4 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">
+                                  {file.name}
+                                </h4>
+                                <p className="text-[10px] font-medium text-slate-400 flex items-center gap-2 mt-0.5">
+                                  <span>{file.size}</span>
+                                  <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
+                                  <span>{file.date}</span>
+                                </p>
+                              </div>
+                            </div>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeSupplyPlanFile(file.id);
+                              }}
+                              className="text-slate-400 hover:text-red-500 transition-colors p-2"
+                            >
+                              <X className="w-5 h-5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
-            </>
-          )}
-        </div>
+            </div>
+          </div>
+        </motion.div>
       </div>
-    </motion.div>
-    </div>
-  );
+    );
   };
   return (
     <div className="min-h-screen bg-[#F4F5F4] dark:bg-[#121411] flex flex-col md:flex-row transition-colors duration-300">
@@ -3285,151 +2410,144 @@ export function AdminPanel({
       <motion.div className="flex-1 ml-0 md:ml-[88px] pb-32 md:pb-8 pt-6 sm:pt-8 px-3 sm:px-8 w-full min-w-0">
         <AnimatePresence mode="wait">
           {activeTab === "supply" && (
-          <AdminPanelSupplyTab
-            activeTab={activeTab}
-            formatCurrency={formatCurrency}
-            calculationResults={calculationResults}
-            setCalculationResults={setCalculationResults}
-            processedStock={processedStock}
-            processedSupplyPlans={processedSupplyPlans}
-            applyAllOptimizations={applyAllOptimizations}
-            tableContainerRef={tableContainerRef}
-            summaryContainerRef={summaryContainerRef}
-            supplyTableRef={supplyTableRef}
-            stockTableRef={stockTableRef}
-            freeStockTableRef={freeStockTableRef}
-            handleMouseDown={handleMouseDown}
-            onSummaryMouseDown={onSummaryMouseDown}
-            onSupplyMouseDown={onSupplyMouseDown}
-            onStockMouseDown={onStockMouseDown}
-            onFreeStockMouseDown={onFreeStockMouseDown}
-            handleMouseLeaveOrUp={handleMouseLeaveOrUp}
-            onSummaryMouseLeaveOrUp={onSummaryMouseLeaveOrUp}
-            handleMouseMove={handleMouseMove}
-            matchedDemand={matchedDemand}
-            supplyCalculationData={supplyCalculationData}
-            getSupplyNomenclature={getSupplyNomenclature}
-            handleCopyForSheets={handleCopyForSheets}
-            handleExportStock={handleExportStock}
-            tabs={tabs}
-            renderFilesContent={renderFilesContent}
-            setActiveTab={setActiveTab}
-            supplySection={supplySection}
-            setSupplySection={setSupplySection}
-            setProductionSection={setProductionSection}
-            isCopied={isCopied}
-            setIsCopied={setIsCopied}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            statusFilter={statusFilter}
-            setStatusFilter={setStatusFilter}
-            isProcessing={isProcessing}
-            isDragging={isDragging}
-            isSummaryDragging={isSummaryDragging}
-            isSupplyDragging={isSupplyDragging}
-            isStockDragging={isStockDragging}
-            isFreeStockDragging={isFreeStockDragging}
-            copySuccess={copySuccess}
-            setCopySuccess={setCopySuccess}
-            stockTotals={stockTotals}
-            isPurchasingMode={isPurchasingMode}
-            freeStock={freeStock}
-            validationErrors={validationErrors}
-          />
-        )}
-          {activeTab === "economy" && (
-          <AdminPanelEconomyTab
-            activeTab={activeTab}
-            handleSave={handleSave}
-            isSaving={isSaving}
-            saved={saved}
-            economyItems={economyItems}
-            handleEconomyChange={handleEconomyChange}
-            handleRemoveGrade={handleRemoveGrade}
-            setScrap={setScrap}
-            setRemnant={setRemnant}
-            allGrades={allGrades}
-                                                saveError={saveError}
-            rawPrices={rawPrices}
-            handlePriceChange={handlePriceChange}
-            adminSection={adminSection}
-            setAdminSection={setAdminSection}
-                        scrap={scrap}
-            remnant={remnant}
-            customGrades={customGrades}
-            remnantPricing={remnantPricing}
-            newGrade={newGrade}
-            setNewGrade={setNewGrade}
-            handleAddGrade={handleAddGrade}
-                                    deletedGrades={deletedGrades}
-                        handlePricingChange={handlePricingChange}
-            formatDate={formatDate}
-            validationErrors={validationErrors}
-          />
-        )}
-          {activeTab === "production" && (
-          <AdminPanelProductionTab
-            activeTab={activeTab}
-            formatCurrency={formatCurrency}
-            planFiles={planFiles}
-            stockFiles={stockFiles}
-            calculationResults={calculationResults}
-            processedStock={processedStock}
-            processedSupplyPlans={processedSupplyPlans}
-            tableContainerRef={tableContainerRef}
-            summaryContainerRef={summaryContainerRef}
-            supplyTableRef={supplyTableRef}
-            stockTableRef={stockTableRef}
-            freeStockTableRef={freeStockTableRef}
-            handleMouseDown={handleMouseDown}
-            onSummaryMouseDown={onSummaryMouseDown}
-            onSupplyMouseDown={onSupplyMouseDown}
-            onStockMouseDown={onStockMouseDown}
-            onFreeStockMouseDown={onFreeStockMouseDown}
-            handleMouseLeaveOrUp={handleMouseLeaveOrUp}
-            onSummaryMouseLeaveOrUp={onSummaryMouseLeaveOrUp}
-            handleMouseMove={handleMouseMove}
-            matchedDemand={matchedDemand}
-            supplyCalculationData={supplyCalculationData}
-            filteredMatchedDemand={filteredMatchedDemand}
-            filteredTotals={filteredTotals}
-            getSupplyNomenclature={getSupplyNomenclature}
-            handleCopyForSheets={handleCopyForSheets}
-            handleExportStock={handleExportStock}
-            renderFilesContent={renderFilesContent}
-            setActiveTab={setActiveTab}
-            setSupplySection={setSupplySection}
-            productionSection={productionSection}
-            setProductionSection={setProductionSection}
-            isCopied={isCopied}
-            setIsCopied={setIsCopied}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            statusFilter={statusFilter}
-            setStatusFilter={setStatusFilter}
-            isProcessing={isProcessing}
-            isDragging={isDragging}
-            isSummaryDragging={isSummaryDragging}
-            isSupplyDragging={isSupplyDragging}
-            isStockDragging={isStockDragging}
-            isFreeStockDragging={isFreeStockDragging}
-            copySuccess={copySuccess}
-            setCopySuccess={setCopySuccess}
-            stockTotals={stockTotals}
-            freeStock={freeStock}
-          />
-        )}
-          {activeTab === "logistics" && (
-          <AdminPanelLogisticsTab
-            activeTab={activeTab}
-          />
-        )}
-          {activeTab === "help" && (
-          <AdminPanelHelpTab
-            activeTab={activeTab}
+            <AdminPanelSupplyTab
+              activeTab={activeTab}
+              formatCurrency={formatCurrency}
+              calculationResults={calculationResults}
+              setCalculationResults={setCalculationResults}
+              processedStock={processedStock}
+              processedSupplyPlans={processedSupplyPlans}
+              applyAllOptimizations={applyAllOptimizations}
+              tableContainerRef={tableContainerRef}
+              summaryContainerRef={summaryContainerRef}
+              supplyTableRef={supplyTableRef}
+              stockTableRef={stockTableRef}
+              freeStockTableRef={freeStockTableRef}
+              handleMouseDown={handleMouseDown}
+              onSummaryMouseDown={onSummaryMouseDown}
+              onSupplyMouseDown={onSupplyMouseDown}
+              onStockMouseDown={onStockMouseDown}
+              onFreeStockMouseDown={onFreeStockMouseDown}
+              handleMouseLeaveOrUp={handleMouseLeaveOrUp}
+              onSummaryMouseLeaveOrUp={onSummaryMouseLeaveOrUp}
+              handleMouseMove={handleMouseMove}
+              matchedDemand={matchedDemand}
+              supplyCalculationData={supplyCalculationData}
+              getSupplyNomenclature={getSupplyNomenclature}
+              handleCopyForSheets={handleCopyForSheets}
+              handleExportStock={handleExportStock}
+              tabs={tabs}
+              renderFilesContent={renderFilesContent}
+              setActiveTab={setActiveTab}
+              supplySection={supplySection}
+              setSupplySection={setSupplySection}
+              setProductionSection={setProductionSection}
+              isCopied={isCopied}
+              setIsCopied={setIsCopied}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              statusFilter={statusFilter}
+              setStatusFilter={setStatusFilter}
+              isProcessing={isProcessing}
+              isDragging={isDragging}
+              isSummaryDragging={isSummaryDragging}
+              isSupplyDragging={isSupplyDragging}
+              isStockDragging={isStockDragging}
+              isFreeStockDragging={isFreeStockDragging}
+              copySuccess={copySuccess}
+              setCopySuccess={setCopySuccess}
+              stockTotals={stockTotals}
+              isPurchasingMode={isPurchasingMode}
+              freeStock={freeStock}
+              validationErrors={validationErrors}
             />
-        )}
-
+          )}
+          {activeTab === "economy" && (
+            <AdminPanelEconomyTab
+              activeTab={activeTab}
+              handleSave={handleSave}
+              isSaving={isSaving}
+              saved={saved}
+              economyItems={economyItems}
+              handleEconomyChange={handleEconomyChange}
+              handleRemoveGrade={handleRemoveGrade}
+              setScrap={setScrap}
+              setRemnant={setRemnant}
+              allGrades={allGrades}
+              saveError={saveError}
+              rawPrices={rawPrices}
+              handlePriceChange={handlePriceChange}
+              adminSection={adminSection}
+              setAdminSection={setAdminSection}
+              scrap={scrap}
+              remnant={remnant}
+              customGrades={customGrades}
+              remnantPricing={remnantPricing}
+              newGrade={newGrade}
+              setNewGrade={setNewGrade}
+              handleAddGrade={handleAddGrade}
+              deletedGrades={deletedGrades}
+              handlePricingChange={handlePricingChange}
+              formatDate={formatDate}
+              validationErrors={validationErrors}
+            />
+          )}
+          {activeTab === "production" && (
+            <AdminPanelProductionTab
+              activeTab={activeTab}
+              formatCurrency={formatCurrency}
+              planFiles={planFiles}
+              stockFiles={stockFiles}
+              calculationResults={calculationResults}
+              processedStock={processedStock}
+              processedSupplyPlans={processedSupplyPlans}
+              tableContainerRef={tableContainerRef}
+              summaryContainerRef={summaryContainerRef}
+              supplyTableRef={supplyTableRef}
+              stockTableRef={stockTableRef}
+              freeStockTableRef={freeStockTableRef}
+              handleMouseDown={handleMouseDown}
+              onSummaryMouseDown={onSummaryMouseDown}
+              onSupplyMouseDown={onSupplyMouseDown}
+              onStockMouseDown={onStockMouseDown}
+              onFreeStockMouseDown={onFreeStockMouseDown}
+              handleMouseLeaveOrUp={handleMouseLeaveOrUp}
+              onSummaryMouseLeaveOrUp={onSummaryMouseLeaveOrUp}
+              handleMouseMove={handleMouseMove}
+              matchedDemand={matchedDemand}
+              supplyCalculationData={supplyCalculationData}
+              filteredMatchedDemand={filteredMatchedDemand}
+              filteredTotals={filteredTotals}
+              getSupplyNomenclature={getSupplyNomenclature}
+              handleCopyForSheets={handleCopyForSheets}
+              handleExportStock={handleExportStock}
+              renderFilesContent={renderFilesContent}
+              setActiveTab={setActiveTab}
+              setSupplySection={setSupplySection}
+              productionSection={productionSection}
+              setProductionSection={setProductionSection}
+              isCopied={isCopied}
+              setIsCopied={setIsCopied}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              statusFilter={statusFilter}
+              setStatusFilter={setStatusFilter}
+              isProcessing={isProcessing}
+              isDragging={isDragging}
+              isSummaryDragging={isSummaryDragging}
+              isSupplyDragging={isSupplyDragging}
+              isStockDragging={isStockDragging}
+              isFreeStockDragging={isFreeStockDragging}
+              copySuccess={copySuccess}
+              setCopySuccess={setCopySuccess}
+              stockTotals={stockTotals}
+              freeStock={freeStock}
+            />
+          )}
+          {activeTab === "logistics" && (
+            <AdminPanelLogisticsTab activeTab={activeTab} />
+          )}
+          {activeTab === "help" && <AdminPanelHelpTab activeTab={activeTab} />}
         </AnimatePresence>
       </motion.div>
       <BatchManualModal

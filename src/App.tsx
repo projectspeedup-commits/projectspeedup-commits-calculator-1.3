@@ -7,7 +7,7 @@ import {
 import { useStore } from "./store";
 import { app as firebaseApp, auth, db, appId } from "./lib/firebase";
 import { signInAnonymously } from "firebase/auth";
-import { doc, onSnapshot, setDoc } from "firebase/firestore";
+import { subscribeToUserSettings, saveUserSettingsToCloud, subscribeToSystemData, saveSystemDataToCloud } from './services/db/userSettingsService';
 import { useEffect, useState, useCallback, useRef } from "react";
 import debounce from "lodash.debounce";
 import { AdminPanel } from "./components/AdminPanel";
@@ -199,13 +199,8 @@ export default function App() {
     isInitialLoad.current = false;
 
     if (db && isCloudActive && user) {
-      const pricesDocRef = doc(db, "settings", "prices");
-      // Use a ref to hold latest local variables to avoid stale closures in onSnapshot
-      const unsubscribe = onSnapshot(
-        pricesDocRef,
-        (docSnap) => {
-          if (docSnap.exists()) {
-            const data = docSnap.data();
+      const unsubscribe = subscribeToSystemData(db, "settings", "prices", (data) => {
+          if (data) {
 
             const storeState = useStore.getState();
             const resultingCustomGrades =
@@ -323,12 +318,8 @@ export default function App() {
   // Load User Personal Settings
   useEffect(() => {
     if (db && isCloudActive && user) {
-      const userSettingsRef = doc(db, "users", user.uid, "settings", "preferences");
-      const unsubscribe = onSnapshot(
-        userSettingsRef,
-        (docSnap) => {
-          if (docSnap.exists()) {
-            const data = docSnap.data();
+      const unsubscribe = subscribeToUserSettings(db, user.uid, (data) => {
+          if (data) {
             if (data.rawPrices) {
               const loadedPrices = { ...DEFAULT_RAW_PRICES };
               // Since keys might be sanitized, we match them against all possible grades
@@ -464,23 +455,21 @@ export default function App() {
       if (rPricing) payload.remnantPricing = rPricing;
       if (eItems) payload.economyItems = eItems;
 
-      const pricesDocRef = doc(db, "settings", "prices");
       try {
-        await setDoc(pricesDocRef, payload, { merge: true });
+        await saveSystemDataToCloud(db, "settings", "prices", payload);
       } catch (error) {
         // Fallback for non-admins: save only to their personal settings
         console.warn("Could not save to global settings, saving to personal only.");
       }
 
       // Always save to personal settings for the user
-      const userSettingsRef = doc(db, "users", user.uid, "settings", "preferences");
       try {
         const sanitizedRawPrices: Record<string, { md: string; nd: string }> = {};
         for (const [k, v] of Object.entries(rawPricesObj)) {
           sanitizedRawPrices[sanitizeKey(k)] = v;
         }
 
-        await setDoc(userSettingsRef, {
+        await saveUserSettingsToCloud(db, user.uid, {
           rawPrices: sanitizedRawPrices,
           scrapPrice: scrapStr,
           remnantPrice: remnantStr,
@@ -489,9 +478,9 @@ export default function App() {
           deletedGrades: dGrades,
           economyItems: eItems,
           updatedAt: new Date().toISOString()
-        }, { merge: true });
+        });
       } catch (error) {
-        handleFirestoreError(error, OperationType.WRITE, `users/${user.uid}/settings/preferences`);
+        handleFirestoreError(error as any, OperationType.WRITE, `users/${user.uid}/settings/preferences`);
       }
     }
   };
