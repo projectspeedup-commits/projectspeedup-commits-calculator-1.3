@@ -131,7 +131,7 @@ interface AdminPanelProps {
   isCloudActive: boolean;
   isDarkMode: boolean;
   toggleTheme: () => void;
-  initialTab?: "files" | "economy" | "supply";
+  initialTab?: "files" | "economy" | "supply" | "production" | "logistics" | "help";
   isPurchasingMode?: boolean;
 }
 
@@ -275,7 +275,7 @@ export function AdminPanel({
     });
 
     // Validate raw prices
-    Object.entries(rawPrices).forEach(([grade, p]) => {
+    Object.entries(rawPrices).forEach(([grade, p]: [string, any]) => {
       const md = parseFloat(p.md.replace(",", "."));
       const nd = parseFloat(p.nd.replace(",", "."));
       if (isNaN(md) || md < 0) errors[`price_${grade}_md`] = "Некорректная цена МД";
@@ -1515,6 +1515,12 @@ export function AdminPanel({
 
             const row = jsonData[i] || [];
 
+            // Stop parsing if we reach the "Total" (ИТОГО) row
+            const rowStrForTotal = row.join(" ").toLowerCase();
+            if (rowStrForTotal.includes("итого")) {
+              break;
+            }
+
             if (
               row.length === 0 ||
               row.every((c: any) => !c || String(c).trim() === "")
@@ -1960,6 +1966,13 @@ export function AdminPanel({
             }
 
             const row = jsonData[i] || [];
+            
+            // Stop parsing if we reach the "Total" (ИТОГО) row
+            const rowStrForTotal = row.join(" ").toLowerCase();
+            if (rowStrForTotal.includes("итого")) {
+              break;
+            }
+
             if (!row[cols.profile] && !row[cols.grade]) continue;
 
             const rawQty = row[cols.qty];
@@ -2078,6 +2091,13 @@ export function AdminPanel({
             }
 
             const row = jsonData[i] || [];
+
+            // Stop parsing if we reach the "Total" (ИТОГО) row
+            const rowStrForTotal = row.join(" ").toLowerCase();
+            if (rowStrForTotal.includes("итого")) {
+              break;
+            }
+
             if (!row[nomCol]) continue;
 
             const rawNom = String(row[nomCol]).trim();

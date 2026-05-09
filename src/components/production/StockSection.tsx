@@ -39,17 +39,17 @@ export function StockSection({
               </span>
               <span className="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700"></span>
               <span className="text-emerald-600 dark:text-emerald-400 font-black">
-                Итого:{" "}
+                Итого:{""}
                 {processedStock
                   .reduce(
                     (acc: any, curr: any) =>
                       acc +
-                      (typeof curr["Конечный остаток тн."] === "number"
+                      (typeof curr["Конечный остаток тн."] ==="number"
                         ? curr["Конечный остаток тн."]
                         : parseFloat(curr["Конечный остаток тн." as any]) || 0),
                     0,
                   )
-                  .toFixed(3)}{" "}
+                  .toFixed(3)}{""}
                 тн.
               </span>
             </div>
@@ -84,10 +84,10 @@ export function StockSection({
           onMouseLeave={handleMouseLeaveOrUp}
           onMouseUp={handleMouseLeaveOrUp}
           onMouseMove={handleMouseMove}
-          className={`overflow-auto custom-scrollbar max-h-[calc(100vh-300px)] min-h-[400px] relative ${isStockDragging ? "select-none cursor-grabbing" : "cursor-grab"}`}
+          className={`overflow-auto custom-scrollbar max-h-[calc(100vh-300px)] min-h-[400px] relative ${isStockDragging ?"select-none cursor-grabbing" :"cursor-grab"}`}
         >
-          <table className="w-full text-left border-separate border-spacing-0 block md:table">
-            <thead className="text-[10px] uppercase font-black tracking-widest text-slate-400 dark:text-slate-500 bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 z-20 shadow-sm outline outline-1 outline-slate-200 dark:outline-slate-800 hidden md:table-header-group">
+          <table className="w-full text-left border-separate border-spacing-0">
+            <thead className="text-[10px] uppercase font-black tracking-widest text-slate-400 dark:text-slate-500 bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 z-20 shadow-sm outline outline-1 outline-slate-200 dark:outline-slate-800">
               <tr>
                 <th className="px-8 py-5 bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">
                   Номенклатура
@@ -109,16 +109,13 @@ export function StockSection({
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50 text-[11px] font-medium text-slate-600 dark:text-slate-300 block md:table-row-group">
+            <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50 text-[11px] font-medium text-slate-600 dark:text-slate-300">
               {processedStock.map((row: any, i: number) => (
                 <tr
                   key={i}
-                  className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group block md:table-row mb-4 md:mb-0 border border-slate-200 dark:border-slate-800 md:border-none rounded-xl md:rounded-none bg-white dark:bg-[#1A1C19] p-2 md:p-0 md:bg-transparent"
+                  className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group"
                 >
-                  <td className="px-4 md:px-8 py-3 md:py-4 text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                    <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">
-                      Номенклатура
-                    </span>
+                  <td className="px-8 py-3 text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
                     <div
                       className="max-w-[200px] md:max-w-[300px] truncate font-mono text-[10px] text-right md:text-left"
                       title={row["Исходная Номенклатура"]}
@@ -126,42 +123,27 @@ export function StockSection({
                       {row["Исходная Номенклатура"]}
                     </div>
                   </td>
-                  <td className="px-4 md:px-6 py-3 md:py-4 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                    <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">
-                      Профиль
-                    </span>
+                  <td className="px-6 py-3">
                     <span className="inline-flex items-center px-3 py-1.5 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                       {row["Профиль"]}
                     </span>
                   </td>
-                  <td className="px-4 md:px-6 py-3 md:py-4 text-right md:text-center font-bold text-slate-700 dark:text-slate-200 flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                    <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">
-                      Сталь
-                    </span>
+                  <td className="px-6 py-3 text-center font-bold text-slate-700 dark:text-slate-200">
                     <span>{row["Марка стали"]}</span>
                   </td>
-                  <td className="px-4 md:px-6 py-3 md:py-4 text-right md:text-center flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                    <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">
-                      Размер
-                    </span>
+                  <td className="px-6 py-3 text-center">
                     <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 rounded">
                       {row["Размер"]}
                     </span>
                   </td>
-                  <td className="px-4 md:px-6 py-3 md:py-4 text-right md:text-center flex justify-between items-center md:table-cell border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                    <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">
-                      Длина
-                    </span>
+                  <td className="px-6 py-3 text-center">
                     <span
-                      className={`inline-flex items-center px-3 py-1.5 rounded-md text-[10px] font-bold ${row["Длина"] === "НД" ? "text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10" : "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10"}`}
+                      className={`inline-flex items-center px-3 py-1.5 rounded-md text-[10px] font-bold ${row["Длина"] ==="НД" ?"text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10" :"text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10"}`}
                     >
                       {row["Длина"]}
                     </span>
                   </td>
-                  <td className="px-4 md:px-8 py-3 md:py-4 text-right flex justify-between items-center md:table-cell min-h-[44px]">
-                    <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">
-                      Тн.
-                    </span>
+                  <td className="px-8 py-3 text-right">
                     <div>
                       <span className="text-slate-900 dark:text-white font-black text-xs">
                         {row["Конечный остаток тн."]}

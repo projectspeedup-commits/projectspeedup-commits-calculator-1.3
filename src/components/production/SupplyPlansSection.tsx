@@ -36,7 +36,7 @@ export function SupplyPlansSection(props: any) {
                                           sum + (Number(row["Кол-во"]) || 0),
                                         0,
                                       )
-                                      .toFixed(3)}{" "}
+                                      .toFixed(3)}{""}
                                     тн
                                   </span>
                                 </div>
@@ -44,8 +44,8 @@ export function SupplyPlansSection(props: any) {
                       </div>
 
                       <div className="overflow-auto custom-scrollbar max-h-[calc(100vh-300px)] min-h-[400px] relative cursor-auto">
-                        <table className="w-full text-left border-separate border-spacing-0 block md:table">
-                          <thead className="text-[10px] uppercase font-black tracking-widest text-slate-400 dark:text-slate-500 bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 z-20 shadow-sm outline outline-1 outline-slate-200 dark:outline-slate-800 hidden md:table-header-group">
+                        <table className="w-full text-left border-separate border-spacing-0">
+                          <thead className="text-[10px] uppercase font-black tracking-widest text-slate-400 dark:text-slate-500 bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 z-20 shadow-sm outline outline-1 outline-slate-200 dark:outline-slate-800">
                             <tr>
                               <th className="px-4 py-3 bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">
                                 Профиль
@@ -73,58 +73,50 @@ export function SupplyPlansSection(props: any) {
                               </th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50 text-[11px] font-medium text-slate-600 dark:text-slate-300 block md:table-row-group">
+                          <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50 text-[11px] font-medium text-slate-600 dark:text-slate-300">
                             {processedSupplyPlans.map((row, i) => (
                               <tr
                                 key={i}
-                                className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group block md:table-row mb-4 md:mb-0 border border-slate-200 dark:border-slate-800 md:border-none rounded-xl md:rounded-none bg-white dark:bg-[#1A1C19] p-2 md:p-0 md:bg-transparent"
+                                className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group"
                               >
-                                <td className="px-4 py-3 md:py-2.5 flex justify-between items-center md:table-cell py-3 md:py-2.5 border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Профиль</span>
+                                <td className="px-4">
                                   <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                                     {row["Профиль"]}
                                   </span>
                                 </td>
-                                <td className="px-4 py-3 md:py-2.5 text-right md:text-center font-bold text-slate-700 dark:text-slate-200 flex justify-between items-center md:table-cell py-3 md:py-2.5 border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Марка</span>
+                                <td className="px-4  text-center font-bold text-slate-700 dark:text-slate-200">
                                   {row["Марка"]}
                                 </td>
-                                <td className="px-4 py-3 md:py-2.5 text-right md:text-center flex justify-between items-center md:table-cell py-3 md:py-2.5 border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Размер</span>
+                                <td className="px-4  text-center">
                                   <span className="inline-flex items-center gap-1 text-sky-600 dark:text-sky-400 font-mono font-bold bg-sky-50 dark:bg-sky-500/10 px-2 py-0.5 rounded">
                                     {row["Размер"]}
                                   </span>
                                 </td>
-                                <td className="px-4 py-3 md:py-2.5 text-right md:text-center font-black text-slate-900 dark:text-white flex justify-between items-center md:table-cell py-3 md:py-2.5 border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Кол-во</span>
+                                <td className="px-4  text-center font-black text-slate-900 dark:text-white">
                                   <span>
-                                    {row["Кол-во"]?.toFixed(3)}{" "}
+                                    {row["Кол-во"]?.toFixed(3)}{""}
                                     <span className="text-[10px] text-slate-400 font-bold ml-0.5">
                                       тн
                                     </span>
                                   </span>
                                 </td>
-                                <td className="px-4 py-3 md:py-2.5 text-right md:text-center flex justify-between items-center md:table-cell py-3 md:py-2.5 border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Длина</span>
+                                <td className="px-4  text-center">
                                   <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50">
                                     {row["Длина"]}
                                   </span>
                                 </td>
-                                <td className="px-4 py-3 md:py-2.5 text-right md:text-center text-slate-500 dark:text-slate-400 font-mono flex justify-between items-center md:table-cell py-3 md:py-2.5 border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Размещено</span>
+                                <td className="px-4  text-center text-slate-500 dark:text-slate-400 font-mono">
                                   {row["Дата размещения"]}
                                 </td>
-                                <td className="px-4 py-3 md:py-2.5 text-right md:text-center flex justify-between items-center md:table-cell py-3 md:py-2.5 border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]">
-                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Поставка</span>
+                                <td className="px-4  text-center">
                                   <span className="font-bold text-emerald-600 dark:text-emerald-500">
                                     {row["Ожидаемая дата поставки"]}
                                   </span>
                                 </td>
                                 <td
-                                  className="px-4 py-3 md:py-2.5 truncate max-w-[150px] flex justify-between items-center md:table-cell py-3 md:py-2.5 border-b border-slate-100 dark:border-slate-800/50 md:border-0 min-h-[44px]"
+                                  className="px-4  truncate max-w-[150px]"
                                   title={row["Поставщик"]}
                                 >
-                                  <span className="md:hidden font-bold text-slate-500 uppercase text-[10px]">Поставщик</span>
                                   <span className="truncate">{row["Поставщик"]}</span>
                                 </td>
                               </tr>
