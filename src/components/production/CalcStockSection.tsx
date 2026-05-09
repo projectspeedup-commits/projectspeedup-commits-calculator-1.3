@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import * as LucideIcons from 'lucide-react';
 import * as XLSX from 'xlsx';
+import { StatusDropdown } from '../StatusDropdown';
 import { getTimestampedFilename } from '../../lib/utils';
 import { getGostForGrade } from '../../lib/constants';
 
@@ -102,16 +103,16 @@ export function CalcStockSection({
       ) : (
         <>
           <div
-            className={`bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-[20px] sm:rounded-[32px] overflow-hidden flex flex-col shadow-xl shadow-slate-200/50 dark:shadow-none`}
+            className={`bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-[20px] sm:rounded-[32px] flex flex-col shadow-xl shadow-slate-200/50 dark:shadow-none`}
           >
             <div
-              className={`flex flex-col 2xl:flex-row 2xl:items-center justify-between gap-4 sm:gap-6 p-4 sm:p-5 xl:p-6 pb-2 sm:pb-3 xl:pb-6 bg-white dark:bg-[#1A1C19]`}
+              className={`flex flex-col 2xl:flex-row 2xl:items-center justify-between gap-4 sm:gap-6 p-4 sm:p-5 bg-white dark:bg-[#1A1C19]`}
             >
               <div
                 className={`flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 2xl:border-r border-slate-200 dark:border-slate-800 2xl:pr-6 w-full 2xl:w-auto`}
               >
                 <h4
-                  className={`text-sm sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-widest`}
+                  className={`text-sm sm:text-base font-black text-slate-900 dark:text-white uppercase tracking-widest leading-tight`}
                 >
                   РАСЧЕТ С УЧЕТОМ НАЛИЧИЯ
                 </h4>
@@ -159,16 +160,13 @@ export function CalcStockSection({
                 </div>
                 <div className="flex items-center bg-white dark:bg-slate-800/50 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 border border-slate-200 dark:border-slate-700 w-full sm:w-auto transition-colors focus-within:border-slate-300 dark:focus-within:border-slate-600 focus-within:ring-1 focus-within:ring-slate-200 dark:focus-within:ring-slate-700">
                   <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 mr-1.5 sm:mr-2 shrink-0" />
-                  <select
+                  <StatusDropdown
                     value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="bg-transparent border-none outline-none text-[11px] sm:text-xs text-slate-700 dark:text-slate-200 w-full"
-                  >
-                    <option value="ALL">Все статусы</option>
-                    <option value="OK">Обеспечено</option>
-                    <option value="DEFICIT">Дефицит</option>
-                  </select>
+                    onChange={(val) => setStatusFilter(val)}
+                    className="w-28"
+                  />
                 </div>
+                <div className="flex flex-row items-center gap-2 w-full sm:w-auto shrink-0">
                 <button
                   onClick={() => {
                     if (filteredMatchedDemand.length === 0) return;
@@ -330,7 +328,7 @@ export function CalcStockSection({
                     setIsCopied(true);
                     setTimeout(() => setIsCopied(false), 2000);
                   }}
-                  className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-[#121411] sm:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
+                  className="flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-[#1A1C19] text-slate-600 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
                   title="Скопировать для Excel"
                 >
                   {isCopied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
@@ -429,11 +427,12 @@ export function CalcStockSection({
                     XLSX.utils.book_append_sheet(workbook, worksheet, "Расчет с наличием");
                     XLSX.writeFile(workbook, getTimestampedFilename("Расчет потребности в заготовке"));
                   }}
-                  className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
+                  className="flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
                   title="Скачать в Excel"
                 >
                   <Download className="w-4 h-4" />
                 </button>
+                </div>
               </div>
             </div>
           </div>

@@ -588,7 +588,7 @@ export default function App() {
                   isCloudActive={isCloudActive}
                   isDarkMode={isDarkMode}
                   toggleTheme={toggleTheme}
-                  initialTab="files"
+                  initialTab="production"
                   isPurchasingMode={true}
                 />
               </div>

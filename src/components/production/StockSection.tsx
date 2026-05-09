@@ -24,16 +24,16 @@ export function StockSection({
       transition={{ duration: 0.2 }}
       className="flex flex-col gap-8"
     >
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-[#1A1C19] p-6 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-            <Layers className="w-6 h-6" />
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-[#1A1C19] p-4 sm:p-5 rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+            <Layers className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">
               Актуальные остатки
             </h3>
-            <div className="flex items-center gap-3 mt-1 text-sm font-medium">
+            <div className="flex items-center gap-2 mt-0.5 text-xs font-medium">
               <span className="text-slate-500">
                 Обнаружено {processedStock.length} позиций
               </span>
@@ -55,10 +55,10 @@ export function StockSection({
             </div>
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto mt-2 sm:mt-0">
+        <div className="flex flex-row items-center gap-2 w-full sm:w-auto mt-2 md:mt-0 shrink-0">
           <button
             onClick={handleCopyForSheets}
-            className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50"
+            className="flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
             title="Скопировать для Excel"
           >
             {isCopied ? (
@@ -69,7 +69,7 @@ export function StockSection({
           </button>
           <button
             onClick={handleExportStock}
-            className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
+            className="flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
             title="Скачать в Excel"
           >
             <Download className="w-4 h-4" />

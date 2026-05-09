@@ -73,10 +73,10 @@ export function CalcSection({
         </div>
       ) : (
         <div className="flex flex-col gap-6">
-          <div className="bg-white dark:bg-[#1A1C19] rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-            <div className="p-4 sm:p-6 sm:px-8 border-b border-slate-100 dark:border-slate-800 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-slate-50/50 dark:bg-slate-800/20">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6 w-full xl:w-auto">
-                <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white uppercase tracking-widest shrink-0">
+          <div className="bg-white dark:bg-[#1A1C19] rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+            <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-slate-50/50 dark:bg-slate-800/20">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full xl:w-auto">
+                <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white uppercase tracking-widest shrink-0 leading-tight">
                   Портфель заказов
                 </h4>
                 <div className="bg-sky-50 dark:bg-sky-500/5 rounded-2xl px-6 py-3 border border-sky-100 dark:border-sky-500/20 flex items-center w-full sm:w-auto min-h-[56px] shadow-sm">
@@ -97,11 +97,12 @@ export function CalcSection({
                   </span>
                 </div>
               </div>
-              <div className="flex flex-wrap items-stretch sm:items-center gap-2 sm:gap-4 w-full xl:w-auto">
-                <div className="text-xs font-bold text-slate-400 dark:text-slate-500 hidden sm:block">
+              <div className="flex flex-row items-center gap-2 w-full xl:w-auto shrink-0 mt-2 xl:mt-0">
+                <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 hidden sm:block mr-2 uppercase tracking-widest">
                   {calculationResults.length} строк
                 </div>
 
+                <div className="flex flex-row items-center gap-2 w-full sm:w-auto shrink-0">
                 <button
                   onClick={() => {
                     const headers = [
@@ -147,7 +148,7 @@ export function CalcSection({
                   className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm w-[calc(50%-0.25rem)] sm:w-auto ${
                     copySuccess
                       ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                      : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50"
+                      : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
                   }`}
                   title="Скопировать для вставки (Ctrl+V) в Google Таблицы"
                 >
@@ -332,6 +333,7 @@ export function CalcSection({
                   </svg>
                   <span className="whitespace-nowrap">Excel</span>
                 </button>
+                </div>
               </div>
             </div>
 

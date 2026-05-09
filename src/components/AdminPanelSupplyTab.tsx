@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import * as XLSX from 'xlsx-js-style';
 import * as LucideIcons from 'lucide-react';
 import { getGostForGrade } from '../lib/constants';
+import { StatusDropdown } from './StatusDropdown';
 import { getTimestampedFilename } from '../lib/utils';
 import { BatchManualModal } from './BatchManualModal';
 import { StockManualModal } from './StockManualModal';
@@ -199,7 +200,7 @@ export default function AdminPanelSupplyTab(props: any) {
                         setCopySuccess(true);
                         setTimeout(() => setCopySuccess(false), 2000);
                       }}
-                      className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50"
+                      className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
                       title="Скопировать заявку для вставки (Ctrl+V) в Google Таблицы"
                     >
                       {copySuccess ? (
@@ -402,7 +403,7 @@ export default function AdminPanelSupplyTab(props: any) {
                       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto mt-2 sm:mt-0">
                         <button
                           onClick={handleCopyForSheets}
-                          className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50"
+                          className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
                           title="Скопировать для Excel"
                         >
                           {isCopied ? (
@@ -1189,7 +1190,7 @@ export default function AdminPanelSupplyTab(props: any) {
                                 className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm w-[calc(50%-0.25rem)] sm:w-auto ${
                                   copySuccess
                                     ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                                    : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50"
+                                    : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
                                 }`}
                                 title="Скопировать для вставки (Ctrl+V) в Google Таблицы"
                               >
@@ -2106,17 +2107,11 @@ export default function AdminPanelSupplyTab(props: any) {
                               </div>
                               <div className="flex items-center bg-slate-50 dark:bg-slate-800 rounded-xl px-3 py-2 border border-slate-200 dark:border-slate-700">
                                 <Filter className="w-4 h-4 text-slate-400 mr-2 shrink-0" />
-                                <select
+                                <StatusDropdown
                                   value={statusFilter}
-                                  onChange={(e) =>
-                                    setStatusFilter(e.target.value)
-                                  }
-                                  className="bg-transparent border-none outline-none text-xs text-slate-700 dark:text-slate-200"
-                                >
-                                  <option value="ALL">Все статусы</option>
-                                  <option value="OK">Обеспечено</option>
-                                  <option value="DEFICIT">Дефицит</option>
-                                </select>
+                                  onChange={(val) => setStatusFilter(val)}
+                                  className="w-32"
+                                />
                               </div>
                               <button
                                 onClick={() => {
@@ -2387,7 +2382,7 @@ export default function AdminPanelSupplyTab(props: any) {
                                   setIsCopied(true);
                                   setTimeout(() => setIsCopied(false), 2000);
                                 }}
-                                className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-[#121411] sm:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
+                                className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-[#1A1C19] text-slate-600 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
                                 title="Скопировать для Excel"
                               >
                                 {isCopied ? (
@@ -3279,7 +3274,7 @@ export default function AdminPanelSupplyTab(props: any) {
                               setIsCopied(true);
                               setTimeout(() => setIsCopied(false), 2000);
                             }}
-                            className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-[#121411] sm:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
+                            className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-[#1A1C19] text-slate-600 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
                             title="Скопировать для Excel"
                           >
                             {isCopied ? (
@@ -3358,7 +3353,7 @@ export default function AdminPanelSupplyTab(props: any) {
                                 getTimestampedFilename("Заявка на обеспечение"),
                               );
                             }}
-                            className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
+                            className="flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
                             title="Скачать в Excel"
                           >
                             <Download className="w-4 h-4" />
@@ -3776,7 +3771,7 @@ export default function AdminPanelSupplyTab(props: any) {
                                 setIsCopied(true);
                                 setTimeout(() => setIsCopied(false), 2000);
                               }}
-                              className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-[#121411] sm:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
+                              className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-[#1A1C19] text-slate-600 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
                               title="Скопировать для Excel"
                             >
                               {isCopied ? (

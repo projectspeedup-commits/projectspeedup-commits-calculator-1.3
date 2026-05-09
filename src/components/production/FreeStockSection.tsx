@@ -21,17 +21,17 @@ export function FreeStockSection(props: any) {
                     className={`flex flex-col gap-8`}
                   >
                     <div className="bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-[20px] sm:rounded-[32px] overflow-hidden flex flex-col shadow-xl">
-                      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 sm:gap-6 p-4 sm:p-5 xl:p-6 pb-2 sm:pb-3 xl:pb-6 bg-white dark:bg-[#1A1C19]">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 xl:border-r border-slate-200 dark:border-slate-800 xl:pr-6 w-full xl:w-auto">
-                          <h4 className="text-sm sm:text-base font-black text-slate-900 dark:text-white uppercase tracking-widest">
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 p-4 sm:p-5 xl:p-5 bg-white dark:bg-[#1A1C19]">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 xl:border-r border-slate-200 dark:border-slate-800 xl:pr-4 w-full xl:w-auto">
+                          <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest leading-tight">
                             Свободный остаток заготовки
                           </h4>
-                          <div className="flex items-baseline justify-between sm:justify-start px-4 sm:px-5 py-2 sm:py-2.5 text-emerald-600 font-black bg-emerald-50/80 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/30 rounded-xl sm:rounded-2xl w-full sm:w-auto shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-                            <span className="text-[11px] sm:text-xs mr-3 uppercase font-bold text-emerald-600/80 tracking-widest">
+                          <div className="flex items-baseline justify-between sm:justify-start px-3 sm:px-4 py-1.5 sm:py-2 text-emerald-600 font-black bg-emerald-50/80 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/30 rounded-xl w-full sm:w-auto shadow-[0_2px_8px_rgba(0,0,0,0.04)] mt-1 sm:mt-0">
+                            <span className="text-[10px] sm:text-xs mr-2 uppercase font-bold text-emerald-600/80 tracking-widest">
                               Общий остаток
                             </span>
                             <div>
-                              <span className="text-xl sm:text-2xl tracking-tight leading-none">
+                              <span className="text-lg sm:text-xl tracking-tight leading-none">
                                 {freeStock
                                   .reduce(
                                     (acc, row) => acc + row.remainingStock,
@@ -45,7 +45,7 @@ export function FreeStockSection(props: any) {
                             </div>
                           </div>
                         </div>
-                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full xl:w-auto">
+                        <div className="flex flex-row items-center gap-2 w-full md:w-auto mt-2 md:mt-0 shrink-0">
                           <button
                             onClick={() => {
                               if (freeStock.length === 0) return;
@@ -76,7 +76,7 @@ export function FreeStockSection(props: any) {
                               setIsCopied(true);
                               setTimeout(() => setIsCopied(false), 2000);
                             }}
-                            className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-[#121411] sm:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
+                            className="flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-[#1A1C19] text-slate-600 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
                             title="Скопировать для Excel"
                           >
                             {isCopied ? (
@@ -155,7 +155,7 @@ export function FreeStockSection(props: any) {
                                 getTimestampedFilename("Свободный остаток заготовки на складе г/к"),
                               );
                             }}
-                            className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
+                            className="flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
                             title="Скачать в Excel"
                           >
                             <Download className="w-4 h-4" />

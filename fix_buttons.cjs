@@ -22,7 +22,7 @@ const files = walk('src/components');
 
 files.forEach(file => {
   let content = fs.readFileSync(file, 'utf8');
-  let newContent = content.replace(/hover:bg-slate-50"/g, 'hover:bg-slate-50 dark:hover:bg-slate-700"');
+  let newContent = content.replace(/bg-white dark:bg-\[#121411\] sm:bg-slate-800 text-slate-500 dark:text-slate-400/g, 'bg-white dark:bg-[#1A1C19] text-slate-600 dark:text-slate-400');
   
   if (content !== newContent) {
     fs.writeFileSync(file, newContent, 'utf8');

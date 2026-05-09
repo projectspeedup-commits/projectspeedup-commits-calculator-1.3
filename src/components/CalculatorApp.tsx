@@ -61,7 +61,7 @@ import {
   getDocs,
   writeBatch,
 } from "firebase/firestore";
-import { handleFirestoreError, OperationType } from "../lib/utils";
+import { handleFirestoreError, OperationType, validateNumeric, validateDimensions } from "../lib/utils";
 
 import { ConfirmModal } from "./ConfirmModal";
 import { UserManualModal } from "./UserManualModal";
@@ -119,8 +119,52 @@ export function CalculatorApp({
   const [isCopied, setIsCopied] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [savedCalculations, setSavedCalculations] = useState<any[]>([]);
   const [showHistory, setShowHistory] = useState(false);
+
+  useEffect(() => {
+    const errors: Record<string, string> = {};
+
+    // Validate Steel Grade
+    if (!steelGrade) {
+      errors.steelGrade = "Выберите марку стали";
+    }
+
+    // Validate Weights
+    const weightVal = validateNumeric(orderWeight, { min: 0.001, fieldName: "Объем заказа" });
+    if (!weightVal.isValid && orderWeight) errors.orderWeight = weightVal.message!;
+
+    // Validate Dimensions
+    if (selectedTarget && selectedRaw) {
+      const dimVal = validateDimensions(selectedTarget, selectedRaw);
+      if (!dimVal.isValid) errors.dimensions = dimVal.message!;
+    }
+
+    // Validate Lengths
+    if (lengthInput.value) {
+      const rawLenVal = validateNumeric(lengthInput.value, { min: 1000, max: 9000, fieldName: "Длина заготовки" });
+      if (!rawLenVal.isValid) errors.rawLength = rawLenVal.message!;
+    }
+
+    if (orderedLength && orderedLength !== "НД" && !orderedLength.includes("НД")) {
+      const orderLenVal = validateNumeric(orderedLength.replace(/[^\d]/g, ""), { 
+        min: 200, 
+        max: 8500, 
+        fieldName: "Длина заказа" 
+      });
+      if (!orderLenVal.isValid) errors.orderedLength = orderLenVal.message!;
+    }
+
+    // Validate Sell Price
+    if (sellPrice) {
+      const priceVal = validateNumeric(sellPrice, { min: 1, fieldName: "Цена продажи" });
+      if (!priceVal.isValid) errors.sellPrice = priceVal.message!;
+    }
+
+    setValidationErrors(errors);
+  }, [steelGrade, selectedTarget, selectedRaw, orderWeight, lengthInput.value, orderedLength, sellPrice]);
+
   const [showManual, setShowManual] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [notification, setNotification] = useState<{
@@ -729,6 +773,13 @@ export function CalculatorApp({
   };
 
   const handleSave = async () => {
+    // Check for validation errors first
+    const errorMessages = Object.values(validationErrors);
+    if (errorMessages.length > 0) {
+      showNotify(`Исправьте ошибки: ${errorMessages[0]}`, "error");
+      return;
+    }
+
     if (!steelGrade || !selectedTarget || !selectedRaw) {
       showNotify("Заполните основные поля расчета перед сохранением.", "error");
       return;
@@ -1482,29 +1533,34 @@ export function CalculatorApp({
                         )}
                       </label>
                       <div className="relative">
-                        <select
-                          value={steelGrade}
-                          onChange={(e) => setSteelGrade(e.target.value)}
-                          className="w-full bg-[#F0F4F4] dark:bg-slate-800 border-b border-slate-400 dark:border-slate-600 rounded-t-lg px-3 h-10 text-sm font-medium appearance-none cursor-pointer focus:border-slate-800 dark:focus:border-white focus:outline-none text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-500 transition-all"
-                        >
-                          <option
-                            value=""
-                            disabled
-                            className="bg-white dark:bg-slate-800 text-black dark:text-white"
-                          >
-                            Выберите марку...
-                          </option>
-                          {allGrades.map((grade) => (
-                            <option
-                              key={grade}
-                              value={grade}
-                              className="bg-white dark:bg-slate-800 text-black dark:text-white"
-                            >
-                              {grade}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+  <select
+    value={steelGrade}
+    onChange={(e) => setSteelGrade(e.target.value)}
+    className={`w-full bg-[#F0F4F4] dark:bg-slate-800 border-b ${validationErrors.steelGrade ? "border-red-500 ring-2 ring-red-500/20" : "border-slate-400 dark:border-slate-600"} rounded-t-lg px-3 h-10 text-sm font-medium appearance-none cursor-pointer focus:border-slate-800 dark:focus:border-white focus:outline-none text-slate-900 dark:text-white transition-all`}
+  >
+    <option
+      value=""
+      disabled
+      className="bg-white dark:bg-slate-800 text-black dark:text-white"
+    >
+      Выберите марку...
+    </option>
+    {allGrades.map((grade) => (
+      <option
+        key={grade}
+        value={grade}
+        className="bg-white dark:bg-slate-800 text-black dark:text-white"
+      >
+        {grade}
+      </option>
+    ))}
+  </select>
+  {validationErrors.steelGrade && (
+    <div className="absolute -bottom-5 left-0 text-[9px] font-bold text-red-500 uppercase tracking-tight flex items-center gap-1">
+      <AlertCircle className="w-2.5 h-2.5" /> {validationErrors.steelGrade}
+    </div>
+  )}
+</div>
                     </div>
 
                     <div className="space-y-1.5 text-slate-800 dark:text-white">
@@ -1512,29 +1568,29 @@ export function CalculatorApp({
                         Готовый пруток
                       </label>
                       <div className="relative">
-                        <select
-                          value={selectedTarget}
-                          onChange={(e) => setSelectedTarget(e.target.value)}
-                          className="w-full bg-[#F0F4F4] dark:bg-slate-800 border-b border-slate-400 dark:border-slate-600 rounded-t-lg px-3 h-10 text-sm font-medium appearance-none cursor-pointer focus:border-slate-800 dark:focus:border-white focus:outline-none text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-500 transition-all"
-                        >
-                          <option
-                            value=""
-                            disabled
-                            className="bg-white dark:bg-slate-800 text-black dark:text-white"
-                          >
-                            Размер, мм...
-                          </option>
-                          {targetOptions.map((size) => (
-                            <option
-                              key={size}
-                              value={size}
-                              className="bg-white dark:bg-slate-800 text-black dark:text-white"
-                            >
-                              {size}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+  <select
+    value={selectedTarget}
+    onChange={(e) => setSelectedTarget(e.target.value)}
+    className={`w-full bg-[#F0F4F4] dark:bg-slate-800 border-b ${validationErrors.dimensions ? "border-red-500 ring-2 ring-red-500/20" : "border-slate-400 dark:border-slate-600"} rounded-t-lg px-3 h-10 text-sm font-medium appearance-none cursor-pointer focus:border-slate-800 dark:focus:border-white focus:outline-none text-slate-900 dark:text-white transition-all`}
+  >
+    <option
+      value=""
+      disabled
+      className="bg-white dark:bg-slate-800 text-black dark:text-white"
+    >
+      Размер, мм...
+    </option>
+    {targetOptions.map((size) => (
+      <option
+        key={size}
+        value={size}
+        className="bg-white dark:bg-slate-800 text-black dark:text-white"
+      >
+        {size}
+      </option>
+    ))}
+  </select>
+</div>
                     </div>
 
                     <div className="space-y-1.5 text-slate-800 dark:text-white">
@@ -1542,30 +1598,35 @@ export function CalculatorApp({
                         Заготовка
                       </label>
                       <div className="relative">
-                        <select
-                          value={selectedRaw}
-                          onChange={(e) => setSelectedRaw(e.target.value)}
-                          disabled={!selectedTarget}
-                          className="w-full bg-[#F0F4F4] dark:bg-slate-800 border-b border-slate-400 dark:border-slate-600 rounded-t-lg px-3 h-10 text-sm font-medium appearance-none disabled:opacity-50 cursor-pointer focus:border-slate-800 dark:focus:border-white focus:outline-none transition-all text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-500"
-                        >
-                          <option
-                            value=""
-                            disabled
-                            className="bg-white dark:bg-slate-800 text-black dark:text-white"
-                          >
-                            {selectedTarget ? "Выбор..." : "Ожидание"}
-                          </option>
-                          {rawOptions.map((size) => (
-                            <option
-                              key={size}
-                              value={size}
-                              className="bg-white dark:bg-slate-800 text-black dark:text-white"
-                            >
-                              {size}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+  <select
+    value={selectedRaw}
+    onChange={(e) => setSelectedRaw(e.target.value)}
+    disabled={!selectedTarget}
+    className={`w-full bg-[#F0F4F4] dark:bg-slate-800 border-b ${validationErrors.dimensions ? "border-red-500 ring-2 ring-red-500/20" : "border-slate-400 dark:border-slate-600"} rounded-t-lg px-3 h-10 text-sm font-medium appearance-none disabled:opacity-50 cursor-pointer focus:border-slate-800 dark:focus:border-white focus:outline-none transition-all text-slate-900 dark:text-white`}
+  >
+    <option
+      value=""
+      disabled
+      className="bg-white dark:bg-slate-800 text-black dark:text-white"
+    >
+      {selectedTarget ? "Выбор..." : "Ожидание"}
+    </option>
+    {rawOptions.map((size) => (
+      <option
+        key={size}
+        value={size}
+        className="bg-white dark:bg-slate-800 text-black dark:text-white"
+      >
+        {size}
+      </option>
+    ))}
+  </select>
+  {validationErrors.dimensions && (
+    <div className="absolute -bottom-5 left-0 text-[10px] font-bold text-red-500 uppercase tracking-tight flex items-center gap-1 whitespace-nowrap">
+      <AlertCircle className="w-2.5 h-2.5" /> {validationErrors.dimensions}
+    </div>
+  )}
+</div>
                     </div>
 
                     <div className="space-y-1.5 text-slate-800 dark:text-white">
@@ -1573,20 +1634,25 @@ export function CalculatorApp({
                         Объем заказа
                       </label>
                       <div className="relative">
-                        <input
-                          type="text"
-                          inputMode="decimal"
-                          placeholder="Напр. 5"
-                          value={orderWeight}
-                          onChange={(e) =>
-                            handleNumericInput(e, setOrderWeight)
-                          }
-                          className="w-full bg-[#F0F4F4] dark:bg-slate-800 border-b border-slate-400 dark:border-slate-600 rounded-t-lg pl-3 pr-8 h-10 text-sm font-medium outline-none transition-all placeholder:text-slate-400 focus:border-slate-800 dark:focus:border-white dark:text-white focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-500"
-                        />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-xs">
-                          тн
-                        </span>
-                      </div>
+  <input
+    type="text"
+    inputMode="decimal"
+    placeholder="Напр. 5"
+    value={orderWeight}
+    onChange={(e) =>
+      handleNumericInput(e, setOrderWeight)
+    }
+    className={`w-full bg-[#F0F4F4] dark:bg-slate-800 border-b ${validationErrors.orderWeight ? "border-red-500 ring-2 ring-red-500/20" : "border-slate-400 dark:border-slate-600"} rounded-t-lg pl-3 pr-8 h-10 text-sm font-medium outline-none transition-all placeholder:text-slate-400 focus:border-slate-800 dark:focus:border-white dark:text-white`}
+  />
+  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-xs">
+    тн
+  </span>
+  {validationErrors.orderWeight && (
+    <div className="absolute -bottom-5 left-0 text-[10px] font-bold text-red-500 uppercase tracking-tight flex items-center gap-1">
+      <AlertCircle className="w-2.5 h-2.5" /> {validationErrors.orderWeight}
+    </div>
+  )}
+</div>
                     </div>
 
                     <div className="col-span-1 sm:col-span-2 2xl:col-span-4 flex flex-col sm:flex-row gap-2 sm:gap-3 border-t border-slate-200 dark:border-slate-800 pt-4 mt-2">
@@ -1690,22 +1756,27 @@ export function CalculatorApp({
                         Длина заготовки
                       </label>
                       <div className="relative">
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          value={displayedRawLength}
-                          onChange={(e) =>
-                            handleNumericInput(e, (val) =>
-                              setLengthInput({ value: val, source: "raw" }),
-                            )
-                          }
-                          disabled={!selectedTarget}
-                          className="w-full bg-[#F0F4F4] dark:bg-slate-800 border-b border-slate-400 dark:border-slate-600 rounded-t-lg pl-3 pr-10 h-10 text-sm font-medium transition-all disabled:opacity-50 placeholder:text-slate-400 focus:border-slate-800 dark:focus:border-white focus:bg-slate-200 dark:focus:bg-slate-700 focus:outline-none dark:text-white focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-500"
-                        />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 font-medium text-xs">
-                          мм
-                        </span>
-                      </div>
+  <input
+    type="text"
+    inputMode="numeric"
+    value={displayedRawLength}
+    onChange={(e) =>
+      handleNumericInput(e, (val) =>
+        setLengthInput({ value: val, source: "raw" }),
+      )
+    }
+    disabled={!selectedTarget}
+    className={`w-full bg-[#F0F4F4] dark:bg-slate-800 border-b ${validationErrors.rawLength ? "border-red-500 ring-2 ring-red-500/20" : "border-slate-400 dark:border-slate-600"} rounded-t-lg pl-3 pr-10 h-10 text-sm font-medium transition-all disabled:opacity-50 placeholder:text-slate-400 focus:border-slate-800 dark:focus:border-white focus:bg-slate-200 dark:focus:bg-slate-700 focus:outline-none dark:text-white`}
+  />
+  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 font-medium text-xs">
+    мм
+  </span>
+  {validationErrors.rawLength && (
+    <div className="absolute -bottom-5 left-0 text-[10px] font-bold text-red-500 uppercase tracking-tight flex items-center gap-1">
+      <AlertCircle className="w-2.5 h-2.5" /> {validationErrors.rawLength}
+    </div>
+  )}
+</div>
                     </div>
 
                     <ArrowRight className="w-6 h-6 text-slate-400 hidden md:block shrink-0 mx-2" />
@@ -1800,19 +1871,24 @@ export function CalculatorApp({
                       </p>
                     </div>
                     <div className="relative w-full sm:w-1/3 shrink-0">
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        value={orderedLength}
-                        onChange={(e) =>
-                          handleNumericInput(e, setOrderedLength)
-                        }
-                        className="w-full bg-[#F0F4F4] dark:bg-slate-800 border-b border-slate-400 dark:border-slate-600 text-slate-900 dark:text-white rounded-t-lg px-4 h-12 text-lg font-medium transition-all focus:border-slate-800 dark:focus:border-white focus:bg-slate-200 dark:focus:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-500"
-                      />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-medium text-xs">
-                        мм
-                      </span>
-                    </div>
+  <input
+    type="text"
+    inputMode="numeric"
+    value={orderedLength}
+    onChange={(e) =>
+      handleNumericInput(e, setOrderedLength)
+    }
+    className={`w-full bg-[#F0F4F4] dark:bg-slate-800 border-b ${validationErrors.orderedLength ? "border-red-500 ring-2 ring-red-500/20" : "border-slate-400 dark:border-slate-600"} text-slate-900 dark:text-white rounded-t-lg px-4 h-12 text-lg font-medium transition-all focus:border-slate-800 dark:focus:border-white focus:bg-slate-200 dark:focus:bg-slate-700 focus:outline-none`}
+  />
+  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-medium text-xs">
+    мм
+  </span>
+  {validationErrors.orderedLength && (
+    <div className="absolute -bottom-5 left-0 text-[10px] font-bold text-red-500 uppercase tracking-tight flex items-center gap-1">
+      <AlertCircle className="w-2.5 h-2.5" /> {validationErrors.orderedLength}
+    </div>
+  )}
+</div>
                   </div>
 
                   {optimalLengths.length > 0 &&
@@ -2134,18 +2210,23 @@ export function CalculatorApp({
                         Продажа за 1 т (без НДС)
                       </label>
                       <div className="relative">
-                        <input
-                          type="text"
-                          inputMode="decimal"
-                          placeholder="55 000"
-                          value={formatInputValue(sellPrice)}
-                          onChange={(e) => handleNumericInput(e, setSellPrice)}
-                          className="w-full bg-[#F0F4F4] dark:bg-slate-800 border-b border-slate-400 dark:border-slate-600 rounded-t-lg pl-3 pr-10 h-10 text-sm font-medium transition-all focus:border-slate-800 dark:focus:border-white focus:bg-slate-200 dark:focus:bg-slate-700 focus:outline-none dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-500"
-                        />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 font-semibold text-xs">
-                          руб
-                        </span>
-                      </div>
+  <input
+    type="text"
+    inputMode="decimal"
+    placeholder="55 000"
+    value={formatInputValue(sellPrice)}
+    onChange={(e) => handleNumericInput(e, setSellPrice)}
+    className={`w-full bg-[#F0F4F4] dark:bg-slate-800 border-b ${validationErrors.sellPrice ? "border-red-500 ring-2 ring-red-500/20" : "border-slate-400 dark:border-slate-600"} rounded-t-lg pl-3 pr-10 h-10 text-sm font-medium transition-all focus:border-slate-800 dark:focus:border-white focus:bg-slate-200 dark:focus:bg-slate-700 focus:outline-none dark:text-white placeholder:text-slate-400`}
+  />
+  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 font-semibold text-xs">
+    руб
+  </span>
+  {validationErrors.sellPrice && (
+    <div className="absolute -bottom-5 left-0 text-[10px] font-bold text-red-500 uppercase tracking-tight flex items-center gap-1">
+      <AlertCircle className="w-2.5 h-2.5" /> {validationErrors.sellPrice}
+    </div>
+  )}
+</div>
                     </div>
 
                     <div className="space-y-1.5 w-full">

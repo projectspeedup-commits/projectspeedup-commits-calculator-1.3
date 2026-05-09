@@ -2,6 +2,7 @@ import React, { Fragment, useMemo } from 'react';
 import { motion } from 'motion/react';
 import * as LucideIcons from 'lucide-react';
 import * as XLSX from 'xlsx';
+import { StatusDropdown } from '../StatusDropdown';
 import { getTimestampedFilename } from '../../lib/utils';
 import { getGostForGrade } from '../../lib/constants';
 
@@ -16,8 +17,29 @@ export function CalcSupplySection(props: any) {
   } = props;
   
   const validMatchedDemand = useMemo(() => {
-    return (supplyCalculationData?.matchedDemand || []).filter((r: any) => (r.remainingToProcess ?? 0) >= 0.300);
-  }, [supplyCalculationData?.matchedDemand]);
+    return (supplyCalculationData?.matchedDemand || []).filter((res: any) => {
+      if ((res.remainingToProcess ?? 0) < 0.300) return false;
+
+      let matchesSearch = true;
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        matchesSearch = (
+          (res.orderNo || "").toLowerCase().includes(q) ||
+          (res.client || "").toLowerCase().includes(q) ||
+          (res.nomenclature || "").toLowerCase().includes(q)
+        );
+      }
+
+      let matchesStatus = true;
+      if (statusFilter === "OK") {
+        matchesStatus = (res.finalShortage || 0) <= 0.001;
+      } else if (statusFilter === "DEFICIT") {
+        matchesStatus = (res.finalShortage || 0) > 0.001;
+      }
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [supplyCalculationData?.matchedDemand, searchQuery, statusFilter]);
   
   const validAllocatedFromSupply = useMemo(() => {
     return validMatchedDemand.reduce((sum: number, r: any) => sum + (r.allocatedFromSupply || 0), 0);
@@ -60,16 +82,16 @@ export function CalcSupplySection(props: any) {
                       </div>
                     ) : (
                       <div
-                        className={`bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-[20px] sm:rounded-[32px] overflow-hidden flex flex-col shadow-xl shadow-slate-200/50 dark:shadow-none`}
+                        className={`bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-[20px] sm:rounded-[32px] flex flex-col shadow-xl shadow-slate-200/50 dark:shadow-none`}
                       >
                         <div
-                          className={`flex flex-col 2xl:flex-row 2xl:items-center justify-between gap-4 sm:gap-6 p-4 sm:p-5 xl:p-6 pb-2 sm:pb-3 xl:pb-6 bg-white dark:bg-[#1A1C19]`}
+                          className={`flex flex-col 2xl:flex-row 2xl:items-center justify-between gap-4 sm:gap-6 p-4 sm:p-5 bg-white dark:bg-[#1A1C19]`}
                         >
                           <div
                             className={`flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 2xl:border-r border-slate-200 dark:border-slate-800 2xl:pr-6 w-full 2xl:w-auto`}
                           >
                             <h4
-                              className={`text-sm sm:text-base font-black text-slate-900 dark:text-white uppercase tracking-widest`}
+                              className={`text-sm sm:text-base font-black text-slate-900 dark:text-white uppercase tracking-widest leading-tight`}
                             >
                               Расчет с учетом поставок
                             </h4>
@@ -119,6 +141,15 @@ export function CalcSupplySection(props: any) {
                                 className="bg-transparent border-none outline-none text-[11px] sm:text-xs w-full text-slate-700 dark:text-slate-200 placeholder:text-slate-400"
                               />
                             </div>
+                            <div className="flex items-center bg-white dark:bg-slate-800/50 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 border border-slate-200 dark:border-slate-700 w-full md:w-auto transition-colors focus-within:border-slate-300 dark:focus-within:border-slate-600 focus-within:ring-1 focus-within:ring-slate-200 dark:focus-within:ring-slate-700">
+                                <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 mr-1.5 sm:mr-2 shrink-0" />
+                                <StatusDropdown
+                                  value={statusFilter}
+                                  onChange={(val) => setStatusFilter(val)}
+                                  className="w-28"
+                                />
+                            </div>
+                            <div className="flex flex-row items-center gap-2 w-full sm:w-auto shrink-0">
                             <button
                               onClick={() => {
                                 if (
@@ -338,7 +369,7 @@ export function CalcSupplySection(props: any) {
                                 setIsCopied(true);
                                 setTimeout(() => setIsCopied(false), 2000);
                               }}
-                              className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-[#121411] sm:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
+                              className="flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-[#1A1C19] text-slate-600 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
                               title="Скопировать для Excel"
                             >
                               {isCopied ? (
@@ -577,11 +608,12 @@ export function CalcSupplySection(props: any) {
                                   getTimestampedFilename("Расчет потребности в заготовке"),
                                 );
                               }}
-                              className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
+                              className="flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
                               title="Скачать в Excel"
                             >
                               <Download className="w-4 h-4" />
                             </button>
+                            </div>
                           </div>
                         </div>
                         <div
@@ -741,21 +773,6 @@ export function CalcSupplySection(props: any) {
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-[11px]">
                               {validMatchedDemand
-                                .filter((res) => {
-                                  if (!searchQuery) return true;
-                                  const q = searchQuery.toLowerCase();
-                                  return (
-                                    (res.orderNo || "")
-                                      .toLowerCase()
-                                      .includes(q) ||
-                                    (res.client || "")
-                                      .toLowerCase()
-                                      .includes(q) ||
-                                    (res.nomenclature || "")
-                                      .toLowerCase()
-                                      .includes(q)
-                                  );
-                                })
                                 .map((res: any, idx) => {
                                   const maxRows = Math.max(
                                     1,

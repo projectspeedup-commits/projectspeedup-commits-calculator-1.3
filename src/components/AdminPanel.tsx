@@ -248,11 +248,48 @@ export function AdminPanel({
     | "calc-supply"
   >("files");
   const [isCopied, setIsCopied] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
+
+  // Real-time validation for Economy fields
+  useEffect(() => {
+    const errors: Record<string, string> = {};
+    
+    // Validate scrap
+    const scrapVal = parseFloat(scrap.replace(",", "."));
+    if (isNaN(scrapVal) || scrapVal < 0) {
+      errors.scrap = "Цена лома должна быть положительным числом";
+    }
+
+    // Validate remnant
+    const remnantVal = parseFloat(remnant.replace(",", "."));
+    if (isNaN(remnantVal) || remnantVal < 0) {
+      errors.remnant = "Цена делового отхода должна быть положительным числом";
+    }
+
+    // Validate economy items
+    economyItems.forEach(item => {
+      const val = parseFloat(String(item.norm).replace(",", "."));
+      if (isNaN(val) || val < 0) {
+        errors[`economy_${item.id}`] = "Значение должно быть положительным числом";
+      }
+    });
+
+    // Validate raw prices
+    Object.entries(rawPrices).forEach(([grade, p]) => {
+      const md = parseFloat(p.md.replace(",", "."));
+      const nd = parseFloat(p.nd.replace(",", "."));
+      if (isNaN(md) || md < 0) errors[`price_${grade}_md`] = "Некорректная цена МД";
+      if (isNaN(nd) || nd < 0) errors[`price_${grade}_nd`] = "Некорректная цена НД";
+    });
+
+    setValidationErrors(errors);
+  }, [scrap, remnant, economyItems, rawPrices]);
 
   // Search & Filters state
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [uploadWarnings, setUploadWarnings] = useState<string[]>([]);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   const formatCurrency = (val: number) => {
     return (
@@ -1289,6 +1326,9 @@ export function AdminPanel({
     setIsProcessing(true);
     setUploadWarnings([]);
 
+    // Give browser time to render loading state
+    await new Promise(resolve => setTimeout(resolve, 50));
+
     try {
       const allExtractedData: Omit<
         CalculationResult,
@@ -1505,7 +1545,10 @@ export function AdminPanel({
                       .replace(/\s/g, "")
                       .replace(",", "."),
                   );
-            if (isNaN(weightTons) || weightTons < 0) weightTons = 0;
+            if (isNaN(weightTons) || weightTons < 0) {
+              weightTons = 0;
+              setUploadWarnings(prev => [...prev, `Строка ${i}: Некорректный вес (${rawWeight})`]);
+            }
 
             const rawRemaining =
               colMap.remaining !== -1 ? row[colMap.remaining] : null;
@@ -1519,8 +1562,12 @@ export function AdminPanel({
                         .replace(",", "."),
                     )
                 : weightTons;
-            if (isNaN(remainingToProcess) || remainingToProcess < 0)
+            if (isNaN(remainingToProcess) || remainingToProcess < 0) {
               remainingToProcess = weightTons;
+              if (rawRemaining !== null) {
+                setUploadWarnings(prev => [...prev, `Строка ${i}: Некорректный остаток к выполнению (${rawRemaining})`]);
+              }
+            }
 
             let typeStr = String(
               row[colMap.type] || nomenclature,
@@ -1588,6 +1635,8 @@ export function AdminPanel({
               );
               if (sizeMatch) {
                 diameter = parseFloat(sizeMatch[1].replace(",", "."));
+              } else {
+                setUploadWarnings(prev => [...prev, `Строка ${i}: Не удалось определить диаметр (${rawSize})`]);
               }
             }
             if (isNaN(diameter) || diameter < 0) diameter = 0;
@@ -1829,6 +1878,9 @@ export function AdminPanel({
     if (filesToProcess.length === 0) return;
     setIsProcessingSupplyPlans(true);
 
+    // Give browser time to render loading state
+    await new Promise(resolve => setTimeout(resolve, 50));
+
     try {
       const extractedPlans: any[] = [];
 
@@ -1919,7 +1971,10 @@ export function AdminPanel({
                       .replace(/\s/g, "")
                       .replace(",", "."),
                   );
-            if (isNaN(qty) || qty <= 0) continue;
+            if (isNaN(qty) || qty <= 0) {
+              setUploadWarnings(prev => [...prev, `Строка ${i}: Некорректное количество (${rawQty})`]);
+              continue;
+            }
 
             const excelDateToJS = (serial: number | string | undefined) => {
               if (!serial) return "";
@@ -1960,6 +2015,9 @@ export function AdminPanel({
   ) => {
     if (filesToProcess.length === 0) return;
     setIsProcessingStock(true);
+
+    // Give browser time to render loading state
+    await new Promise(resolve => setTimeout(resolve, 50));
 
     try {
       const extractedStock: any[] = [];
@@ -2032,7 +2090,12 @@ export function AdminPanel({
                       .replace(/\s/g, "")
                       .replace(",", "."),
                   );
-            if (isNaN(weight) || weight <= 0.0001) continue;
+            if (isNaN(weight) || weight <= 0.0001) {
+              if (rawWeight !== undefined && rawWeight !== "") {
+                setUploadWarnings(prev => [...prev, `Строка ${i}: Некорректный остаток (${rawWeight})`]);
+              }
+              continue;
+            }
 
             let profile = "круг";
             if (rawNom.toLowerCase().includes("шестиг"))
@@ -2370,8 +2433,6 @@ export function AdminPanel({
     </div>
   );
 
-  const [copySuccess, setCopySuccess] = useState(false);
-
   const handlePriceChange = (
     grade: string,
     type: "md" | "nd",
@@ -2439,6 +2500,11 @@ export function AdminPanel({
   };
 
   const handleSave = async () => {
+    if (Object.keys(validationErrors).length > 0) {
+      setSaveError("Пожалуйста, исправьте ошибки валидации перед сохранением.");
+      setTimeout(() => setSaveError(""), 4000);
+      return;
+    }
     setIsSaving(true);
     setSaveError("");
     try {
@@ -2500,7 +2566,28 @@ export function AdminPanel({
     }
   };
 
-  const renderFilesContent = (hideExtraBlocks = false) => (
+  const renderFilesContent = (hideExtraBlocks = false) => {
+    const isAnyProcessing = isProcessing || isProcessingStock || isProcessingSupplyPlans;
+    return (
+    <div className="relative">
+      {isAnyProcessing && (
+        <div className="absolute inset-0 bg-white/50 dark:bg-[#121411]/50 backdrop-blur-sm z-50 flex flex-col items-center justify-center min-h-[400px] rounded-3xl">
+          <div className="bg-white dark:bg-[#1A1C19] p-8 rounded-[24px] shadow-xl border border-slate-200 dark:border-slate-800 flex flex-col items-center gap-6">
+            <div className="relative w-16 h-16">
+              <div className="absolute inset-0 border-4 border-slate-100 dark:border-slate-800 rounded-full" />
+              <div className="absolute inset-0 border-4 border-blue-500 rounded-full border-t-transparent animate-spin" />
+            </div>
+            <div className="flex flex-col items-center gap-2 text-center">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                Обработка файлов
+              </h3>
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                {isProcessing ? "Анализируем планы и заявки..." : isProcessingStock ? "Обрабатываем складские остатки..." : "Загружаем реестры..."}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     <motion.div
       key="files"
       initial={{ opacity: 0, y: 10 }}
@@ -2963,7 +3050,9 @@ export function AdminPanel({
         </div>
       </div>
     </motion.div>
+    </div>
   );
+  };
   return (
     <div className="min-h-screen bg-[#F4F5F4] dark:bg-[#121411] flex flex-col md:flex-row transition-colors duration-300">
       {/* Mobile App Navigation Bar */}
@@ -3225,6 +3314,7 @@ export function AdminPanel({
             stockTotals={stockTotals}
             isPurchasingMode={isPurchasingMode}
             freeStock={freeStock}
+            validationErrors={validationErrors}
           />
         )}
           {activeTab === "economy" && (
@@ -3254,6 +3344,7 @@ export function AdminPanel({
                                     deletedGrades={deletedGrades}
                         handlePricingChange={handlePricingChange}
             formatDate={formatDate}
+            validationErrors={validationErrors}
           />
         )}
           {activeTab === "production" && (

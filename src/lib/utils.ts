@@ -44,6 +44,95 @@ export function getTimestampedFilename(baseName: string) {
   return `${baseName}, ${timestamp}.xlsx`;
 }
 
+export interface ValidationResult {
+  isValid: boolean;
+  message?: string;
+  errorType?: "range" | "format" | "required";
+}
+
+/**
+ * Validates numeric input for the metal calculator.
+ */
+export function validateNumeric(
+  value: string | number,
+  params: {
+    min?: number;
+    max?: number;
+    allowZero?: boolean;
+    fieldName?: string;
+  } = {}
+): ValidationResult {
+  const { min = 0, max, allowZero = false, fieldName = "Поле" } = params;
+  const numValue = Number(String(value).replace(/\s/g, "").replace(",", "."));
+
+  if (isNaN(numValue)) {
+    return { 
+      isValid: false, 
+      message: `${fieldName} должно быть числом`, 
+      errorType: "format" 
+    };
+  }
+
+  if (numValue === 0 && !allowZero) {
+    return { 
+      isValid: false, 
+      message: `${fieldName} не может быть нулевым`, 
+      errorType: "range" 
+    };
+  }
+
+  if (numValue < min) {
+    return { 
+      isValid: false, 
+      message: `${fieldName} не может быть меньше ${min}`, 
+      errorType: "range" 
+    };
+  }
+
+  if (max !== undefined && numValue > max) {
+    return { 
+      isValid: false, 
+      message: `${fieldName} не может превышать ${max}`, 
+      errorType: "range" 
+    };
+  }
+
+  return { isValid: true };
+}
+
+/**
+ * Validates drawing dimensions for the rolling process.
+ */
+export function validateDimensions(
+  target: string | number,
+  raw: string | number
+): ValidationResult {
+  const t = Number(target);
+  const r = Number(raw);
+
+  if (!t || !r) return { isValid: false, message: "Не указаны размеры", errorType: "required" };
+  
+  if (r <= t) {
+    return { 
+      isValid: false, 
+      message: "Размер заготовки должен быть больше готового размера", 
+      errorType: "range" 
+    };
+  }
+
+  // Common technical constraint: ratio should not be too high for single pass
+  const ratio = Math.pow(r / t, 2);
+  if (ratio > 2.5) {
+    return { 
+      isValid: false, 
+      message: "Слишком большой коэффициент вытяжки. Возможно, требуется промежуточный отжиг.", 
+      errorType: "range" 
+    };
+  }
+
+  return { isValid: true };
+}
+
 export function handleFirestoreError(
   error: unknown,
   operationType: OperationType,
