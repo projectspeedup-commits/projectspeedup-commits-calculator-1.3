@@ -3254,11 +3254,6 @@ export function AdminPanel({
                                     deletedGrades={deletedGrades}
                         handlePricingChange={handlePricingChange}
             formatDate={formatDate}
-            handleEconomyChange={handleEconomyChange}
-            allGrades={allGrades}
-            handleRemoveGrade={handleRemoveGrade}
-            setScrap={setScrap}
-            setRemnant={setRemnant}
           />
         )}
           {activeTab === "production" && (

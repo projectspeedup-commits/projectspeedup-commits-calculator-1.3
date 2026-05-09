@@ -19,6 +19,14 @@ export function CalcSupplySection(props: any) {
     return (supplyCalculationData?.matchedDemand || []).filter((r: any) => (r.remainingToProcess ?? 0) >= 0.300);
   }, [supplyCalculationData?.matchedDemand]);
   
+  const validAllocatedFromSupply = useMemo(() => {
+    return validMatchedDemand.reduce((sum: number, r: any) => sum + (r.allocatedFromSupply || 0), 0);
+  }, [validMatchedDemand]);
+
+  const validDeficit = useMemo(() => {
+    return validMatchedDemand.reduce((sum: number, r: any) => sum + (r.finalShortage || 0), 0);
+  }, [validMatchedDemand]);
+
   return (
     <React.Fragment>
       <motion.div
@@ -72,7 +80,7 @@ export function CalcSupplySection(props: any) {
                                 </span>
                                 <div>
                                   <span className="text-lg sm:text-xl tracking-tight leading-none">
-                                    {supplyCalculationData.totals.allocated.toFixed(
+                                    {validAllocatedFromSupply.toFixed(
                                       3,
                                     )}
                                   </span>
@@ -87,7 +95,7 @@ export function CalcSupplySection(props: any) {
                                 </span>
                                 <div>
                                   <span className="text-lg sm:text-xl tracking-tight leading-none">
-                                    {supplyCalculationData.totals.deficit.toFixed(
+                                    {validDeficit.toFixed(
                                       3,
                                     )}
                                   </span>
@@ -101,14 +109,14 @@ export function CalcSupplySection(props: any) {
                           <div
                             className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full 2xl:w-auto flex-wrap`}
                           >
-                            <div className="flex items-center bg-slate-50 dark:bg-slate-800 rounded-xl px-3 py-2 sm:w-64 border border-slate-200 dark:border-slate-700">
-                              <Search className="w-4 h-4 text-slate-400 mr-2 shrink-0" />
+                            <div className="flex items-center bg-white dark:bg-slate-800/50 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 border border-slate-200 dark:border-slate-700 w-full sm:w-64 transition-colors focus-within:border-slate-300 dark:focus-within:border-slate-600 focus-within:ring-1 focus-within:ring-slate-200 dark:focus-within:ring-slate-700">
+                              <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 mr-1.5 sm:mr-2 shrink-0" />
                               <input
                                 type="text"
-                                placeholder="Поиск по заказу, клиенту..."
+                                placeholder="Поиск по заказу..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="bg-transparent border-none outline-none text-xs w-full text-slate-700 dark:text-slate-200 placeholder:text-slate-400"
+                                className="bg-transparent border-none outline-none text-[11px] sm:text-xs w-full text-slate-700 dark:text-slate-200 placeholder:text-slate-400"
                               />
                             </div>
                             <button

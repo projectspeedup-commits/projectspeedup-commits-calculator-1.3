@@ -79,7 +79,7 @@ export default function AdminPanelSupplyTab(props: any) {
                             <div className="absolute -right-4 -top-4 w-16 h-16 bg-emerald-500/10 blur-xl rounded-full group-hover:scale-150 transition-transform duration-700" />
                             <span className="text-[10px] sm:text-[11px] xl:text-[7.5px] 2xl:text-[10px] text-emerald-600 dark:text-emerald-400 font-black uppercase tracking-widest mb-1 relative z-10 flex items-center leading-tight">
                               <Package className="w-3 h-3 xl:w-2 xl:h-2 2xl:w-3.5 2xl:h-3.5 mr-1 xl:mr-0.5 opacity-80 shrink-0" />
-                              <span className="truncate">Взято из заг.</span>
+                              <span className="whitespace-nowrap">Взято из заг.</span>
                             </span>
                             <span className="text-xl sm:text-2xl xl:text-[13px] 2xl:text-xl font-black text-emerald-950 dark:text-emerald-50 leading-none relative z-10 tracking-tighter">
                               {activeDashboardTotals.allocated.toFixed(3)}
@@ -94,7 +94,7 @@ export default function AdminPanelSupplyTab(props: any) {
                             <div className="absolute -right-4 -top-4 w-16 h-16 bg-rose-500/10 blur-xl rounded-full group-hover:scale-150 transition-transform duration-700" />
                             <span className="text-[10px] sm:text-[11px] xl:text-[7.5px] 2xl:text-[10px] text-rose-600 dark:text-rose-400 font-black uppercase tracking-widest mb-1 relative z-10 flex items-center leading-tight">
                               <ShoppingCart className="w-3 h-3 xl:w-2 xl:h-2 2xl:w-3.5 2xl:h-3.5 mr-1 xl:mr-0.5 opacity-80 shrink-0" />
-                              <span className="truncate">Дефицит</span>
+                              <span className="whitespace-nowrap">Дефицит</span>
                             </span>
                             <span className="text-xl sm:text-2xl xl:text-[13px] 2xl:text-xl font-black text-rose-950 dark:text-rose-50 leading-none relative z-10 tracking-tighter">
                               {activeDashboardTotals.deficit.toFixed(3)}
@@ -1071,7 +1071,8 @@ export default function AdminPanelSupplyTab(props: any) {
                                 title="Применить рекомендуемую длину заготовки ко всем строкам для максимизации КИМ"
                               >
                                 <TrendingUp className="w-4 h-4 shadow-sm" />
-                                <span className="truncate">
+                                <span className="whitespace-nowrap sm:hidden">КИМ</span>
+                                <span className="whitespace-nowrap hidden sm:inline">
                                   Применить все улучшения КИМ
                                 </span>
                               </button>
@@ -1232,7 +1233,7 @@ export default function AdminPanelSupplyTab(props: any) {
                                       ></rect>
                                       <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                                     </svg>
-                                    <span className="truncate">Sheets</span>
+                                    <span className="whitespace-nowrap">Sheets</span>
                                   </>
                                 )}
                               </button>
@@ -1465,7 +1466,7 @@ export default function AdminPanelSupplyTab(props: any) {
                                   <polyline points="7 10 12 15 17 10"></polyline>
                                   <line x1="12" y1="15" x2="12" y2="3"></line>
                                 </svg>
-                                <span className="truncate">Excel</span>
+                                <span className="whitespace-nowrap">Excel</span>
                               </button>
                             </div>
                           </div>

@@ -147,22 +147,22 @@ export function CalcStockSection({
               <div
                 className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full 2xl:w-auto flex-wrap`}
               >
-                <div className="flex items-center bg-slate-50 dark:bg-slate-800 rounded-xl px-3 py-2 sm:w-64 border border-slate-200 dark:border-slate-700">
-                  <Search className="w-4 h-4 text-slate-400 mr-2 shrink-0" />
+                <div className="flex items-center bg-white dark:bg-slate-800/50 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 border border-slate-200 dark:border-slate-700 w-full sm:w-64 transition-colors focus-within:border-slate-300 dark:focus-within:border-slate-600 focus-within:ring-1 focus-within:ring-slate-200 dark:focus-within:ring-slate-700">
+                  <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 mr-1.5 sm:mr-2 shrink-0" />
                   <input
                     type="text"
-                    placeholder="Поиск по заказу, клиенту..."
+                    placeholder="Поиск по заказу..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="bg-transparent border-none outline-none text-xs w-full text-slate-700 dark:text-slate-200 placeholder:text-slate-400"
+                    className="bg-transparent border-none outline-none text-[11px] sm:text-xs w-full text-slate-700 dark:text-slate-200 placeholder:text-slate-400"
                   />
                 </div>
-                <div className="flex items-center bg-slate-50 dark:bg-slate-800 rounded-xl px-3 py-2 border border-slate-200 dark:border-slate-700">
-                  <Filter className="w-4 h-4 text-slate-400 mr-2 shrink-0" />
+                <div className="flex items-center bg-white dark:bg-slate-800/50 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 border border-slate-200 dark:border-slate-700 w-full sm:w-auto transition-colors focus-within:border-slate-300 dark:focus-within:border-slate-600 focus-within:ring-1 focus-within:ring-slate-200 dark:focus-within:ring-slate-700">
+                  <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 mr-1.5 sm:mr-2 shrink-0" />
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="bg-transparent border-none outline-none text-xs text-slate-700 dark:text-slate-200"
+                    className="bg-transparent border-none outline-none text-[11px] sm:text-xs text-slate-700 dark:text-slate-200 w-full"
                   >
                     <option value="ALL">Все статусы</option>
                     <option value="OK">Обеспечено</option>

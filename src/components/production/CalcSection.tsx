@@ -191,7 +191,7 @@ export function CalcSection({
                         ></rect>
                         <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                       </svg>
-                      <span className="truncate">Sheets</span>
+                      <span className="whitespace-nowrap">Sheets</span>
                     </>
                   )}
                 </button>
@@ -330,7 +330,7 @@ export function CalcSection({
                     <polyline points="7 10 12 15 17 10"></polyline>
                     <line x1="12" y1="15" x2="12" y2="3"></line>
                   </svg>
-                  <span className="truncate">Excel</span>
+                  <span className="whitespace-nowrap">Excel</span>
                 </button>
               </div>
             </div>

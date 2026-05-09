@@ -207,28 +207,29 @@ export default function App() {
           if (docSnap.exists()) {
             const data = docSnap.data();
 
-            setCustomGrades((prevCustomGrades) => {
-              const resultingCustomGrades =
-                data.customGrades || prevCustomGrades;
-              if (data.customGrades && typeof window !== "undefined") {
-                window.localStorage.setItem(
-                  "arsenal_custom_grades",
-                  JSON.stringify(resultingCustomGrades),
-                );
-              }
+            const storeState = useStore.getState();
+            const resultingCustomGrades =
+              data.customGrades || storeState.customGrades;
+            setCustomGrades(resultingCustomGrades);
+            if (data.customGrades && typeof window !== "undefined") {
+              window.localStorage.setItem(
+                "arsenal_custom_grades",
+                JSON.stringify(resultingCustomGrades),
+              );
+            }
 
-              setDeletedGrades((prevDeletedGrades) => {
-                const resultingDeletedGrades =
-                  data.deletedGrades || prevDeletedGrades;
-                if (data.deletedGrades && typeof window !== "undefined") {
-                  window.localStorage.setItem(
-                    "arsenal_deleted_grades",
-                    JSON.stringify(resultingDeletedGrades),
-                  );
-                }
+            const resultingDeletedGrades =
+              data.deletedGrades || storeState.deletedGrades;
+            setDeletedGrades(resultingDeletedGrades);
+            if (data.deletedGrades && typeof window !== "undefined") {
+              window.localStorage.setItem(
+                "arsenal_deleted_grades",
+                JSON.stringify(resultingDeletedGrades),
+              );
+            }
 
-                // Now update raw prices with the correct dependency references
-                if (data.rawPrices || data.rawPricesV2) {
+            // Now update raw prices with the correct dependency references
+            if (data.rawPrices || data.rawPricesV2) {
                   const loadedPrices = { ...DEFAULT_RAW_PRICES };
                   const allG = [
                     ...Object.keys(DEFAULT_RAW_PRICES),
@@ -266,11 +267,6 @@ export default function App() {
                       JSON.stringify(loadedPrices),
                     );
                 }
-                return resultingDeletedGrades;
-              });
-
-              return resultingCustomGrades;
-            });
 
             if (data.remnantPricing) {
               setRemnantPricing(data.remnantPricing);
