@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 interface LoginScreenProps {
   onManagerLogin: () => void;
   onPurchasingLogin: () => void;
-  onAdminLogin: () => void;
+  onAdminLogin: (role: "admin" | "developer") => void;
   user: any;
   isCloudActive: boolean;
   isConnecting?: boolean;
@@ -35,7 +35,10 @@ export function LoginScreen({
     e.preventDefault();
     if (username === "trushin" && password === "rfhectkm") {
       setError(false);
-      onAdminLogin();
+      onAdminLogin("admin");
+    } else if (username === "aleksandr" && password === "zmk-dev-2026") {
+      setError(false);
+      onAdminLogin("developer");
     } else {
       setError(true);
     }

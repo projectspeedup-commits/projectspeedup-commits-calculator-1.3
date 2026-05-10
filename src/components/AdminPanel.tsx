@@ -112,6 +112,7 @@ interface AdminPanelProps {
     | "logistics"
     | "help";
   isPurchasingMode?: boolean;
+  isDeveloperMode?: boolean;
 }
 
 export function AdminPanel({
@@ -129,6 +130,7 @@ export function AdminPanel({
   toggleTheme,
   initialTab = "economy",
   isPurchasingMode = false,
+  isDeveloperMode = false,
 }: AdminPanelProps) {
   const [activeTab, setActiveTab] = useState<
     "files" | "economy" | "supply" | "production" | "logistics" | "help"
@@ -2527,7 +2529,12 @@ export function AdminPanel({
           {activeTab === "logistics" && (
             <AdminPanelLogisticsTab activeTab={activeTab} />
           )}
-          {activeTab === "help" && <AdminPanelHelpTab activeTab={activeTab} />}
+          {activeTab === "help" && (
+            <AdminPanelHelpTab 
+              activeTab={activeTab} 
+              isDeveloperMode={isDeveloperMode} 
+            />
+          )}
         </AnimatePresence>
       </motion.div>
       <BatchManualModal

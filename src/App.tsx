@@ -21,7 +21,7 @@ import { handleFirestoreError, OperationType } from "./lib/utils";
 
 export default function App() {
   const [view, setView] = useState<
-    "login" | "manager" | "admin" | "purchasing"
+    "login" | "manager" | "admin" | "purchasing" | "developer"
   >("login");
   const { config, loading: configLoading } = useAppConfig();
   const [user, setUser] = useState<any>(null);
@@ -406,7 +406,7 @@ export default function App() {
     }
   }, [user, isCloudActive]);
 
-  const handleAnonymousLogin = async (targetView: "manager" | "purchasing" | "admin") => {
+  const handleAnonymousLogin = async (targetView: "manager" | "purchasing" | "admin" | "developer") => {
     if (!user) {
       try {
         if (!isCloudActive && config?.usePostgres) {
@@ -570,7 +570,13 @@ export default function App() {
               <LoginScreen
                 onManagerLogin={() => handleAnonymousLogin("manager")}
                 onPurchasingLogin={() => handleAnonymousLogin("purchasing")}
-                onAdminLogin={() => handleAnonymousLogin("admin")}
+                onAdminLogin={(role) => {
+                  if (role === "developer") {
+                    handleAnonymousLogin("developer");
+                  } else {
+                    handleAnonymousLogin("admin");
+                  }
+                }}
                 user={user}
                 isCloudActive={isCloudActive}
                 isConnecting={isConnecting}
@@ -582,9 +588,9 @@ export default function App() {
             </motion.div>
           )}
 
-          {view === "admin" && (
+          {(view === "admin" || view === "developer") && (
             <motion.div
-              key="admin"
+              key={view}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -605,6 +611,7 @@ export default function App() {
                   isCloudActive={isCloudActive}
                   isDarkMode={isDarkMode}
                   toggleTheme={toggleTheme}
+                  isDeveloperMode={view === "developer"}
                 />
               </div>
             </motion.div>
