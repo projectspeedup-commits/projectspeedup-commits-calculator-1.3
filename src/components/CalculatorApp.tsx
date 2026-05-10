@@ -914,22 +914,32 @@ export function CalculatorApp({
   };
 
   const loadCalculation = (calc: any) => {
-    setProfileType(calc.profileType);
-    setSteelGrade(calc.steelGrade);
-    setSelectedTarget(calc.selectedTarget);
-    setSelectedRaw(calc.selectedRaw);
-    setOrderWeight(calc.orderWeight);
-    setOrderedLength(calc.orderedLength || "6000");
-    setSellPrice(calc.sellPrice || "");
+    // Determine profile type with fallback and case-insensitivity
+    const pType = String(calc.profileType || calc.profile_type || "round").toLowerCase();
+    setProfileType(pType.includes("hex") || pType.includes("шест") ? "hex" : "round");
+    
+    setSteelGrade(calc.steelGrade || calc.steel_grade || "");
+    setSelectedTarget(calc.selectedTarget || calc.selected_target || "");
+    setSelectedRaw(calc.selectedRaw || calc.selected_raw || "");
+    setOrderWeight(calc.orderWeight || calc.order_weight || "");
+    
+    // Fix: don't default order length to 6000 unless it's genuinely missing
+    setOrderedLength(calc.orderedLength || calc.ordered_length || "НД");
+    setSellPrice(calc.sellPrice || calc.sell_price || "");
 
-    if (calc.lengthInputValue && calc.lengthInputSource) {
+    const lVal = calc.lengthInputValue || calc.length_input_value;
+    const lSrc = calc.lengthInputSource || calc.length_input_source;
+    if (lVal) {
       setLengthInput({
-        value: calc.lengthInputValue,
-        source: calc.lengthInputSource,
+        value: lVal,
+        source: lSrc || "raw",
       });
     }
-    if (calc.frontCoef) setFrontCoef(calc.frontCoef);
-    if (calc.backCoef) setBackCoef(calc.backCoef);
+    
+    const fCoef = calc.frontCoef || calc.front_coef;
+    const bCoef = calc.backCoef || calc.back_coef;
+    if (fCoef) setFrontCoef(fCoef);
+    if (bCoef) setBackCoef(bCoef);
 
     setShowHistory(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1479,9 +1489,10 @@ export function CalculatorApp({
                                 {calc.orderWeight || calc.order_weight} тн
                               </span>
                               <span className="text-[9px] font-bold text-indigo-600 dark:text-indigo-400">
-                                {String(calc.profileType || calc.profile_type).toLowerCase() === "round"
-                                  ? "Круг"
-                                  : "Шестигр."}
+                                  {(() => {
+                                    const pt = String(calc.profileType || calc.profile_type || "round").toLowerCase();
+                                    return (pt.includes("round") || pt.includes("круг")) ? "Круг" : "Шестигр.";
+                                  })()}
                               </span>
                             </div>
                           </div>

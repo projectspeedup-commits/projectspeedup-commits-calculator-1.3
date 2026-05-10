@@ -63,6 +63,7 @@ async function startServer() {
       res.json(result.rows.map(row => {
         const jsonData = typeof row.data === 'string' ? JSON.parse(row.data) : (row.data || {});
         // Merge JSON data with flat columns, prioritizing JSON, but ensuring all fields exist
+        // This ensures compatibility with both old and new storage formats
         return {
           ...jsonData,
           id: row.id.toString(),
@@ -125,6 +126,7 @@ async function startServer() {
       const row = result.rows[0];
       const jsonData = typeof row.data === 'string' ? JSON.parse(row.data) : (row.data || {});
       
+      // Return the full object exactly like GET does
       res.json({
         ...jsonData,
         id: row.id.toString(),
@@ -132,6 +134,12 @@ async function startServer() {
         profileType: jsonData.profileType || row.profile_type || 'round',
         steelGrade: jsonData.steelGrade || row.steel_grade || '',
         selectedTarget: jsonData.selectedTarget || row.selected_target || '0',
+        selectedRaw: jsonData.selectedRaw || row.selected_raw || '0',
+        orderWeight: jsonData.orderWeight || row.order_weight || '0',
+        orderedLength: jsonData.orderedLength || row.ordered_length || '0',
+        lengthInputValue: jsonData.lengthInputValue || row.length_input_value || '0',
+        usefulLength: jsonData.usefulLength || row.useful_length || '0',
+        label: jsonData.label || row.label || '',
         created_at: row.created_at
       });
     } catch (err) {
