@@ -46,12 +46,22 @@ export default function AdminPanelHelpTab(props: any) {
                         <h4 className="text-emerald-400 font-bold uppercase tracking-wider text-xs">
                           Шаг 0: Подключение к серверу
                         </h4>
-                        <p className="text-sm text-slate-300 leading-relaxed">
-                          Сначала нужно «зайти» на сервер Ubuntu через терминал Windows (PowerShell или CMD):
-                        </p>
-                        <div className="bg-black/40 rounded-2xl p-4 border border-slate-800 font-mono text-xs text-emerald-300 space-y-2">
-                          <p className="text-white">ssh aleksandr@192.168.1.245</p>
-                          <p className="text-slate-500 italic"># Пользователь: aleksandr. Введите пароль (символы не будут видны).</p>
+                        <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700 space-y-3 shadow-inner">
+                          <div className="space-y-1">
+                             <p className="text-[10px] font-bold text-slate-400 uppercase">macOS (MacBook):</p>
+                             <p className="text-xs text-slate-300 leading-relaxed">
+                                Откройте <b>Терминал</b> и введите:
+                             </p>
+                             <code className="block bg-black/40 p-2 rounded text-emerald-400 text-[10px] select-all">ssh aleksandr@192.168.1.245</code>
+                          </div>
+                          <div className="space-y-1 mt-3">
+                             <p className="text-[10px] font-bold text-slate-400 uppercase">Windows:</p>
+                             <p className="text-xs text-slate-300 leading-relaxed">
+                                Откройте <b>PowerShell</b> и введите:
+                             </p>
+                             <code className="block bg-black/40 p-2 rounded text-sky-400 text-[10px] select-all">ssh aleksandr@192.168.1.245</code>
+                          </div>
+                          <p className="text-[9px] text-slate-500 italic mt-2 italic"># Пароль при вводе не отображается — это нормально.</p>
                         </div>
                       </div>
 
@@ -60,16 +70,16 @@ export default function AdminPanelHelpTab(props: any) {
                           Шаг 1: Сохранение кода (GitHub)
                         </h4>
                         <p className="text-sm text-slate-300 leading-relaxed">
-                          В интерфейсе AI Studio выполните экспорт, чтобы обновить код в интернете:
+                          Чтобы ваши изменения в AI Studio попали на сервер:
                         </p>
                         <ul className="space-y-2">
                           <li className="flex items-center gap-3 text-slate-400 text-sm">
                             <Check className="w-4 h-4 text-emerald-500" />
-                            <span>Нажмите <b>Settings</b> → <b>Export to GitHub</b></span>
+                            <span>В меню <b>Settings</b> → <b>Export to GitHub</b></span>
                           </li>
                           <li className="flex items-center gap-3 text-slate-400 text-sm">
                             <Check className="w-4 h-4 text-emerald-500" />
-                            <span>Нажмите кнопку <b>Push Changes</b>.</span>
+                            <span>Нажмите <b>Push Changes</b>.</span>
                           </li>
                         </ul>
                       </div>
@@ -80,91 +90,68 @@ export default function AdminPanelHelpTab(props: any) {
                         </h4>
                         <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700 space-y-3">
                           <p className="text-xs text-slate-300">
-                            <b>Вариант А (Авто):</b> Скрипт <code>server_update.sh</code> уже в корне проекта. Настройте cron (см. ниже), чтобы сервер обновлялся сам.
-                          </p>
-                          <p className="text-xs text-slate-300">
-                            <b>Вариант Б (Ручной):</b> Введите в терминале:
+                             Введите в терминале сервера:
                           </p>
                           <div className="bg-black/40 rounded-lg p-3 font-mono text-[10px] text-sky-300 space-y-1">
                             <p>cd ~/zmk-app</p>
                             <p>./server_update.sh</p>
                           </div>
+                          <p className="text-[9px] text-slate-500">
+                            Сервер сам скачает код, соберет проект и перезапустится через PM2.
+                          </p>
                         </div>
                       </div>
 
-                      <div className="space-y-6">
+                      <div className="space-y-6 lg:col-span-3 border-t border-slate-800 pt-6">
                         <h4 className="text-fuchsia-400 font-bold uppercase tracking-wider text-xs">
                           Шаг 3: Внешний доступ (Интернет)
                         </h4>
                         
-                        <div className="space-y-6">
-                          {/* Option 1: PM2 LocalTunnel */}
-                          <div className="bg-slate-800/40 p-5 rounded-2xl border border-slate-700 shadow-xl">
-                            <div className="flex items-center gap-3 mb-3">
-                              <div className="p-2 bg-fuchsia-500/20 rounded-lg">
-                                <div className="w-2 h-2 rounded-full bg-fuchsia-500 animate-pulse"></div>
-                              </div>
-                              <p className="text-sm font-bold text-fuchsia-300">Вариант А: LocalTunnel + PM2 (Работа 24/7)</p>
-                            </div>
-                            <p className="text-xs text-slate-400 mb-4 leading-relaxed">
-                              Чтобы ссылка не "падала" и не выдавала 503, запустите её через менеджер процессов:
-                            </p>
-                            <div className="bg-black/60 rounded-xl p-4 font-mono text-[11px] text-fuchsia-300 border border-fuchsia-500/20 space-y-2">
-                              <p className="text-slate-500 italic"># Запустить туннель в фоне</p>
-                              <p>pm2 start lt --name "zmk-tunnel" -- --port 3000 --subdomain zmk-arsenal</p>
-                              <p className="text-slate-500 italic mt-2"># Проверить статус</p>
-                              <p>pm2 status</p>
-                            </div>
-                            <div className="mt-3 p-3 bg-fuchsia-500/5 rounded-lg border border-fuchsia-500/10">
-                              <p className="text-[10px] text-fuchsia-200/70">
-                                <b>Как убрать "проверку IP":</b> Это особенность бесплатного LocalTunnel. Чтобы её не было, нужно использовать Вариант Б или В.
-                              </p>
-                            </div>
-                          </div>
-
-                          {/* Option 2: Ngrok Static */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {/* Option 1: Ngrok (Recommended) */}
                           <div className="bg-slate-800/40 p-5 rounded-2xl border border-slate-700 shadow-xl">
                             <div className="flex items-center gap-3 mb-3">
                               <div className="p-2 bg-emerald-500/20 rounded-lg">
-                                <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                                <LucideIcons.Globe className="w-4 h-4 text-emerald-500" />
                               </div>
-                              <p className="text-sm font-bold text-emerald-300">Вариант Б: Ngrok (Рекомендуется)</p>
+                              <p className="text-sm font-bold text-emerald-300">Ngrok (Работа 24/7)</p>
                             </div>
-                            <p className="text-xs text-slate-400 mb-4">
-                              Самый стабильный способ. Ссылка будет работать 24/7 и не просит вводить IP.
-                            </p>
                             <div className="bg-black/60 rounded-xl p-4 font-mono text-[10px] text-emerald-400 border border-emerald-500/20 space-y-3">
                               <div>
-                                <p className="text-slate-500 mb-1">// 1. Авторизация (выполнить 1 раз):</p>
-                                <p className="select-all">ngrok config add-authtoken 2XodaMEKIPKQ8p4HpEdGdONLaz</p>
+                                <p className="text-slate-500 mb-1">// 1. Очистка и авторизация (Ваш актуальный токен):</p>
+                                <p className="text-red-400 select-all">pm2 delete zmk-link</p>
+                                <p className="text-emerald-300 select-all">ngrok config add-authtoken 3DXodaMEKIPKQ8p4HpEdGdONLaz_2LkCfHR7oLa9BQh4hWHnV</p>
                               </div>
                               <div>
-                                <p className="text-slate-500 mb-1">// 2. Запуск постоянной ссылки:</p>
+                                <p className="text-slate-500 mb-1">// 2. Запуск туннеля в фоне:</p>
                                 <p className="select-all">pm2 start ngrok --name "zmk-link" -- http 3000</p>
                               </div>
                               <div>
-                                <p className="text-slate-500 mb-1">// 3. Узнать вашу ссылку (URL):</p>
-                                <p className="text-yellow-400 select-all">curl http://localhost:4040/api/tunnels | grep -o 'https://[^"]*'</p>
+                                <p className="text-slate-500 mb-1">// 3. ПОЛУЧИТЬ ССЫЛКУ (выполните это):</p>
+                                <code className="text-yellow-400 block p-2 bg-yellow-400/5 rounded border border-yellow-400/20 select-all">curl http://localhost:4040/api/tunnels | grep -o 'https://[a-z0-9.-]*'</code>
                               </div>
                             </div>
                           </div>
 
-                          {/* Option 3: Cloudflare Domain */}
-                          <div className="bg-slate-800/40 p-5 rounded-2xl border border-slate-700 shadow-xl opacity-80 hover:opacity-100 transition-opacity">
-                            <div className="flex items-center gap-3 mb-3">
-                              <div className="p-2 bg-sky-500/20 rounded-lg">
-                                <div className="w-2 h-2 rounded-full bg-sky-500"></div>
-                              </div>
-                              <p className="text-sm font-bold text-sky-300">Вариант В: Cloudflare Tunnel (PRO)</p>
+                          {/* Troubleshooting */}
+                          <div className="bg-orange-950/20 p-5 rounded-2xl border border-orange-500/20">
+                            <h5 className="text-xs font-bold text-orange-400 uppercase mb-3 flex items-center gap-2">
+                              <LucideIcons.AlertTriangle className="w-4 h-4" /> Если ссылка не открывается
+                            </h5>
+                            <div className="space-y-3">
+                              <p className="text-[10px] text-slate-400 leading-relaxed">
+                                Если <b>curl</b> ничего не выдает или ссылка не работает, проверьте логи ошибок:
+                              </p>
+                              <code className="block bg-black/40 p-2 rounded text-orange-300 text-[10px] select-all">pm2 logs zmk-link --lines 20</code>
+                              <p className="text-[10px] text-slate-400 font-medium">
+                                Возможные причины:
+                              </p>
+                              <ul className="text-[9px] text-slate-500 list-disc list-inside space-y-1">
+                                <li>Неверный Authtoken (проверьте пробелы)</li>
+                                <li>Аккаунт Ngrok требует подтверждения почты</li>
+                                <li>Уже запущен другой туннель (сделайте <code className="text-slate-400">pm2 delete all</code>)</li>
+                              </ul>
                             </div>
-                            <p className="text-xs text-slate-400 mb-3">
-                              Самый надежный способ. Требует наличия своего домена (напр. zmk-arsenal.ru).
-                            </p>
-                            <ul className="text-[10px] text-slate-300 space-y-1 list-disc list-inside">
-                              <li>Добавьте домен в Cloudflare (бесплатно)</li>
-                              <li>В панели выберите Zero Trust &gt; Tunnels</li>
-                              <li>Создайте Remote Tunnel и следуйте инструкции</li>
-                            </ul>
                           </div>
                         </div>
                       </div>
