@@ -51,21 +51,19 @@ service cloud.firestore {
 
     match /calculations/{calcId} {
       function isValidCalculation(data) {
-        return data.keys().hasAll(['userId', 'createdAt']) && 
-               data.userId == request.auth.uid &&
-               data.createdAt == request.time &&
-               data.userId is string && data.userId.size() <= 128;
+        return data.userId == request.auth.uid &&
+               data.createdAt == request.time;
       }
       
-      allow get: if isVerified() && isValidId(calcId) && existing().userId == request.auth.uid;
-      allow create: if isVerified() && isValidId(calcId) && isValidCalculation(incoming());
+      allow get: if isVerified() && existing().userId == request.auth.uid;
+      allow create: if isVerified() && isValidCalculation(incoming());
       
-      allow update: if isVerified() && isValidId(calcId) && 
+      allow update: if isVerified() && 
         incoming().userId == request.auth.uid && 
         existing().userId == request.auth.uid &&
         incoming().createdAt == existing().createdAt;
         
-      allow delete: if isVerified() && isValidId(calcId) && existing().userId == request.auth.uid;
+      allow delete: if isVerified() && (isAdmin() || existing().userId == request.auth.uid);
       
       allow list: if isVerified() && resource.data.userId == request.auth.uid;
     }

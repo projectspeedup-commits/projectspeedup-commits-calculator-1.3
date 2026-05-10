@@ -401,9 +401,18 @@ export default function App() {
   const handleAnonymousLogin = async (targetView: "manager" | "purchasing" | "admin") => {
     if (!user) {
       try {
-        await signInAnonymously(auth);
+        if (!isCloudActive && config?.usePostgres) {
+          // Local fallback user
+          setUser({ uid: "local_manager", isAnonymous: true, displayName: "Локальный пользователь" });
+        } else {
+          await signInAnonymously(auth);
+        }
       } catch (error) {
         console.error("Anonymous login failed:", error);
+        // Even if both fail, we might want to let them see the UI in offline mode if we have local storage
+        if (config?.usePostgres) {
+           setUser({ uid: "local_emergency", isAnonymous: true });
+        }
       }
     }
     setView(targetView);
