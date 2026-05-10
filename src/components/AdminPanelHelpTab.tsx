@@ -91,6 +91,40 @@ export default function AdminPanelHelpTab(props: any) {
                           </div>
                         </div>
                       </div>
+
+                      <div className="space-y-4">
+                        <h4 className="text-fuchsia-400 font-bold uppercase tracking-wider text-xs">
+                          Шаг 3: Внешний доступ (Интернет)
+                        </h4>
+                        <p className="text-sm text-slate-300 leading-relaxed">
+                           Чтобы открыть доступ коллегам через интернет, используйте один из инструментов:
+                        </p>
+                        
+                        <div className="space-y-4">
+                          {/* Option 1: Localtunnel (Proven to work for user) */}
+                          <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700">
+                            <p className="text-xs font-bold text-fuchsia-300 mb-2">Вариант А: LocalTunnel (Самый простой)</p>
+                            <div className="bg-black/40 rounded-lg p-3 font-mono text-[10px] text-fuchsia-300 space-y-1">
+                              <p className="text-slate-500 italic"># 1. Установить</p>
+                              <p>sudo npm install -g localtunnel</p>
+                              <p className="text-slate-500 italic mt-2"># 2. Запустить с ВАШИМ именем (например, zmk-app)</p>
+                              <p>lt --port 3000 --subdomain zmk-app</p>
+                            </div>
+                            <p className="text-[10px] text-slate-400 mt-2">
+                              <b>Важно:</b> При первом переходе по ссылке введите ваш IP: <code className="text-white">62.217.186.238</code>
+                            </p>
+                          </div>
+
+                          {/* Option 2: Cloudflare */}
+                          <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700">
+                            <p className="text-xs font-bold text-sky-300 mb-2">Вариант Б: Cloudflare (Более стабильный)</p>
+                            <div className="bg-black/40 rounded-lg p-3 font-mono text-[10px] text-sky-300 space-y-1">
+                              <p className="text-slate-500 italic"># 1. Запустить быстрый туннель</p>
+                              <p>cloudflared tunnel --url http://localhost:3000</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
                     {/* Automation Setup */}
