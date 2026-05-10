@@ -92,36 +92,79 @@ export default function AdminPanelHelpTab(props: any) {
                         </div>
                       </div>
 
-                      <div className="space-y-4">
+                      <div className="space-y-6">
                         <h4 className="text-fuchsia-400 font-bold uppercase tracking-wider text-xs">
                           Шаг 3: Внешний доступ (Интернет)
                         </h4>
-                        <p className="text-sm text-slate-300 leading-relaxed">
-                           Чтобы открыть доступ коллегам через интернет, используйте один из инструментов:
-                        </p>
                         
-                        <div className="space-y-4">
-                          {/* Option 1: Localtunnel (Proven to work for user) */}
-                          <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700">
-                            <p className="text-xs font-bold text-fuchsia-300 mb-2">Вариант А: LocalTunnel (Самый простой)</p>
-                            <div className="bg-black/40 rounded-lg p-3 font-mono text-[10px] text-fuchsia-300 space-y-1">
-                              <p className="text-slate-500 italic"># 1. Установить</p>
-                              <p>sudo npm install -g localtunnel</p>
-                              <p className="text-slate-500 italic mt-2"># 2. Запустить с ВАШИМ именем (например, zmk-app)</p>
-                              <p>lt --port 3000 --subdomain zmk-app</p>
+                        <div className="space-y-6">
+                          {/* Option 1: PM2 LocalTunnel */}
+                          <div className="bg-slate-800/40 p-5 rounded-2xl border border-slate-700 shadow-xl">
+                            <div className="flex items-center gap-3 mb-3">
+                              <div className="p-2 bg-fuchsia-500/20 rounded-lg">
+                                <div className="w-2 h-2 rounded-full bg-fuchsia-500 animate-pulse"></div>
+                              </div>
+                              <p className="text-sm font-bold text-fuchsia-300">Вариант А: LocalTunnel + PM2 (Работа 24/7)</p>
                             </div>
-                            <p className="text-[10px] text-slate-400 mt-2">
-                              <b>Важно:</b> При первом переходе по ссылке введите ваш IP: <code className="text-white">62.217.186.238</code>
+                            <p className="text-xs text-slate-400 mb-4 leading-relaxed">
+                              Чтобы ссылка не "падала" и не выдавала 503, запустите её через менеджер процессов:
                             </p>
+                            <div className="bg-black/60 rounded-xl p-4 font-mono text-[11px] text-fuchsia-300 border border-fuchsia-500/20 space-y-2">
+                              <p className="text-slate-500 italic"># Запустить туннель в фоне</p>
+                              <p>pm2 start lt --name "zmk-tunnel" -- --port 3000 --subdomain zmk-arsenal</p>
+                              <p className="text-slate-500 italic mt-2"># Проверить статус</p>
+                              <p>pm2 status</p>
+                            </div>
+                            <div className="mt-3 p-3 bg-fuchsia-500/5 rounded-lg border border-fuchsia-500/10">
+                              <p className="text-[10px] text-fuchsia-200/70">
+                                <b>Как убрать "проверку IP":</b> Это особенность бесплатного LocalTunnel. Чтобы её не было, нужно использовать Вариант Б или В.
+                              </p>
+                            </div>
                           </div>
 
-                          {/* Option 2: Cloudflare */}
-                          <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700">
-                            <p className="text-xs font-bold text-sky-300 mb-2">Вариант Б: Cloudflare (Более стабильный)</p>
-                            <div className="bg-black/40 rounded-lg p-3 font-mono text-[10px] text-sky-300 space-y-1">
-                              <p className="text-slate-500 italic"># 1. Запустить быстрый туннель</p>
-                              <p>cloudflared tunnel --url http://localhost:3000</p>
+                          {/* Option 2: Ngrok Static */}
+                          <div className="bg-slate-800/40 p-5 rounded-2xl border border-slate-700 shadow-xl">
+                            <div className="flex items-center gap-3 mb-3">
+                              <div className="p-2 bg-emerald-500/20 rounded-lg">
+                                <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                              </div>
+                              <p className="text-sm font-bold text-emerald-300">Вариант Б: Ngrok (Рекомендуется)</p>
                             </div>
+                            <p className="text-xs text-slate-400 mb-4">
+                              Самый стабильный способ. Ссылка будет работать 24/7 и не просит вводить IP.
+                            </p>
+                            <div className="bg-black/60 rounded-xl p-4 font-mono text-[10px] text-emerald-400 border border-emerald-500/20 space-y-3">
+                              <div>
+                                <p className="text-slate-500 mb-1">// 1. Авторизация (выполнить 1 раз):</p>
+                                <p className="select-all">ngrok config add-authtoken 2XodaMEKIPKQ8p4HpEdGdONLaz</p>
+                              </div>
+                              <div>
+                                <p className="text-slate-500 mb-1">// 2. Запуск постоянной ссылки:</p>
+                                <p className="select-all">pm2 start ngrok --name "zmk-link" -- http 3000</p>
+                              </div>
+                              <div>
+                                <p className="text-slate-500 mb-1">// 3. Узнать вашу ссылку (URL):</p>
+                                <p className="text-yellow-400 select-all">curl http://localhost:4040/api/tunnels | grep -o 'https://[^"]*'</p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Option 3: Cloudflare Domain */}
+                          <div className="bg-slate-800/40 p-5 rounded-2xl border border-slate-700 shadow-xl opacity-80 hover:opacity-100 transition-opacity">
+                            <div className="flex items-center gap-3 mb-3">
+                              <div className="p-2 bg-sky-500/20 rounded-lg">
+                                <div className="w-2 h-2 rounded-full bg-sky-500"></div>
+                              </div>
+                              <p className="text-sm font-bold text-sky-300">Вариант В: Cloudflare Tunnel (PRO)</p>
+                            </div>
+                            <p className="text-xs text-slate-400 mb-3">
+                              Самый надежный способ. Требует наличия своего домена (напр. zmk-arsenal.ru).
+                            </p>
+                            <ul className="text-[10px] text-slate-300 space-y-1 list-disc list-inside">
+                              <li>Добавьте домен в Cloudflare (бесплатно)</li>
+                              <li>В панели выберите Zero Trust &gt; Tunnels</li>
+                              <li>Создайте Remote Tunnel и следуйте инструкции</li>
+                            </ul>
                           </div>
                         </div>
                       </div>
