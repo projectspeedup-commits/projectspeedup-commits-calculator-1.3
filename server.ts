@@ -60,12 +60,24 @@ async function startServer() {
         "SELECT * FROM calculations WHERE user_id = $1 ORDER BY created_at DESC",
         [userId || 'offline']
       );
-      res.json(result.rows.map(row => ({
-        ...(typeof row.data === 'string' ? JSON.parse(row.data) : row.data),
-        id: row.id.toString(),
-        createdAt: { toDate: () => new Date(row.created_at) }, // Compatibility with Firebase interface
-        _createdAtMs: new Date(row.created_at).getTime()
-      })));
+      res.json(result.rows.map(row => {
+        const data = typeof row.data === 'string' ? JSON.parse(row.data) : (row.data || {});
+        return {
+          ...data,
+          id: row.id.toString(),
+          userId: row.user_id,
+          profileType: data.profileType || row.profile_type,
+          steelGrade: data.steelGrade || row.steel_grade,
+          selectedTarget: data.selectedTarget || row.selected_target,
+          selectedRaw: data.selectedRaw || row.selected_raw,
+          orderWeight: data.orderWeight || row.order_weight,
+          orderedLength: data.orderedLength || row.ordered_length,
+          lengthInputValue: data.lengthInputValue || row.length_input_value,
+          usefulLength: data.usefulLength || row.useful_length,
+          createdAt: { toDate: () => new Date(row.created_at) },
+          _createdAtMs: new Date(row.created_at).getTime()
+        };
+      }));
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Failed to fetch calculations" });
@@ -108,11 +120,17 @@ async function startServer() {
       const query = `INSERT INTO calculations (${columns.join(', ')}) VALUES (${placeholders}) RETURNING *`;
       
       const result = await pool.query(query, values);
-      const savedRow = result.rows[0];
+      const row = result.rows[0];
+      const savedData = typeof row.data === 'string' ? JSON.parse(row.data) : (row.data || {});
+      
       res.json({
-        ...(typeof savedRow.data === 'string' ? JSON.parse(savedRow.data) : savedRow.data),
-        id: savedRow.id.toString(),
-        created_at: savedRow.created_at
+        ...savedData,
+        id: row.id.toString(),
+        userId: row.user_id,
+        profileType: savedData.profileType || row.profile_type,
+        steelGrade: savedData.steelGrade || row.steel_grade,
+        selectedTarget: savedData.selectedTarget || row.selected_target,
+        created_at: row.created_at
       });
     } catch (err) {
       console.error(err);
