@@ -8,6 +8,8 @@ import { useStore } from "./store";
 import { app as firebaseApp, auth, db, appId } from "./lib/firebase";
 import { signInAnonymously } from "firebase/auth";
 import { subscribeToUserSettings, saveUserSettingsToCloud, subscribeToSystemData, saveSystemDataToCloud } from './services/db/userSettingsService';
+import { backendService } from './services/api/backendService';
+import { useAppConfig } from './hooks/useAppConfig';
 import { useEffect, useState, useCallback, useRef } from "react";
 import debounce from "lodash.debounce";
 import { AdminPanel } from "./components/AdminPanel";
@@ -21,6 +23,7 @@ export default function App() {
   const [view, setView] = useState<
     "login" | "manager" | "admin" | "purchasing"
   >("login");
+  const { config, loading: configLoading } = useAppConfig();
   const [user, setUser] = useState<any>(null);
   const [isCloudActive, setIsCloudActive] = useState(false);
   const [isConnecting, setIsConnecting] = useState(true);
@@ -69,6 +72,29 @@ export default function App() {
   } = useStore();
   
   const isInitialLoad = useRef(true);
+
+  // Load data from PostgreSQL if enabled
+  useEffect(() => {
+    if (config?.usePostgres && user) {
+      const loadPostgresSettings = async () => {
+        try {
+          const data = await backendService.getSettings(user.uid);
+          if (data) {
+            if (data.rawPrices) setGlobalRawPrices(data.rawPrices);
+            if (data.scrapPrice !== undefined) setGlobalScrapPrice(data.scrapPrice);
+            if (data.remnantPrice !== undefined) setGlobalRemnantPrice(data.remnantPrice);
+            if (data.remnantPricing) setRemnantPricing(data.remnantPricing);
+            if (data.customGrades) setCustomGrades(data.customGrades);
+            if (data.deletedGrades) setDeletedGrades(data.deletedGrades);
+            if (data.economyItems) setEconomyItems(data.economyItems);
+          }
+        } catch (err) {
+          console.error("PostgreSQL settings load failed", err);
+        }
+      };
+      loadPostgresSettings();
+    }
+  }, [config, user]);
 
   useEffect(() => {
     const handleOnline = () => {
@@ -469,7 +495,7 @@ export default function App() {
           sanitizedRawPrices[sanitizeKey(k)] = v;
         }
 
-        await saveUserSettingsToCloud(db, user.uid, {
+        const personalPayload = {
           rawPrices: sanitizedRawPrices,
           scrapPrice: scrapStr,
           remnantPrice: remnantStr,
@@ -478,7 +504,13 @@ export default function App() {
           deletedGrades: dGrades,
           economyItems: eItems,
           updatedAt: new Date().toISOString()
-        });
+        };
+
+        if (config?.usePostgres) {
+          await backendService.saveSettings(user.uid, personalPayload);
+        } else {
+          await saveUserSettingsToCloud(db, user.uid, personalPayload);
+        }
       } catch (error) {
         handleFirestoreError(error as any, OperationType.WRITE, `users/${user.uid}/settings/preferences`);
       }

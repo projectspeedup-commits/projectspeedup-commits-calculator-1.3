@@ -48,6 +48,8 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { subscribeToUserHistory, saveCalculationToCloud, deleteCalculationFromCloud, clearUserHistoryFromCloud } from '../services/db/calcHistoryService';
+import { backendService } from '../services/api/backendService';
+import { useAppConfig } from '../hooks/useAppConfig';
 import { PrintTemplate } from "./PrintTemplate";
 import { db } from "../lib/firebase";
 import { handleFirestoreError, OperationType, validateNumeric, validateDimensions } from "../lib/utils";
@@ -111,6 +113,21 @@ export function CalculatorApp({
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [savedCalculations, setSavedCalculations] = useState<any[]>([]);
   const [showHistory, setShowHistory] = useState(false);
+  const { config } = useAppConfig();
+
+  useEffect(() => {
+    if (config?.usePostgres && user) {
+      const loadPostgresHistory = async () => {
+        try {
+          const calcs = await backendService.getCalculations(user.uid);
+          setSavedCalculations(calcs);
+        } catch (err) {
+          console.error("PostgreSQL history load failed", err);
+        }
+      };
+      loadPostgresHistory();
+    }
+  }, [config, user]);
 
   useEffect(() => {
     const errors: Record<string, string> = {};
@@ -707,7 +724,7 @@ export function CalculatorApp({
   ]);
 
   useEffect(() => {
-    if (!isCloudActive) {
+    if (!isCloudActive || config?.usePostgres) {
       if (typeof window !== "undefined") {
         try {
           const raw = window.localStorage.getItem("arsenal_offline_calcs");
@@ -779,7 +796,9 @@ export function CalculatorApp({
         label: `${getProfileGost(profileType)} ${selectedTarget}мм, ${steelGrade}`,
       };
 
-      if (isCloudActive && db && user) {
+      if (config?.usePostgres && user) {
+        await backendService.saveCalculation(payload);
+      } else if (isCloudActive && db && user) {
         await saveCalculationToCloud(db, payload);
       } else {
         payload.id = Date.now().toString();
@@ -807,7 +826,10 @@ export function CalculatorApp({
   const deleteCalculation = async (id: string) => {
     if (confirm("Удалить этот расчет?")) {
       try {
-        if (isCloudActive && db) {
+        if (config?.usePostgres) {
+          await backendService.deleteCalculation(id);
+          setSavedCalculations(prev => prev.filter(c => c.id !== id));
+        } else if (isCloudActive && db) {
           await deleteCalculationFromCloud(db, id);
         } else {
           const newSaved = savedCalculations.filter(c => c.id !== id);

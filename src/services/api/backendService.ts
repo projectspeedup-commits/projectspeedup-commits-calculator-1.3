@@ -1,0 +1,71 @@
+/**
+ * Service for communicating with the PostgreSQL-powered backend.
+ */
+
+const API_URL = ''; // Empty string means current origin
+
+export interface CalculationData {
+  id?: string;
+  userId: string;
+  profileType: 'round' | 'hex';
+  steelGrade: string;
+  selectedTarget: string;
+  selectedRaw: string;
+  orderWeight: string;
+  orderedLength: string;
+  lengthInputValue: string;
+  lengthInputSource: string;
+  frontCoef: string;
+  backCoef: string;
+  usefulLength: string;
+  sellPrice: string;
+  rawPriceUsed: string;
+  scrapPriceUsed: string;
+  remnantPriceUsed: string;
+  label: string;
+  createdAt?: any;
+}
+
+export const backendService = {
+  async getCalculations(userId: string): Promise<CalculationData[]> {
+    const response = await fetch(`${API_URL}/api/calculations?userId=${userId}`);
+    if (!response.ok) throw new Error('Failed to fetch calculations');
+    return response.json();
+  },
+
+  async saveCalculation(data: CalculationData): Promise<any> {
+    const response = await fetch(`${API_URL}/api/calculations`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error('Failed to save calculation');
+    return response.json();
+  },
+
+  async deleteCalculation(id: string): Promise<void> {
+    const response = await fetch(`${API_URL}/api/calculations/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to delete calculation');
+  },
+
+  async getSettings(userId: string): Promise<any> {
+    const response = await fetch(`${API_URL}/api/settings/${userId}`);
+    if (!response.ok) throw new Error('Failed to fetch settings');
+    return response.json();
+  },
+
+  async saveSettings(userId: string, data: any): Promise<void> {
+    const response = await fetch(`${API_URL}/api/settings/${userId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error('Failed to save settings');
+  }
+};

@@ -57,6 +57,28 @@ To create a production build in the `dist` folder:
 npm run build
 ```
 
+### Self-Hosting with PostgreSQL (Optional)
+
+1. **Install PostgreSQL**: Ensure you have a running PostgreSQL instance.
+2. **Initialize Database**:
+   ```bash
+   psql -U your_user -d your_db -f init.sql
+   ```
+3. **Configuration**: Add `DATABASE_URL` to your `.env` file:
+   ```
+   DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
+   ```
+4. **Run Server**:
+   ```bash
+   # Production mode
+   NODE_ENV=production tsx server.ts
+   ```
+
+To manage with PM2:
+```bash
+pm2 start "tsx server.ts" --name "zmk-app"
+```
+
 ## Technologies
 
 - **React 18** + **Vite**
@@ -64,4 +86,6 @@ npm run build
 - **Tailwind CSS**
 - **Lucide React** (Icons)
 - **Firebase** (Firestore & Auth)
+- **PostgreSQL** (Self-hosted Database)
+- **Express** (Backend Server)
 - **Motion** (Animations)
