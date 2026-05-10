@@ -1435,7 +1435,7 @@ export function CalculatorApp({
                                 Сталь:
                               </span>
                               <span className="text-[11px] font-black text-slate-900 dark:text-white uppercase">
-                                {calc.steelGrade}
+                                {calc.steelGrade || calc.steel_grade || "—"}
                               </span>
                             </div>
 
@@ -1445,7 +1445,7 @@ export function CalculatorApp({
                                   Готовый:
                                 </span>
                                 <span className="font-bold text-slate-700 dark:text-slate-200">
-                                  {parseFloat(calc.selectedTarget || "0")} мм
+                                  {parseFloat(String(calc.selectedTarget || calc.selected_target || "0"))} мм
                                 </span>
                               </div>
                               <div className="flex flex-col text-right">
@@ -1453,7 +1453,7 @@ export function CalculatorApp({
                                   Заготовка:
                                 </span>
                                 <span className="font-bold text-slate-700 dark:text-slate-200">
-                                  {calc.lengthInputValue || "6000"} мм
+                                  {calc.lengthInputValue || calc.length_input_value || "—"} мм
                                 </span>
                               </div>
                               <div className="flex flex-col">
@@ -1461,7 +1461,7 @@ export function CalculatorApp({
                                   Заказ:
                                 </span>
                                 <span className="font-bold text-slate-700 dark:text-slate-200">
-                                  {calc.orderedLength || "6000"} мм
+                                  {calc.orderedLength || calc.ordered_length || "—"} мм
                                 </span>
                               </div>
                               <div className="flex flex-col text-right">
@@ -1469,17 +1469,17 @@ export function CalculatorApp({
                                   Полезная:
                                 </span>
                                 <span className="font-bold text-[#0D652D] dark:text-green-400">
-                                  {calc.usefulLength || "—"} мм
+                                  {calc.usefulLength || calc.useful_length || "—"} мм
                                 </span>
                               </div>
                             </div>
 
                             <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center">
                               <span className="text-[9px] font-medium text-slate-400 dark:text-slate-500">
-                                {calc.orderWeight} тн
+                                {calc.orderWeight || calc.order_weight} тн
                               </span>
                               <span className="text-[9px] font-bold text-indigo-600 dark:text-indigo-400">
-                                {calc.profileType === "round"
+                                {String(calc.profileType || calc.profile_type).toLowerCase() === "round"
                                   ? "Круг"
                                   : "Шестигр."}
                               </span>

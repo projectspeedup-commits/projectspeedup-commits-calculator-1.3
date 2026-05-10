@@ -61,19 +61,21 @@ async function startServer() {
         [userId || 'offline']
       );
       res.json(result.rows.map(row => {
-        const data = typeof row.data === 'string' ? JSON.parse(row.data) : (row.data || {});
+        const jsonData = typeof row.data === 'string' ? JSON.parse(row.data) : (row.data || {});
+        // Merge JSON data with flat columns, prioritizing JSON, but ensuring all fields exist
         return {
-          ...data,
+          ...jsonData,
           id: row.id.toString(),
           userId: row.user_id,
-          profileType: data.profileType || row.profile_type,
-          steelGrade: data.steelGrade || row.steel_grade,
-          selectedTarget: data.selectedTarget || row.selected_target,
-          selectedRaw: data.selectedRaw || row.selected_raw,
-          orderWeight: data.orderWeight || row.order_weight,
-          orderedLength: data.orderedLength || row.ordered_length,
-          lengthInputValue: data.lengthInputValue || row.length_input_value,
-          usefulLength: data.usefulLength || row.useful_length,
+          profileType: jsonData.profileType || row.profile_type || 'round',
+          steelGrade: jsonData.steelGrade || row.steel_grade || '',
+          selectedTarget: jsonData.selectedTarget || row.selected_target || '0',
+          selectedRaw: jsonData.selectedRaw || row.selected_raw || '0',
+          orderWeight: jsonData.orderWeight || row.order_weight || '0',
+          orderedLength: jsonData.orderedLength || row.ordered_length || '0',
+          lengthInputValue: jsonData.lengthInputValue || row.length_input_value || '0',
+          usefulLength: jsonData.usefulLength || row.useful_length || '0',
+          label: jsonData.label || row.label || '',
           createdAt: { toDate: () => new Date(row.created_at) },
           _createdAtMs: new Date(row.created_at).getTime()
         };
@@ -121,15 +123,15 @@ async function startServer() {
       
       const result = await pool.query(query, values);
       const row = result.rows[0];
-      const savedData = typeof row.data === 'string' ? JSON.parse(row.data) : (row.data || {});
+      const jsonData = typeof row.data === 'string' ? JSON.parse(row.data) : (row.data || {});
       
       res.json({
-        ...savedData,
+        ...jsonData,
         id: row.id.toString(),
         userId: row.user_id,
-        profileType: savedData.profileType || row.profile_type,
-        steelGrade: savedData.steelGrade || row.steel_grade,
-        selectedTarget: savedData.selectedTarget || row.selected_target,
+        profileType: jsonData.profileType || row.profile_type || 'round',
+        steelGrade: jsonData.steelGrade || row.steel_grade || '',
+        selectedTarget: jsonData.selectedTarget || row.selected_target || '0',
         created_at: row.created_at
       });
     } catch (err) {
