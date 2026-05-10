@@ -61,7 +61,7 @@ async function startServer() {
         [userId || 'offline']
       );
       res.json(result.rows.map(row => ({
-        ...row,
+        ...(typeof row.data === 'string' ? JSON.parse(row.data) : row.data),
         id: row.id.toString(),
         createdAt: { toDate: () => new Date(row.created_at) }, // Compatibility with Firebase interface
         _createdAtMs: new Date(row.created_at).getTime()
@@ -108,7 +108,12 @@ async function startServer() {
       const query = `INSERT INTO calculations (${columns.join(', ')}) VALUES (${placeholders}) RETURNING *`;
       
       const result = await pool.query(query, values);
-      res.json(result.rows[0]);
+      const savedRow = result.rows[0];
+      res.json({
+        ...(typeof savedRow.data === 'string' ? JSON.parse(savedRow.data) : savedRow.data),
+        id: savedRow.id.toString(),
+        created_at: savedRow.created_at
+      });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Failed to save calculation" });
