@@ -78,16 +78,33 @@ export default function AdminPanelHelpTab(props: any) {
                         <h4 className="text-sky-400 font-bold uppercase tracking-wider text-xs">
                           Шаг 2: Обновление (192.168.1.245)
                         </h4>
-                        <p className="text-sm text-slate-300 leading-relaxed">
-                          Теперь в терминале сервера (из Шага 0) введите по очереди:
-                        </p>
-                        <div className="bg-black/40 rounded-2xl p-4 border border-slate-800 font-mono text-xs text-sky-300 space-y-2">
-                          <p className="text-white">cd ~/zmk-app</p>
-                          <p className="text-white">git pull origin main</p>
-                          <p className="text-white">npm run build</p>
-                          <p className="text-white">pm2 restart zmk-app</p>
+                        <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700 space-y-3">
+                          <p className="text-xs text-slate-300">
+                            <b>Вариант А (Авто):</b> Скрипт <code>server_update.sh</code> уже в корне проекта. Настройте cron (см. ниже), чтобы сервер обновлялся сам.
+                          </p>
+                          <p className="text-xs text-slate-300">
+                            <b>Вариант Б (Ручной):</b> Введите в терминале:
+                          </p>
+                          <div className="bg-black/40 rounded-lg p-3 font-mono text-[10px] text-sky-300 space-y-1">
+                            <p>cd ~/zmk-app</p>
+                            <p>./server_update.sh</p>
+                          </div>
                         </div>
                       </div>
+                    </div>
+
+                    {/* Automation Setup */}
+                    <div className="mt-8 pt-8 border-t border-slate-800">
+                       <h4 className="text-emerald-400 font-bold uppercase tracking-wider text-xs mb-4">
+                          Настройка авто-обновления (Cron)
+                        </h4>
+                        <p className="text-sm text-slate-400 mb-4">
+                          Выполните это ОДИН РАЗ, чтобы сервер проверял обновления каждые 5 минут:
+                        </p>
+                        <div className="bg-black/60 rounded-2xl p-5 border border-slate-700 font-mono text-xs text-emerald-400 leading-relaxed">
+                          chmod +x ~/zmk-app/server_update.sh <br/>
+                          (crontab -l 2&gt;/dev/null; echo "*/5 * * * * ~/zmk-app/server_update.sh &gt;&gt; ~/zmk-app/update.log 2&gt;&amp;1") | crontab -
+                        </div>
                     </div>
                   </div>
                 )}
