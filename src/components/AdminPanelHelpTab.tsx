@@ -104,53 +104,74 @@ export default function AdminPanelHelpTab(props: any) {
 
                       <div className="space-y-6 lg:col-span-3 border-t border-slate-800 pt-6">
                         <h4 className="text-fuchsia-400 font-bold uppercase tracking-wider text-xs">
-                          Шаг 3: Внешний доступ (Интернет)
+                          Шаг 3: Внешний доступ (Туннели)
                         </h4>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {/* Option 1: Ngrok (Recommended) */}
-                          <div className="bg-slate-800/40 p-5 rounded-2xl border border-slate-700 shadow-xl">
+                          {/* Option 1: Cloudflare Tunnel (Recommended for Custom Domain) */}
+                          <div className="bg-sky-950/20 p-5 rounded-2xl border border-sky-500/20 shadow-xl col-span-1 md:col-span-2 lg:col-span-1">
                             <div className="flex items-center gap-3 mb-3">
-                              <div className="p-2 bg-emerald-500/20 rounded-lg">
-                                <LucideIcons.Globe className="w-4 h-4 text-emerald-500" />
+                              <div className="p-2 bg-sky-500/20 rounded-lg">
+                                <LucideIcons.ShieldCheck className="w-4 h-4 text-sky-400" />
                               </div>
-                              <p className="text-sm font-bold text-emerald-300">Ngrok (Работа 24/7)</p>
+                              <p className="text-sm font-bold text-sky-300">Свой Домен (Cloudflare)</p>
                             </div>
-                            <div className="bg-black/60 rounded-xl p-4 font-mono text-[10px] text-emerald-400 border border-emerald-500/20 space-y-3">
-                              <div>
-                                <p className="text-slate-500 mb-1">// 1. Очистка и авторизация (Ваш актуальный токен):</p>
-                                <p className="text-red-400 select-all">pm2 delete zmk-link</p>
-                                <p className="text-emerald-300 select-all">ngrok config add-authtoken 3DXodaMEKIPKQ8p4HpEdGdONLaz_2LkCfHR7oLa9BQh4hWHnV</p>
-                              </div>
-                              <div>
-                                <p className="text-slate-500 mb-1">// 2. Запуск туннеля в фоне:</p>
-                                <p className="select-all">pm2 start ngrok --name "zmk-link" -- http 3000</p>
-                              </div>
-                              <div>
-                                <p className="text-slate-500 mb-1">// 3. ПОЛУЧИТЬ ССЫЛКУ (выполните это):</p>
-                                <code className="text-yellow-400 block p-2 bg-yellow-400/5 rounded border border-yellow-400/20 select-all">curl http://localhost:4040/api/tunnels | grep -o 'https://[a-z0-9.-]*'</code>
-                              </div>
+                            <p className="text-[10px] text-slate-400 mb-3 leading-relaxed">
+                              Идеально для вашего домена. Работает стабильно 24/7 без лишних ссылок.
+                            </p>
+                            <div className="space-y-4 mb-4">
+                               <div className="space-y-1">
+                                 <p className="text-[10px] font-bold text-sky-400 uppercase">1. Запуск Tuunel в Dashbaord:</p>
+                                 <p className="text-[9px] text-slate-300 leading-tight">
+                                   В меню слева <b>Zero Trust</b> → <b>Networks</b> → <b>Tunnels</b> → <b>Create a tunnel</b>.
+                                 </p>
+                               </div>
+                               <div className="space-y-1">
+                                 <p className="text-[10px] font-bold text-sky-400 uppercase">2. Установка на сервер:</p>
+                                 <p className="text-[9px] text-slate-300 leading-tight">
+                                   Дайте имя туннелю, выберите <b>Linux (x86-64)</b>. Скопируйте команду из блока <b>"If you already have cloudflared..."</b> (или нижнюю для установки) и вставьте в SSH терминал сервера.
+                                 </p>
+                               </div>
+                               <div className="space-y-1">
+                                 <p className="text-[10px] font-bold text-sky-400 uppercase">3. Привязка домена (Public Hostname):</p>
+                                 <p className="text-[9px] text-slate-300 leading-tight">
+                                   Нажмите <b>Next</b> в панели. Выберите свой домен. Type: <b>HTTP</b>. URL: <code className="text-sky-300">localhost:3000</code>. Нажмите <b>Save tunnel</b>.
+                                 </p>
+                               </div>
+                               <div className="pt-2 border-t border-sky-500/10">
+                                 <p className="text-[9px] text-emerald-400 flex items-center gap-1">
+                                   <LucideIcons.CheckCircle2 className="w-3 h-3" /> Туннель работает как служба. Ngrok больше не нужен.
+                                 </p>
+                               </div>
                             </div>
                           </div>
 
-                          {/* Troubleshooting */}
-                          <div className="bg-orange-950/20 p-5 rounded-2xl border border-orange-500/20">
-                            <h5 className="text-xs font-bold text-orange-400 uppercase mb-3 flex items-center gap-2">
-                              <LucideIcons.AlertTriangle className="w-4 h-4" /> Если ссылка не открывается
+                          {/* Option 3: Pinggy (No install backup) */}
+                          <div className="bg-indigo-950/20 p-5 rounded-2xl border border-indigo-500/20 shadow-xl">
+                            <div className="flex items-center gap-3 mb-3">
+                              <div className="p-2 bg-indigo-500/20 rounded-lg">
+                                <LucideIcons.Zap className="w-4 h-4 text-indigo-400" />
+                              </div>
+                              <p className="text-sm font-bold text-indigo-300">Pinggy (Если Ngrok не работает)</p>
+                            </div>
+                            <p className="text-[10px] text-slate-400 mb-3">
+                              Не требует установки и регистрации. Просто введите команду в терминал:
+                            </p>
+                            <div className="bg-black/60 rounded-xl p-4 font-mono text-[10px] text-indigo-300 border border-indigo-500/20">
+                              <p className="select-all block p-2 bg-indigo-500/5 rounded border border-indigo-500/20">ssh -p 443 -R0:localhost:3000 a.pinggy.io</p>
+                            </div>
+                            <p className="text-[9px] text-slate-500 mt-3 italic">
+                              * Ссылка вида .pinggy.link появится в консоли сразу после запуска.
+                            </p>
+                          </div>
+
+                          <div className="bg-red-950/20 p-5 rounded-2xl border border-red-500/20">
+                             <h5 className="text-xs font-bold text-red-400 uppercase mb-3 flex items-center gap-2">
+                              <LucideIcons.RefreshCw className="w-4 h-4" /> Перезапуск
                             </h5>
-                            <div className="space-y-3">
-                              <p className="text-[10px] text-slate-400 leading-relaxed">
-                                Если <b>curl</b> ничего не выдает или ссылка не работает, проверьте логи ошибок:
-                              </p>
-                              <code className="block bg-black/40 p-2 rounded text-orange-300 text-[10px] select-all">pm2 logs zmk-link --lines 20</code>
-                              <p className="text-[10px] text-slate-400 font-medium">
-                                Возможные причины:
-                              </p>
-                              <ul className="text-[9px] text-slate-500 list-disc list-inside space-y-1">
-                                <li>Неверный Authtoken (проверьте пробелы)</li>
-                                <li>Аккаунт Ngrok требует подтверждения почты</li>
-                                <li>Уже запущен другой туннель (сделайте <code className="text-slate-400">pm2 delete all</code>)</li>
-                              </ul>
+                            <div className="bg-black/60 rounded-xl p-3 font-mono text-[9px] text-red-300 space-y-2 border border-red-500/10">
+                              <p>pm2 delete all</p>
+                              <p>cd ~/zmk-app && pm2 start npm --name "zmk-app" -- run start</p>
                             </div>
                           </div>
                         </div>
