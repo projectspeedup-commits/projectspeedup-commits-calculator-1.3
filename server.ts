@@ -126,6 +126,18 @@ async function startServer() {
     }
   });
 
+  app.delete("/api/calculations", async (req, res) => {
+    const { userId } = req.query;
+    if (!userId) return res.status(400).json({ error: "userId required" });
+    try {
+      await pool.query("DELETE FROM calculations WHERE user_id = $1", [userId]);
+      res.json({ success: true });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to clear calculations" });
+    }
+  });
+
   // Settings API (optional but good for future)
   app.get("/api/settings/:userId", async (req, res) => {
     const { userId } = req.params;
@@ -154,6 +166,34 @@ async function startServer() {
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Failed to save settings" });
+    }
+  });
+
+  app.get("/api/global-settings", async (req, res) => {
+    try {
+      const result = await pool.query("SELECT * FROM user_settings WHERE user_id = 'global'");
+      if (result.rows.length > 0) {
+        res.json(result.rows[0].data);
+      } else {
+        res.json(null);
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to fetch global settings" });
+    }
+  });
+
+  app.post("/api/global-settings", async (req, res) => {
+    const data = req.body;
+    try {
+      await pool.query(
+        "INSERT INTO user_settings (user_id, data, updated_at) VALUES ('global', $1, NOW()) ON CONFLICT (user_id) DO UPDATE SET data = $1, updated_at = NOW()",
+        [JSON.stringify(data)]
+      );
+      res.json({ success: true });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to save global settings" });
     }
   });
 

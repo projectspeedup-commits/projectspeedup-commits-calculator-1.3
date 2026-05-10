@@ -724,7 +724,19 @@ export function CalculatorApp({
   ]);
 
   useEffect(() => {
-    if (!isCloudActive || config?.usePostgres) {
+    if (config?.usePostgres && user) {
+      backendService.getCalculations(user.uid)
+        .then(calcs => {
+          setSavedCalculations(calcs);
+        })
+        .catch(err => {
+          console.error("Failed to load calculations from server:", err);
+          showNotify("Ошибка загрузки истории с сервера", "error");
+        });
+      return;
+    }
+
+    if (!isCloudActive) {
       if (typeof window !== "undefined") {
         try {
           const raw = window.localStorage.getItem("arsenal_offline_calcs");
@@ -797,7 +809,14 @@ export function CalculatorApp({
       };
 
       if (config?.usePostgres && user) {
-        await backendService.saveCalculation(payload);
+        const savedItem = await backendService.saveCalculation(payload);
+        // Transform the saved item for compatibility if needed
+        const newCalc = {
+          ...savedItem,
+          id: savedItem.id.toString(),
+          createdAt: { toDate: () => new Date(savedItem.created_at || Date.now()) }
+        };
+        setSavedCalculations(prev => [newCalc, ...prev]);
       } else if (isCloudActive && db && user) {
         await saveCalculationToCloud(db, payload);
       } else {
@@ -864,7 +883,10 @@ export function CalculatorApp({
     setIsClearing(true);
     try {
       let deletedCount = savedCalculations.length;
-      if (isCloudActive && db) {
+      if (config?.usePostgres && user) {
+        await backendService.clearHistory(user.uid);
+        setSavedCalculations([]);
+      } else if (isCloudActive && db) {
         deletedCount = await clearUserHistoryFromCloud(db, savedCalculations);
       } else {
         setSavedCalculations([]);

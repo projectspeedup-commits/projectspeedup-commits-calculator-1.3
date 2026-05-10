@@ -52,6 +52,13 @@ export const backendService = {
     if (!response.ok) throw new Error('Failed to delete calculation');
   },
 
+  async clearHistory(userId: string): Promise<void> {
+    const response = await fetch(`${API_URL}/api/calculations?userId=${userId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to clear history');
+  },
+
   async getSettings(userId: string): Promise<any> {
     const response = await fetch(`${API_URL}/api/settings/${userId}`);
     if (!response.ok) throw new Error('Failed to fetch settings');
@@ -67,5 +74,22 @@ export const backendService = {
       body: JSON.stringify(data),
     });
     if (!response.ok) throw new Error('Failed to save settings');
+  },
+
+  async getGlobalSettings(): Promise<any> {
+    const response = await fetch(`${API_URL}/api/global-settings`);
+    if (!response.ok) throw new Error('Failed to fetch global settings');
+    return response.json();
+  },
+
+  async saveGlobalSettings(data: any): Promise<void> {
+    const response = await fetch(`${API_URL}/api/global-settings`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error('Failed to save global settings');
   }
 };

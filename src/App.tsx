@@ -76,23 +76,31 @@ export default function App() {
   // Load data from PostgreSQL if enabled
   useEffect(() => {
     if (config?.usePostgres && user) {
-      const loadPostgresSettings = async () => {
+      const loadPostgresData = async () => {
         try {
-          const data = await backendService.getSettings(user.uid);
-          if (data) {
-            if (data.rawPrices) setGlobalRawPrices(data.rawPrices);
-            if (data.scrapPrice !== undefined) setGlobalScrapPrice(data.scrapPrice);
-            if (data.remnantPrice !== undefined) setGlobalRemnantPrice(data.remnantPrice);
-            if (data.remnantPricing) setRemnantPricing(data.remnantPricing);
-            if (data.customGrades) setCustomGrades(data.customGrades);
-            if (data.deletedGrades) setDeletedGrades(data.deletedGrades);
-            if (data.economyItems) setEconomyItems(data.economyItems);
+          // Load shared global settings first
+          const globalData = await backendService.getGlobalSettings();
+          if (globalData) {
+            if (globalData.rawPrices) setGlobalRawPrices(globalData.rawPrices);
+            if (globalData.scrapPrice !== undefined) setGlobalScrapPrice(globalData.scrapPrice);
+            if (globalData.remnantPrice !== undefined) setGlobalRemnantPrice(globalData.remnantPrice);
+            if (globalData.remnantPricing) setRemnantPricing(globalData.remnantPricing);
+            if (globalData.customGrades) setCustomGrades(globalData.customGrades);
+            if (globalData.deletedGrades) setDeletedGrades(globalData.deletedGrades);
+            if (globalData.economyItems) setEconomyItems(globalData.economyItems);
+          }
+
+          // Then load personal user overrides if any
+          const personalData = await backendService.getSettings(user.uid);
+          if (personalData) {
+            if (personalData.rawPrices) setGlobalRawPrices(personalData.rawPrices);
+            // ... add other overrides if needed
           }
         } catch (err) {
           console.error("PostgreSQL settings load failed", err);
         }
       };
-      loadPostgresSettings();
+      loadPostgresData();
     }
   }, [config, user]);
 
@@ -224,7 +232,7 @@ export default function App() {
 
     isInitialLoad.current = false;
 
-    if (db && isCloudActive && user) {
+    if (db && isCloudActive && user && !config?.usePostgres) {
       const unsubscribe = subscribeToSystemData(db, "settings", "prices", (data) => {
           if (data) {
 
@@ -468,7 +476,7 @@ export default function App() {
       }
     } catch (e) {}
 
-    if (db && isCloudActive && user) {
+    if (db && isCloudActive && user && !config?.usePostgres) {
       const firestoreRawPricesV2: Record<string, { md: string; nd: string }> =
         {};
       const firestoreRawPricesOld: Record<string, string> = {};
@@ -493,7 +501,11 @@ export default function App() {
       if (eItems) payload.economyItems = eItems;
 
       try {
-        await saveSystemDataToCloud(db, "settings", "prices", payload);
+        if (config?.usePostgres) {
+          await backendService.saveGlobalSettings(payload);
+        } else {
+          await saveSystemDataToCloud(db, "settings", "prices", payload);
+        }
       } catch (error) {
         // Fallback for non-admins: save only to their personal settings
         console.warn("Could not save to global settings, saving to personal only.");
