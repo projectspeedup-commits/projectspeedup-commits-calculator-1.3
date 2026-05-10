@@ -230,6 +230,37 @@ async function startServer() {
     }
   });
 
+  // Admin Data API
+  app.get("/api/admin-data/:type", async (req, res) => {
+    const { type } = req.params;
+    try {
+      const result = await pool.query("SELECT * FROM user_settings WHERE user_id = $1", [`admin_${type}`]);
+      if (result.rows.length > 0) {
+        res.json(result.rows[0].data);
+      } else {
+        res.json(null);
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to fetch admin data" });
+    }
+  });
+
+  app.post("/api/admin-data/:type", async (req, res) => {
+    const { type } = req.params;
+    const data = req.body;
+    try {
+      await pool.query(
+        "INSERT INTO user_settings (user_id, data, updated_at) VALUES ($1, $2, NOW()) ON CONFLICT (user_id) DO UPDATE SET data = $2, updated_at = NOW()",
+        [`admin_${type}`, JSON.stringify(data)]
+      );
+      res.json({ success: true });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to save admin data" });
+    }
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({

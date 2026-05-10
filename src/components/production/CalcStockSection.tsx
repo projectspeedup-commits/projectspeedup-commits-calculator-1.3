@@ -173,23 +173,24 @@ export function CalcStockSection({
                     onClick={() => {
                       if (filteredMatchedDemand.length === 0) return;
                       const headers = [
-                        "Внутренний №",
-                        "Дата Заказа",
-                        "№ Заказа",
-                        "Клиент",
                         "Номенклатура",
                         "Профиль",
                         "Марка",
                         "Размер мм.",
                         "Длина",
                         "Кол-во тн в заказе",
-                        "ИТОГО остаток к выполнению",
+                        "ИТОГО ост. к выполнению",
+                        "Номенклатура заг.",
+                        "Марка заг.",
+                        "Размер заг.",
+                        "Кол-во тн заг.",
+                        "Длина мм.",
                         "Взято со склада (тн)",
-                        "ИТОГО остатка к завершению",
+                        "ИТОГО ост. к завершению",
                         "Тех. отходы склад г/к",
                         "Дел. Остатки склад г/к",
                         "КИМ склад г/к",
-                        "Исходная Номенклатура",
+                        "ИсходНоменклатура",
                         "Профиль наличия",
                         "НТД",
                         "Марка стали наличия",
@@ -202,10 +203,6 @@ export function CalcStockSection({
                       const rows: string[][] = [];
                       matchedDemand.forEach((res: any) => {
                         const baseRow = [
-                          res.internalNo || "",
-                          res.shippingDate || "",
-                          res.orderNo || "",
-                          res.client || "",
                           res.nomenclature || "",
                           res.type || "",
                           res.grade || "",
@@ -213,39 +210,38 @@ export function CalcStockSection({
                           res.lengthType === "НД" ? "НД" : `МД ${res.length}`,
                           String(res.weightTons || 0).replace(".", ","),
                           String(res.remainingToProcess || 0).replace(".", ","),
+                          res.supplyNomenclature || "",
+                          res.supplyGrade || "",
+                          String(res.supplyDiameter || "").replace(".", ","),
+                          String(res.totalWeight || 0).replace(".", ","),
+                          res.lengthType === "МД" ? `МД ${res.billetLength}` : "НД",
                           String(res.allocatedStock || 0).replace(".", ","),
                           String(res.shortageStock || 0).replace(".", ","),
-                          res.allocatedStock > 0 && res.combinedTechWaste > 0
-                            ? String(res.combinedTechWaste.toFixed(3)).replace(".", ",")
-                            : "0",
-                          res.allocatedStock > 0 && res.combinedUsefulRem > 0
-                            ? String(res.combinedUsefulRem.toFixed(3)).replace(".", ",")
-                            : "0",
-                          res.allocatedStock > 0 && res.combinedKim > 0
-                            ? String(res.combinedKim.toFixed(3)).replace(".", ",")
-                            : "0",
                         ];
                         const maxRows = Math.max(1, res.matchedStockItems?.length || 0);
                         const rowTemplate = Array(headers.length).fill("");
-                        for (let i = 0; i < 16; i++) rowTemplate[i] = baseRow[i];
+                        for (let i = 0; i < 14; i++) rowTemplate[i] = baseRow[i];
 
                         for (let r = 0; r < maxRows; r++) {
                           const outRow = [...rowTemplate];
                           if (r > 0) {
-                            for (let c = 0; c < 16; c++) outRow[c] = "";
+                            for (let c = 0; c < 14; c++) outRow[c] = "";
                           }
 
                           const st = res.matchedStockItems?.[r];
                           if (st) {
-                            outRow[16] = st["Исходная Номенклатура"] || "";
-                            outRow[17] = st["Профиль"] || "";
-                            outRow[18] = st["НТД"] || "";
-                            outRow[19] = st["Марка стали"] || "";
-                            outRow[20] = String(st["Размер"] || "").replace(".", ",");
-                            outRow[21] = st["Длина"] || "";
-                            outRow[22] = String(st.stockBeforeTaking || 0).replace(".", ",");
-                            outRow[23] = String(st.allocatedAmount || 0).replace(".", ",");
-                            outRow[24] = String(st.stockAfterTaking || 0).replace(".", ",");
+                            outRow[14] = st.calculatedTechWaste > 0 ? String(st.calculatedTechWaste.toFixed(3)).replace(".", ",") : "0";
+                            outRow[15] = st.calculatedUsefulRem > 0 ? String(st.calculatedUsefulRem.toFixed(3)).replace(".", ",") : "0";
+                            outRow[16] = st.calculatedKim > 0 ? String(st.calculatedKim.toFixed(3)).replace(".", ",") : "0";
+                            outRow[17] = st["Исходная Номенклатура"] || "";
+                            outRow[18] = st["Профиль"] || "";
+                            outRow[19] = st["НТД"] || "";
+                            outRow[20] = st["Марка стали"] || "";
+                            outRow[21] = String(st["Размер"] || "").replace(".", ",");
+                            outRow[22] = st["Длина"] || "";
+                            outRow[23] = String(st.stockBeforeTaking || 0).replace(".", ",");
+                            outRow[24] = String(st.allocatedAmount || 0).replace(".", ",");
+                            outRow[25] = String(st.stockAfterTaking || 0).replace(".", ",");
                           }
                           rows.push(outRow);
                         }
@@ -343,23 +339,24 @@ export function CalcStockSection({
                     onClick={() => {
                       if (matchedDemand.length === 0) return;
                       const headers = [
-                        "Внутренний №",
-                        "Дата Заказа",
-                        "№ Заказа",
-                        "Клиент",
                         "Номенклатура",
                         "Профиль",
                         "Марка",
                         "Размер мм.",
                         "Длина",
                         "Кол-во тн в заказе",
-                        "ИТОГО остаток к выполнению",
+                        "ИТОГО ост. к выполнению",
+                        "Номенклатура заг.",
+                        "Марка заг.",
+                        "Размер заг.",
+                        "Кол-во тн заг.",
+                        "Длина мм.",
                         "Взято со склада (тн)",
-                        "ИТОГО остатка к завершению",
+                        "ИТОГО ост. к завершению",
                         "Тех. отходы склад г/к",
-                        "Делов. Остатки склад г/к",
+                        "Дел. Остатки склад г/к",
                         "КИМ склад г/к",
-                        "Исходная Номенклатура",
+                        "Исход Номенклатура",
                         "Профиль наличия",
                         "НТД",
                         "Марка стали наличия",
@@ -372,10 +369,6 @@ export function CalcStockSection({
                       const rows: any[][] = [];
                       matchedDemand.forEach((res: any) => {
                         const baseRow = [
-                          res.internalNo || "",
-                          res.shippingDate || "",
-                          res.orderNo || "",
-                          res.client || "",
                           res.nomenclature || "",
                           res.type || "",
                           res.grade || "",
@@ -383,40 +376,45 @@ export function CalcStockSection({
                           res.lengthType === "НД" ? "НД" : `МД ${res.length}`,
                           Number(res.weightTons || 0),
                           Number(res.remainingToProcess || 0),
+                          res.supplyNomenclature || "",
+                          res.supplyGrade || "",
+                          Number(res.supplyDiameter || 0),
+                          Number(res.totalWeight || 0),
+                          res.lengthType === "МД" ? `МД ${res.billetLength}` : "НД",
                           Number(res.allocatedStock || 0),
                           Number(res.shortageStock || 0),
-                          res.allocatedStock > 0 && res.combinedTechWaste > 0 ? Number(res.combinedTechWaste.toFixed(3)) : 0,
-                          res.allocatedStock > 0 && res.combinedUsefulRem > 0 ? Number(res.combinedUsefulRem.toFixed(3)) : 0,
-                          res.allocatedStock > 0 && res.combinedKim > 0 ? Number(res.combinedKim.toFixed(3)) : 0,
                         ];
                         const maxRows = Math.max(1, res.matchedStockItems?.length || 0);
                         const rowTemplate = Array(headers.length).fill("");
-                        for (let i = 0; i < 16; i++) rowTemplate[i] = baseRow[i];
+                        for (let i = 0; i < 14; i++) rowTemplate[i] = baseRow[i];
 
                         for (let r = 0; r < maxRows; r++) {
                           const outRow = [...rowTemplate];
                           if (r > 0) {
-                            for (let c = 0; c < 16; c++) outRow[c] = "";
+                            for (let c = 0; c < 14; c++) outRow[c] = "";
                           }
 
                           const st = res.matchedStockItems?.[r];
                           if (st) {
-                            outRow[16] = st["Исходная Номенклатура"] || "";
-                            outRow[17] = st["Профиль"] || "";
-                            outRow[18] = st["НТД"] || "";
-                            outRow[19] = st["Марка стали"] || "";
-                            outRow[20] = st["Размер"] || "";
-                            outRow[21] = st["Длина"] || "";
-                            outRow[22] = Number(st.stockBeforeTaking || 0);
-                            outRow[23] = Number(st.allocatedAmount || 0);
-                            outRow[24] = Number(st.stockAfterTaking || 0);
+                            outRow[14] = Number(st.calculatedTechWaste || 0);
+                            outRow[15] = Number(st.calculatedUsefulRem || 0);
+                            outRow[16] = Number(st.calculatedKim || 0);
+                            outRow[17] = st["Исходная Номенклатура"] || "";
+                            outRow[18] = st["Профиль"] || "";
+                            outRow[19] = st["НТД"] || "";
+                            outRow[20] = st["Марка стали"] || "";
+                            outRow[21] = st["Размер"] || "";
+                            outRow[22] = st["Длина"] || "";
+                            outRow[23] = Number(st.stockBeforeTaking || 0);
+                            outRow[24] = Number(st.allocatedAmount || 0);
+                            outRow[25] = Number(st.stockAfterTaking || 0);
                           }
                           rows.push(outRow);
                         }
                       });
 
                       const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-                      const numberCols = [9, 10, 11, 12, 13, 14, 15, 22, 23, 24];
+                      const numberCols = [3, 5, 6, 9, 10, 12, 13, 14, 15, 16, 23, 24, 25];
                       const range = XLSX.utils.decode_range(worksheet["!ref"] || "A1:A1");
                       for (let R = 1; R <= range.e.r; ++R) {
                         for (let c of numberCols) {
@@ -512,20 +510,6 @@ export function CalcStockSection({
                         </th>
                         <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap border-r border-slate-200 dark:border-slate-700">
                           Длина мм.
-                        </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-amber-500/80 uppercase tracking-widest whitespace-nowrap">
-                          Тех.
-                          <br />
-                          Отходы
-                        </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-amber-500/80 uppercase tracking-widest whitespace-nowrap">
-                          Делов.
-                          <br />
-                          Остаток
-                        </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-amber-500 uppercase tracking-widest whitespace-nowrap border-r border-slate-200 dark:border-slate-700">
-                          КИМ /<br />
-                          Совет
                         </th>
                         <th className="px-5 py-4 text-center text-[10px] font-bold text-emerald-500 uppercase tracking-widest whitespace-nowrap">
                           Взято со склада (тн)
@@ -732,68 +716,22 @@ export function CalcStockSection({
                                   {res.supplyDiameter}
                                 </td>
                                 <td
-                                  className={`px-5 py-3 align-middle whitespace-nowrap text-center border-x border-emerald-100/50 dark:border-emerald-900/30 bg-emerald-50/30 dark:bg-emerald-900/5`}
+                                  className={`px-5 py-3 align-middle whitespace-nowrap text-center font-black text-slate-700 dark:text-slate-300`}
                                   rowSpan={Math.max(1, res.matchedStockItems.length)}
                                 >
-                                  <span className="font-black text-emerald-600 dark:text-emerald-400">
-                                    {Math.max(0, res.remainingToProcess - (res.allocatedStock || 0)).toFixed(3)}
-                                  </span>
+                                  {res.totalWeight ? res.totalWeight.toFixed(3) : "0.000"}
                                 </td>
                                 <td
                                   className={`px-5 py-3 align-middle whitespace-nowrap text-center font-mono text-[10px] text-slate-500 border-r border-slate-200 dark:border-slate-700`}
                                   rowSpan={Math.max(1, res.matchedStockItems.length)}
                                 >
-                                  {res.lengthType === "МД" ? "НД" : "РЯД"}
+                                  {res.lengthType === "МД" ? `МД ${res.billetLength}` : "НД"}
                                 </td>
                               </>
                             )}
                             {stockItem ? (
                               <>
-                                <td className="px-5 py-2 align-middle whitespace-nowrap text-center opacity-50 bg-slate-50 dark:bg-[#1A1C19]">
-                                  {stockItem.calculatedTechWaste > 0 ? (
-                                    <span className="font-mono font-bold text-amber-600 dark:text-amber-500">
-                                      {stockItem.calculatedTechWaste.toFixed(3)}
-                                      <span className="text-[9px] ml-1">тн</span>
-                                    </span>
-                                  ) : (
-                                    <span className="text-slate-300">-</span>
-                                  )}
-                                </td>
-                                <td className="px-5 py-2 align-middle whitespace-nowrap text-center opacity-50 bg-slate-50 dark:bg-[#1A1C19]">
-                                  {stockItem.calculatedUsefulRem > 0 ? (
-                                    <span className="font-mono font-bold text-amber-600 dark:text-amber-500">
-                                      {stockItem.calculatedUsefulRem.toFixed(3)}
-                                      <span className="text-[9px] ml-1">тн</span>
-                                    </span>
-                                  ) : (
-                                    <span className="text-slate-300">-</span>
-                                  )}
-                                </td>
-                                <td className="px-5 py-2 align-middle whitespace-nowrap text-center border-r border-[#E2E8F0] dark:border-slate-700 opacity-50 bg-slate-50 dark:bg-[#1A1C19]">
-                                  <div className="flex flex-col items-center justify-center gap-1">
-                                    {stockItem.calculatedKim > 0 && stockItem.calculatedKim < 0.95 ? (
-                                      <>
-                                        <div className="inline-flex items-center justify-center min-w-[48px] px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 font-bold text-[10px]">
-                                          {(stockItem.calculatedKim * 100).toFixed(1)}%
-                                        </div>
-                                        <span className="text-[9px] font-bold text-rose-500 leading-tight">
-                                          Низкий КИМ
-                                        </span>
-                                      </>
-                                    ) : stockItem.calculatedKim >= 0.95 ? (
-                                      <>
-                                        <div className="inline-flex items-center justify-center min-w-[48px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 font-bold text-[10px]">
-                                          {(stockItem.calculatedKim * 100).toFixed(1)}%
-                                        </div>
-                                        <span className="text-[9px] font-bold text-emerald-500 leading-tight">
-                                          Оптимально
-                                        </span>
-                                      </>
-                                    ) : (
-                                      <span className="text-slate-300">-</span>
-                                    )}
-                                  </div>
-                                </td>
+
 
                                 <td className="px-5 py-2 align-middle whitespace-nowrap text-center font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-900/10">
                                   {stockItem.allocatedAmount.toFixed(3)}
@@ -872,9 +810,6 @@ export function CalcStockSection({
                               </>
                             ) : (
                               <>
-                                <td colSpan={3} className="px-5 py-2 align-middle text-center bg-slate-50/50 dark:bg-[#1A1C19]/50 border-r border-slate-200 dark:border-slate-700">
-                                  <span className="text-slate-300 dark:text-slate-600">-</span>
-                                </td>
                                 <td className="px-5 py-2 align-middle text-center bg-emerald-50/30 dark:bg-emerald-900/5">
                                   <span className="text-emerald-300 dark:text-emerald-800">0.000</span>
                                 </td>
@@ -883,7 +818,10 @@ export function CalcStockSection({
                                     {res.shortageStock.toFixed(3)}
                                   </span>
                                 </td>
-                                <td colSpan={12} className="px-5 py-3 align-middle text-center bg-slate-50/50 dark:bg-[#1A1C19]/50 text-slate-400 dark:text-slate-500 italic text-[10px]">
+                                <td className="px-5 py-2 align-middle text-center bg-slate-50/50 dark:bg-[#1A1C19]/50"></td>
+                                <td className="px-5 py-2 align-middle text-center bg-slate-50/50 dark:bg-[#1A1C19]/50"></td>
+                                <td className="px-5 py-2 align-middle text-center bg-slate-50/50 dark:bg-[#1A1C19]/50 border-r border-slate-200 dark:border-slate-700"></td>
+                                <td colSpan={9} className="px-5 py-3 align-middle text-center bg-slate-50/50 dark:bg-[#1A1C19]/50 text-slate-400 dark:text-slate-500 italic text-[10px]">
                                   Нет подходящих позиций на складе
                                 </td>
                               </>

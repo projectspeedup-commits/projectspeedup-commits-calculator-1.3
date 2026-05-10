@@ -16,6 +16,7 @@ export function StatusDropdown({ value, onChange, className = '' }: StatusDropdo
     { value: 'ALL', label: 'Все статусы' },
     { value: 'OK', label: 'Обеспечено' },
     { value: 'DEFICIT', label: 'Дефицит' },
+    { value: 'NOT_PROVIDED', label: 'Не обеспечено' },
   ];
 
   const selectedOption = options.find((opt) => opt.value === value) || options[0];

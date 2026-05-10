@@ -368,8 +368,10 @@ export function AdminPanel({
   }, [scrap, remnant, economyItems, rawPrices]);
 
   // Search & Filters state
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [stockSearchQuery, setStockSearchQuery] = useState("");
+  const [stockStatusFilter, setStockStatusFilter] = useState("ALL");
+  const [supplySearchQuery, setSupplySearchQuery] = useState("");
+  const [supplyStatusFilter, setSupplyStatusFilter] = useState("ALL");
 
   const formatCurrency = (val: number) => {
     return (
@@ -699,9 +701,9 @@ export function AdminPanel({
     const stockProfile = stock["Профиль"]?.toLowerCase();
     const reqProfile = res.type?.toLowerCase();
 
-    // Шестигранник делается из круга
     const isValidProfile =
-      stockProfile === "круг" || stockProfile === reqProfile;
+      stockProfile === reqProfile ||
+      (reqProfile === "шестигранник" && stockProfile === "круг");
     if (!isValidProfile) return false;
 
     if (stock["Марка стали"]?.toLowerCase() !== res.grade?.toLowerCase())
@@ -885,8 +887,13 @@ export function AdminPanel({
       matchedStockItems.forEach((stock: any) => {
         const sLen = getStockBilletLength(stock);
         const m = calculateMetrics(d, sLen);
-        combinedTechWaste += m.twRate * stock.allocatedAmount;
-        combinedUsefulRem += m.urRate * stock.allocatedAmount;
+        
+        stock.calculatedTechWaste = m.twRate * stock.allocatedAmount;
+        stock.calculatedUsefulRem = m.urRate * stock.allocatedAmount;
+        stock.calculatedKim = m.kim;
+
+        combinedTechWaste += stock.calculatedTechWaste;
+        combinedUsefulRem += stock.calculatedUsefulRem;
         combinedFinishedWeight += m.kim * stock.allocatedAmount;
         baseTotalWeight += stock.allocatedAmount;
       });
@@ -1098,6 +1105,10 @@ export function AdminPanel({
       stockItems.forEach((stock: any) => {
         const sLen = getStockBilletLength(stock);
         const m = calculateMetrics(d, sLen);
+        stock.calculatedTechWaste = m.twRate * stock.allocatedAmount;
+        stock.calculatedUsefulRem = m.urRate * stock.allocatedAmount;
+        stock.calculatedKim = m.kim;
+
         combinedTechWaste2 += m.twRate * stock.allocatedAmount;
         combinedUsefulRem2 += m.urRate * stock.allocatedAmount;
         combinedFinishedWeight2 += m.kim * stock.allocatedAmount;
@@ -1118,6 +1129,10 @@ export function AdminPanel({
       supplyItems.forEach((supply: any) => {
         const sLen = getStockBilletLength(supply);
         const m = calculateMetrics(d, sLen);
+        supply.calculatedTechWaste = m.twRate * supply.allocatedAmount;
+        supply.calculatedUsefulRem = m.urRate * supply.allocatedAmount;
+        supply.calculatedKim = m.kim;
+
         combinedTechWaste3 += m.twRate * supply.allocatedAmount;
         combinedUsefulRem3 += m.urRate * supply.allocatedAmount;
         combinedFinishedWeight3 += m.kim * supply.allocatedAmount;
@@ -1127,7 +1142,7 @@ export function AdminPanel({
       const combinedKim3 =
         supplyTotalBase > 0 ? combinedFinishedWeight3 / supplyTotalBase : 0;
 
-      totalAllocated += allocatedFromSupply;
+      totalAllocated += (allocatedFromStock + allocatedFromSupply);
       totalDeficit += finalShortage;
 
       return {
@@ -1168,6 +1183,26 @@ export function AdminPanel({
       0,
     );
 
+    const validDemandsForKim2 = matchedDemand.filter(
+      (res) => res.allocatedFromStock > 0,
+    );
+    const averageKim2 =
+      validDemandsForKim2.length > 0
+        ? validDemandsForKim2.reduce((sum, res) => sum + res.combinedKim2, 0) /
+          validDemandsForKim2.length
+        : 0;
+    const totalTechWaste2 = matchedDemand.reduce(
+      (sum, res) => sum + res.combinedTechWaste2,
+      0,
+    );
+    const totalUsefulRem2 = matchedDemand.reduce(
+      (sum, res) => sum + res.combinedUsefulRem2,
+      0,
+    );
+    
+    // Specifically for supply dashboard, calculate total from supply alone
+    const totalAllocatedSupply = matchedDemand.reduce((sum, res) => sum + (res.allocatedFromSupply || 0), 0);
+
     return {
       matchedDemand,
       freeSupply: availableSupply.filter(
@@ -1175,11 +1210,15 @@ export function AdminPanel({
       ),
       totals: {
         allocated: totalAllocated,
+        allocatedSupply: totalAllocatedSupply,
         deficit: totalDeficit,
         remaining: totalRemaining,
-        averageKim: averageKim3,
-        techWaste2: totalTechWaste3,
-        usefulRem2: totalUsefulRem3,
+        averageKim2: averageKim2,
+        techWaste2: totalTechWaste2,
+        usefulRem2: totalUsefulRem2,
+        averageKim3: averageKim3,
+        techWaste3: totalTechWaste3,
+        usefulRem3: totalUsefulRem3,
       },
     };
   }, [calculationResults, processedStock, processedSupplyPlans]);
@@ -1193,7 +1232,7 @@ export function AdminPanel({
   const filteredMatchedDemand = useMemo(() => {
     return matchedDemand.filter((item) => {
       // Free text search
-      const query = searchQuery.toLowerCase();
+      const query = stockSearchQuery.toLowerCase();
       const matchesSearch =
         !query ||
         (item.orderNo && String(item.orderNo).toLowerCase().includes(query)) ||
@@ -1205,15 +1244,17 @@ export function AdminPanel({
 
       // Status filter
       let matchesStatus = true;
-      if (statusFilter === "OK") {
-        matchesStatus = item.remainingToProcess <= item.allocatedStock;
-      } else if (statusFilter === "DEFICIT") {
+      if (stockStatusFilter === "OK") {
+        matchesStatus = item.allocatedStock > 0;
+      } else if (stockStatusFilter === "DEFICIT") {
         matchesStatus = item.remainingToProcess > item.allocatedStock;
+      } else if (stockStatusFilter === "NOT_PROVIDED") {
+        matchesStatus = item.allocatedStock === 0;
       }
 
       return matchesSearch && matchesStatus;
     });
-  }, [matchedDemand, searchQuery, statusFilter]);
+  }, [matchedDemand, stockSearchQuery, stockStatusFilter]);
 
   const groupedByOrderDemand = useMemo(() => {
     const groups: Record<string, any> = {};
@@ -2426,10 +2467,14 @@ export function AdminPanel({
               setProductionSection={setProductionSection}
               isCopied={isCopied}
               setIsCopied={setIsCopied}
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              statusFilter={statusFilter}
-              setStatusFilter={setStatusFilter}
+              stockSearchQuery={stockSearchQuery}
+              setStockSearchQuery={setStockSearchQuery}
+              stockStatusFilter={stockStatusFilter}
+              setStockStatusFilter={setStockStatusFilter}
+              supplySearchQuery={supplySearchQuery}
+              setSupplySearchQuery={setSupplySearchQuery}
+              supplyStatusFilter={supplyStatusFilter}
+              setSupplyStatusFilter={setSupplyStatusFilter}
               isProcessing={isProcessing}
               isDragging={isDragging}
               isSummaryDragging={isSummaryDragging}
@@ -2510,10 +2555,14 @@ export function AdminPanel({
               setProductionSection={setProductionSection}
               isCopied={isCopied}
               setIsCopied={setIsCopied}
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              statusFilter={statusFilter}
-              setStatusFilter={setStatusFilter}
+              stockSearchQuery={stockSearchQuery}
+              setStockSearchQuery={setStockSearchQuery}
+              stockStatusFilter={stockStatusFilter}
+              setStockStatusFilter={setStockStatusFilter}
+              supplySearchQuery={supplySearchQuery}
+              setSupplySearchQuery={setSupplySearchQuery}
+              supplyStatusFilter={supplyStatusFilter}
+              setSupplyStatusFilter={setSupplyStatusFilter}
               isProcessing={isProcessing}
               isDragging={isDragging}
               isSummaryDragging={isSummaryDragging}

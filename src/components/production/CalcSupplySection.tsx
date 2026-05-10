@@ -18,8 +18,6 @@ export function CalcSupplySection(props: any) {
   
   const validMatchedDemand = useMemo(() => {
     return (supplyCalculationData?.matchedDemand || []).filter((res: any) => {
-      if ((res.remainingToProcess ?? 0) < 0.300) return false;
-
       let matchesSearch = true;
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
@@ -31,23 +29,25 @@ export function CalcSupplySection(props: any) {
       }
 
       let matchesStatus = true;
+      const totalAllocated = (res.allocatedFromStock || 0) + (res.allocatedFromSupply || 0);
       if (statusFilter === "OK") {
-        matchesStatus = (res.finalShortage || 0) <= 0.001;
+        matchesStatus = totalAllocated > 0;
       } else if (statusFilter === "DEFICIT") {
         matchesStatus = (res.finalShortage || 0) > 0.001;
+      } else if (statusFilter === "NOT_PROVIDED") {
+        matchesStatus = totalAllocated === 0;
       }
-
       return matchesSearch && matchesStatus;
     });
   }, [supplyCalculationData?.matchedDemand, searchQuery, statusFilter]);
   
   const validAllocatedFromSupply = useMemo(() => {
-    return validMatchedDemand.reduce((sum: number, r: any) => sum + (r.allocatedFromSupply || 0), 0);
-  }, [validMatchedDemand]);
+    return supplyCalculationData?.totals?.allocatedSupply || 0;
+  }, [supplyCalculationData]);
 
   const validDeficit = useMemo(() => {
-    return validMatchedDemand.reduce((sum: number, r: any) => sum + (r.finalShortage || 0), 0);
-  }, [validMatchedDemand]);
+    return supplyCalculationData?.totals?.deficit || 0;
+  }, [supplyCalculationData]);
 
   return (
     <React.Fragment>

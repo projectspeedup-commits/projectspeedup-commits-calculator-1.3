@@ -1,68 +1,83 @@
-import { doc, onSnapshot, setDoc, Firestore } from "firebase/firestore";
+import { backendService } from "../api/backendService";
 
 export const subscribeToUserSettings = (
-  db: Firestore | undefined | null,
+  db: any,
   userId: string,
   onData: (data: any) => void,
   onError?: (error: any) => void,
 ) => {
-  if (!db || !userId) return () => {};
-  return onSnapshot(
-    doc(db, "users", userId, "settings", "preferences"),
-    (docSnap) => {
-      if (docSnap.exists()) {
-        onData(docSnap.data());
-      } else {
-        onData(null);
-      }
-    },
-    onError,
-  );
+  if (!userId) return () => {};
+
+  let isMounted = true;
+  let interval: ReturnType<typeof setInterval>;
+
+  const fetchData = async () => {
+    try {
+      const data = await backendService.getSettings(userId);
+      if (isMounted) onData(data);
+    } catch (e) {
+      if (isMounted && onError) onError(e);
+    }
+  };
+
+  fetchData();
+  interval = setInterval(fetchData, 60000); // 1 minute poll
+
+  return () => {
+    isMounted = false;
+    clearInterval(interval);
+  };
 };
 
 export const saveUserSettingsToCloud = async (
-  db: Firestore | undefined | null,
+  db: any,
   userId: string,
   payload: any,
 ) => {
-  if (!db || !userId) return;
+  if (!userId) return;
   try {
-    await setDoc(doc(db, "users", userId, "settings", "preferences"), payload, {
-      merge: true,
-    });
+    await backendService.saveSettings(userId, payload);
   } catch (e) {
     console.error("Failed to save settings", e);
   }
 };
 
 export const subscribeToSystemData = (
-  db: Firestore | undefined | null,
+  db: any,
   collectionName: string,
   type: string,
   onData: (data: any) => void,
   onError?: (error: any) => void,
 ) => {
-  if (!db) return () => {};
-  return onSnapshot(
-    doc(db, collectionName, type),
-    (docSnap) => {
-      if (docSnap.exists()) {
-        onData(docSnap.data());
-      }
-    },
-    onError,
-  );
+  let isMounted = true;
+  let interval: ReturnType<typeof setInterval>;
+
+  const fetchData = async () => {
+    try {
+      const data = await backendService.getAdminData(`${collectionName}_${type}`);
+      if (isMounted) onData(data);
+    } catch (e) {
+      if (isMounted && onError) onError(e);
+    }
+  };
+
+  fetchData();
+  interval = setInterval(fetchData, 60000);
+
+  return () => {
+    isMounted = false;
+    clearInterval(interval);
+  };
 };
 
 export const saveSystemDataToCloud = async (
-  db: Firestore | undefined | null,
+  db: any,
   collectionName: string,
   type: string,
   payload: any,
 ) => {
-  if (!db) return;
   try {
-    await setDoc(doc(db, collectionName, type), payload, { merge: true });
+    await backendService.saveAdminData(`${collectionName}_${type}`, payload);
   } catch (e) {
     console.warn("Failed to save system data", e);
   }

@@ -569,6 +569,16 @@ export const useExcelProcessors = (props: any) => {
             : usefulLength - (piecesCount || 0) * item.length;
         const initialScrapTons =
           drawLength > 0 ? (initialLeftovers / drawLength) * totalWeight : 0;
+          
+        let gostStr = "ГОСТ 2590-2006";
+        const pType = String(item.type).toLowerCase();
+        let profilePrefix = "Круг";
+        if (pType.includes("шестигранник")) { gostStr = "ГОСТ 2879-2006"; profilePrefix = "Шестигранник"; }
+        else if (pType.includes("квадрат")) { gostStr = "ГОСТ 2591-2006"; profilePrefix = "Квадрат"; }
+        
+        const supplyNomenclature = `${profilePrefix} ${getGostForGrade(item.grade)}/${gostStr}`;
+        const supplyGrade = item.grade;
+        const supplyDiameter = parseFloat(billetDia.toFixed(2));
 
         return {
           ...item,
@@ -589,6 +599,9 @@ export const useExcelProcessors = (props: any) => {
           optimizedBilletLength,
           optimizedKim,
           initialScrapTons,
+          supplyNomenclature,
+          supplyGrade,
+          supplyDiameter
         } as CalculationResult;
       });
 

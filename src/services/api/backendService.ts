@@ -91,5 +91,24 @@ export const backendService = {
       body: JSON.stringify(data),
     });
     if (!response.ok) throw new Error('Failed to save global settings');
+  },
+  
+  async getAdminData(type: string): Promise<any> {
+    const response = await fetch(`${API_URL}/api/admin-data/${type}`);
+    if (!response.ok) throw new Error('Failed to fetch admin data');
+    const text = await response.text();
+    if (!text) return null;
+    return JSON.parse(text);
+  },
+
+  async saveAdminData(type: string, data: any): Promise<void> {
+    const response = await fetch(`${API_URL}/api/admin-data/${type}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error('Failed to save admin data');
   }
 };

@@ -65,7 +65,7 @@ export function SupplyCalcSupplySection(props: any) {
  </span>
  <div>
  <span className="text-lg sm:text-xl tracking-tight leading-none">
- {supplyCalculationData.totals.allocated.toFixed(
+ {(supplyCalculationData.totals.allocatedSupply || 0).toFixed(
  3,
  )}
  </span>
@@ -635,21 +635,27 @@ export function SupplyCalcSupplySection(props: any) {
  </thead>
  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-[11px]">
  {supplyCalculationData.matchedDemand
- .filter((res) => {
- if (!searchQuery) return true;
- const q = searchQuery.toLowerCase();
- return (
- (res.orderNo ||"")
- .toLowerCase()
- .includes(q) ||
- (res.client ||"")
- .toLowerCase()
- .includes(q) ||
- (res.nomenclature ||"")
- .toLowerCase()
- .includes(q)
- );
- })
+  .filter((res: any) => {
+  let matchesSearch = true;
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    matchesSearch = (
+      (res.orderNo ||"").toLowerCase().includes(q) ||
+      (res.client ||"").toLowerCase().includes(q) ||
+      (res.nomenclature ||"").toLowerCase().includes(q)
+    );
+  }
+  let matchesStatus = true;
+  const totalAllocated = (res.allocatedFromStock || 0) + (res.allocatedFromSupply || 0);
+  if (statusFilter === "OK") {
+    matchesStatus = totalAllocated > 0;
+  } else if (statusFilter === "DEFICIT") {
+    matchesStatus = (res.finalShortage || 0) > 0.001;
+  } else if (statusFilter === "NOT_PROVIDED") {
+    matchesStatus = totalAllocated === 0;
+  }
+  return matchesSearch && matchesStatus;
+  })
  .map((res: any, idx) => {
  const maxRows = Math.max(
  1,

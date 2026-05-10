@@ -14,7 +14,7 @@ import { CalcSupplySection } from './production/CalcSupplySection';
 import { SupplyPlansSection } from './production/SupplyPlansSection';
 
 export default function AdminPanelProductionTab(props: any) {
-  const { activeTab, formatCurrency, planFiles, stockFiles, calculationResults, processedStock, processedSupplyPlans, tableContainerRef, summaryContainerRef, supplyTableRef, stockTableRef, freeStockTableRef, handleMouseDown, onSummaryMouseDown, onSupplyMouseDown, onStockMouseDown, onFreeStockMouseDown, handleMouseLeaveOrUp, onSummaryMouseLeaveOrUp, handleMouseMove, matchedDemand, supplyCalculationData, filteredMatchedDemand, filteredTotals, getSupplyNomenclature, handleCopyForSheets, handleExportStock, renderFilesContent, setActiveTab, setSupplySection, productionSection, setProductionSection, isCopied, setIsCopied, searchQuery, setSearchQuery, statusFilter, setStatusFilter, isProcessing, isDragging, isSummaryDragging, isSupplyDragging, isStockDragging, isFreeStockDragging, copySuccess, setCopySuccess, stockTotals, freeStock , isPurchasingMode } = props;
+  const { activeTab, formatCurrency, planFiles, stockFiles, calculationResults, processedStock, processedSupplyPlans, tableContainerRef, summaryContainerRef, supplyTableRef, stockTableRef, freeStockTableRef, handleMouseDown, onSummaryMouseDown, onSupplyMouseDown, onStockMouseDown, onFreeStockMouseDown, handleMouseLeaveOrUp, onSummaryMouseLeaveOrUp, handleMouseMove, matchedDemand, supplyCalculationData, filteredMatchedDemand, filteredTotals, getSupplyNomenclature, handleCopyForSheets, handleExportStock, renderFilesContent, setActiveTab, setSupplySection, productionSection, setProductionSection, isCopied, setIsCopied, stockSearchQuery, setStockSearchQuery, stockStatusFilter, setStockStatusFilter, supplySearchQuery, setSupplySearchQuery, supplyStatusFilter, setSupplyStatusFilter, isProcessing, isDragging, isSummaryDragging, isSupplyDragging, isStockDragging, isFreeStockDragging, copySuccess, setCopySuccess, stockTotals, freeStock , isPurchasingMode } = props;
   const { Activity, Plus, Layers, Package, Upload, Download, Copy, Check, ShoppingCart, Search, Filter, FolderSearch, ArrowRight, ClipboardList, HelpCircle } = LucideIcons;
 
   return (
@@ -45,143 +45,144 @@ export default function AdminPanelProductionTab(props: any) {
                   productionSection !=="supply-plans" &&
                   (() => {
                     const isProdSupplyView =
-                      productionSection ==="calc-supply" ||
-                      productionSection ==="supply-plans";
-                    const activeDashboardTotals = {
-                      allocated: isProdSupplyView
-                        ? supplyCalculationData.totals.allocated || 0
-                        : stockTotals.allocated || 0,
-                      deficit: isProdSupplyView
-                        ? supplyCalculationData.totals.deficit || 0
-                        : stockTotals.deficit || 0,
-                      remaining: isProdSupplyView
-                        ? supplyCalculationData.totals.remaining || 0
-                        : stockTotals.remaining || 0,
-                      techWaste2: isProdSupplyView
-                        ? supplyCalculationData.totals.techWaste2 || 0
-                        : stockTotals.techWaste2 || 0,
-                      usefulRem2: isProdSupplyView
-                        ? supplyCalculationData.totals.usefulRem2 || 0
-                        : stockTotals.usefulRem2 || 0,
-                      averageKim: isProdSupplyView
-                        ? supplyCalculationData.totals.averageKim || 0
-                        : stockTotals.averageKim || 0,
+                      productionSection === "calc-supply" ||
+                      productionSection === "supply-plans";
+                      
+                    // We define metrics for Stock (Stage 2)
+                    const stockMetricsItem = {
+                      allocated: stockTotals.allocated || 0,
+                      deficit: stockTotals.deficit || 0,
+                      remaining: stockTotals.remaining || 0,
+                      techWaste2: stockTotals.techWaste2 || 0,
+                      usefulRem2: stockTotals.usefulRem2 || 0,
+                      averageKim: stockTotals.averageKim || 0,
                     };
+                    
+                    // We define metrics for Supply (Stage 3)
+                    const supplyMetricsItem = {
+                      allocated: supplyCalculationData.totals.allocatedSupply || 0,
+                      deficit: supplyCalculationData.totals.deficit || 0,
+                      remaining: supplyCalculationData.totals.remaining || 0,
+                      techWaste2: supplyCalculationData.totals.techWaste2 || 0, // from stage 2 calculation in supply run
+                      usefulRem2: supplyCalculationData.totals.usefulRem2 || 0,
+                      averageKim2: supplyCalculationData.totals.averageKim2 || 0,
+                      techWaste3: supplyCalculationData.totals.techWaste3 || 0,
+                      usefulRem3: supplyCalculationData.totals.usefulRem3 || 0,
+                      averageKim3: supplyCalculationData.totals.averageKim3 || 0,
+                    };
+
                     return (
-                      <div className="flex-none min-w-0 xl:max-w-4xl w-full md:w-auto relative overflow-hidden">
+                      <div className="flex-none min-w-0 w-full xl:w-auto xl:flex-1 relative overflow-hidden">
                         <div
                           ref={summaryContainerRef}
-                          onMouseDown={onSummaryMouseDown}
-                          onMouseUp={onSummaryMouseLeaveOrUp}
-                          onMouseLeave={onSummaryMouseLeaveOrUp}
-                          onMouseMove={handleMouseMove}
-                          className={`flex items-stretch xl:items-center gap-2 sm:gap-3 xl:gap-4 w-full p-2 bg-slate-50/80 dark:bg-[#1A1C19]/40 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/60 rounded-[20px] overflow-x-auto xl:overflow-x-visible xl:justify-around hide-scrollbar snap-x snap-mandatory xl:snap-none transition-all ${
-                            isSummaryDragging
-                              ?"cursor-grabbing select-none scroll-auto"
-                              :"cursor-grab xl:cursor-default scroll-smooth"
-                          }`}
+                          className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2 xl:gap-3 w-full p-1.5 sm:p-2 bg-slate-50/80 dark:bg-[#1A1C19]/40 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/60 rounded-[16px] sm:rounded-[20px] transition-all"
                         >
-                          {/* Item 1: Взято из заг. */}
-                          <div className="shrink-0 xl:shrink-0 snap-start flex flex-col min-w-[130px] sm:min-w-[140px] xl:min-w-max justify-center px-4 py-2.5 sm:py-3 xl:px-4 bg-gradient-to-br from-emerald-50 to-emerald-100/30 dark:from-emerald-950/40 dark:to-emerald-900/10 border border-emerald-200/50 dark:border-emerald-800/50 rounded-xl sm:rounded-2xl shadow-sm relative overflow-hidden group">
-                            <span className="text-[10px] sm:text-[11px] xl:text-[9px] 2xl:text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-widest mb-0.5 relative z-10 flex items-center leading-tight">
-                              <Package className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 opacity-80" />
-                              <span className="truncate whitespace-nowrap">
-                                взято из заг.
+                          {/* Item 1: Взято (Stock or Supply) */}
+                          {!isProdSupplyView ? (
+                            <div className="flex flex-col min-w-[110px] justify-center px-3 py-2 sm:py-2.5 bg-gradient-to-br from-emerald-50 to-emerald-100/30 dark:from-emerald-950/40 dark:to-emerald-900/10 border border-emerald-200/50 dark:border-emerald-800/50 rounded-xl shadow-sm relative overflow-hidden group">
+                              <span className="text-[9px] sm:text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-widest mb-0.5 relative z-10 flex items-center leading-tight">
+                                <Package className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 opacity-80 shrink-0" />
+                                <span className="truncate whitespace-nowrap">взято со склада</span>
                               </span>
-                            </span>
-                            <div className="flex items-baseline gap-1 relative z-10">
-                              <span className="text-xl sm:text-2xl xl:text-lg 2xl:text-xl font-black text-slate-800 dark:text-white hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors">
-                                {activeDashboardTotals.allocated.toFixed(3)}
-                              </span>
-                              <span className="text-[10px] sm:text-[11px] xl:text-[9px] 2xl:text-[10px] text-emerald-600/80 dark:text-emerald-500 font-bold uppercase">
-                                тн
-                              </span>
+                              <div className="flex items-baseline gap-1 relative z-10">
+                                <span className="text-lg sm:text-xl font-black text-slate-800 dark:text-white hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors">
+                                  {stockMetricsItem.allocated.toFixed(3)}
+                                </span>
+                                <span className="text-[9px] sm:text-[10px] text-emerald-600/80 dark:text-emerald-500 font-bold uppercase">тн</span>
+                              </div>
                             </div>
-                          </div>
+                          ) : (
+                            <div className="flex flex-col min-w-[110px] justify-center px-3 py-2 sm:py-2.5 bg-gradient-to-br from-emerald-50 to-emerald-100/30 dark:from-emerald-950/40 dark:to-emerald-900/10 border border-emerald-200/50 dark:border-emerald-800/50 rounded-xl shadow-sm relative overflow-hidden group">
+                              <span className="text-[9px] sm:text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-widest mb-0.5 relative z-10 flex items-center leading-tight">
+                                <Package className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 opacity-80 shrink-0" />
+                                <span className="truncate whitespace-nowrap">взято плановых:</span>
+                              </span>
+                              <div className="flex items-baseline gap-1 relative z-10">
+                                <span className="text-lg sm:text-xl font-black text-slate-800 dark:text-white hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors">
+                                  {supplyMetricsItem.allocated.toFixed(3)}
+                                </span>
+                                <span className="text-[9px] sm:text-[10px] text-emerald-600/80 dark:text-emerald-500 font-bold uppercase">тн</span>
+                              </div>
+                            </div>
+                          )}
 
                           {/* Item 2: Дефицит */}
-                          <div className="shrink-0 xl:shrink-0 snap-start flex flex-col min-w-[130px] sm:min-w-[140px] xl:min-w-max justify-center px-4 py-2.5 sm:py-3 xl:px-4 bg-gradient-to-br from-rose-50 to-rose-100/30 dark:from-rose-950/40 dark:to-rose-900/10 border border-rose-200/50 dark:border-rose-800/50 rounded-xl sm:rounded-2xl shadow-sm relative overflow-hidden group">
-                            <span className="text-[10px] sm:text-[11px] xl:text-[9px] 2xl:text-[10px] text-rose-600 dark:text-rose-400 font-bold uppercase tracking-widest mb-0.5 relative z-10 flex items-center leading-tight">
-                              <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 opacity-80" />
+                          <div className="flex flex-col min-w-[110px] justify-center px-3 py-2 sm:py-2.5 bg-gradient-to-br from-rose-50 to-rose-100/30 dark:from-rose-950/40 dark:to-rose-900/10 border border-rose-200/50 dark:border-rose-800/50 rounded-xl shadow-sm relative overflow-hidden group">
+                            <span className="text-[9px] sm:text-[10px] text-rose-600 dark:text-rose-400 font-bold uppercase tracking-widest mb-0.5 relative z-10 flex items-center leading-tight">
+                              <ShoppingCart className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 opacity-80 shrink-0" />
                               <span className="truncate whitespace-nowrap">
-                                дефицит
+                                {isProdSupplyView ? "дефицит пл.:" : "дефицит"}
                               </span>
                             </span>
                             <div className="flex items-baseline gap-1 relative z-10">
-                              <span className="text-xl sm:text-2xl xl:text-lg 2xl:text-xl font-black text-rose-600 dark:text-rose-400">
-                                {activeDashboardTotals.deficit.toFixed(3)}
+                              <span className="text-lg sm:text-xl font-black text-rose-600 dark:text-rose-400">
+                                {(isProdSupplyView ? supplyMetricsItem.deficit : stockMetricsItem.deficit).toFixed(3)}
                               </span>
-                              <span className="text-[10px] sm:text-[11px] xl:text-[9px] 2xl:text-[10px] text-rose-600/80 dark:text-rose-500 font-bold uppercase">
-                                тн
-                              </span>
+                              <span className="text-[9px] sm:text-[10px] text-rose-600/80 dark:text-rose-500 font-bold uppercase">тн</span>
                             </div>
                           </div>
 
-                          {/* Item 3: Остаток заг. */}
-                          <div className="shrink-0 xl:shrink-0 snap-start flex flex-col min-w-[130px] sm:min-w-[140px] xl:min-w-max justify-center px-4 py-2.5 sm:py-3 xl:px-4 bg-gradient-to-br from-sky-50 to-sky-100/30 dark:from-sky-950/40 dark:to-sky-900/10 border border-sky-200/50 dark:border-sky-800/50 rounded-xl sm:rounded-2xl shadow-sm relative overflow-hidden group">
-                            <span className="text-[10px] sm:text-[11px] xl:text-[9px] 2xl:text-[10px] text-sky-600 dark:text-sky-400 font-bold uppercase tracking-widest mb-0.5 flex items-center leading-tight truncate">
-                              остаток заг.
+                          {/* Item 3: Остаток */}
+                          <div className="flex flex-col min-w-[110px] justify-center px-3 py-2 sm:py-2.5 bg-gradient-to-br from-sky-50 to-sky-100/30 dark:from-sky-950/40 dark:to-sky-900/10 border border-sky-200/50 dark:border-sky-800/50 rounded-xl shadow-sm relative overflow-hidden group">
+                            <span className="text-[9px] sm:text-[10px] text-sky-600 dark:text-sky-400 font-bold uppercase tracking-widest mb-0.5 flex items-center leading-tight truncate">
+                              {isProdSupplyView ? "остаток плановых:" : "остаток заг."}
                             </span>
                             <div className="flex items-baseline gap-1">
-                              <span className="text-xl sm:text-2xl xl:text-lg 2xl:text-xl font-black text-slate-800 dark:text-white">
-                                {activeDashboardTotals.remaining.toFixed(3)}
+                              <span className="text-lg sm:text-xl font-black text-slate-800 dark:text-white">
+                                {(isProdSupplyView ? supplyMetricsItem.remaining : stockMetricsItem.remaining).toFixed(3)}
                               </span>
-                              <span className="text-[10px] sm:text-[11px] xl:text-[9px] 2xl:text-[10px] text-sky-600/80 dark:text-sky-500 font-bold uppercase">
-                                тн
-                              </span>
+                              <span className="text-[9px] sm:text-[10px] text-sky-600/80 dark:text-sky-500 font-bold uppercase">тн</span>
                             </div>
                           </div>
 
-                          {/* Item 4: Тех. отходы 2 */}
-                          <div className="shrink-0 xl:shrink-0 snap-start flex flex-col min-w-[130px] sm:min-w-[140px] xl:min-w-max justify-center px-4 py-2.5 sm:py-3 xl:px-4 bg-gradient-to-br from-amber-50 to-amber-100/30 dark:from-amber-950/40 dark:to-amber-900/10 border border-amber-200/50 dark:border-amber-800/50 rounded-xl sm:rounded-2xl shadow-sm relative overflow-hidden group">
-                            <span className="text-[10px] sm:text-[11px] xl:text-[9px] 2xl:text-[10px] text-amber-600 dark:text-amber-400 font-bold uppercase tracking-widest mb-0.5 flex items-center leading-tight truncate">
-                              тех. отходы 2
+                          {/* Item 4: Тех. отходы */}
+                          <div className="flex flex-col min-w-[110px] justify-center px-3 py-2 sm:py-2.5 bg-gradient-to-br from-amber-50 to-amber-100/30 dark:from-amber-950/40 dark:to-amber-900/10 border border-amber-200/50 dark:border-amber-800/50 rounded-xl shadow-sm relative overflow-hidden group">
+                            <span className="text-[9px] sm:text-[10px] text-amber-600 dark:text-amber-400 font-bold uppercase tracking-widest mb-0.5 flex items-center leading-tight truncate">
+                              {isProdSupplyView ? "тех. отходы пл." : "тех. отходы склад"}
                             </span>
                             <div className="flex items-baseline gap-1">
-                              <span className="text-xl sm:text-2xl xl:text-lg 2xl:text-xl font-black text-slate-800 dark:text-white">
-                                {activeDashboardTotals.techWaste2.toFixed(3)}
+                              <span className="text-lg sm:text-xl font-black text-slate-800 dark:text-white">
+                                {(isProdSupplyView ? supplyMetricsItem.techWaste3 : stockMetricsItem.techWaste2).toFixed(3)}
                               </span>
-                              <span className="text-[10px] sm:text-[11px] xl:text-[9px] 2xl:text-[10px] text-amber-600/80 dark:text-amber-500 font-bold uppercase">
-                                тн
-                              </span>
+                              <span className="text-[9px] sm:text-[10px] text-amber-600/80 dark:text-amber-500 font-bold uppercase">тн</span>
                             </div>
                           </div>
 
-                          {/* Item 5: Дел. остатки 2 */}
-                          <div className="shrink-0 xl:shrink-0 snap-start flex flex-col min-w-[130px] sm:min-w-[140px] xl:min-w-max justify-center px-4 py-2.5 sm:py-3 xl:px-4 bg-gradient-to-br from-amber-50 to-amber-100/30 dark:from-amber-950/40 dark:to-amber-900/10 border border-amber-200/50 dark:border-amber-800/50 rounded-xl sm:rounded-2xl shadow-sm relative overflow-hidden group">
-                            <span className="text-[10px] sm:text-[11px] xl:text-[9px] 2xl:text-[10px] text-amber-600 dark:text-amber-400 font-bold uppercase tracking-widest mb-0.5 flex items-center leading-tight truncate">
-                              дел. остатки 2
+                          {/* Item 5: Дел. остатки */}
+                          <div className="flex flex-col min-w-[110px] justify-center px-3 py-2 sm:py-2.5 bg-gradient-to-br from-amber-50 to-amber-100/30 dark:from-amber-950/40 dark:to-amber-900/10 border border-amber-200/50 dark:border-amber-800/50 rounded-xl shadow-sm relative overflow-hidden group">
+                            <span className="text-[9px] sm:text-[10px] text-amber-600 dark:text-amber-400 font-bold uppercase tracking-widest mb-0.5 flex items-center leading-tight truncate">
+                              {isProdSupplyView ? "дел. остатки пл." : "дел. остатки склад"}
                             </span>
                             <div className="flex items-baseline gap-1">
-                              <span className="text-xl sm:text-2xl xl:text-lg 2xl:text-xl font-black text-slate-800 dark:text-white">
-                                {activeDashboardTotals.usefulRem2.toFixed(3)}
+                              <span className="text-lg sm:text-xl font-black text-slate-800 dark:text-white">
+                                {(isProdSupplyView ? supplyMetricsItem.usefulRem3 : stockMetricsItem.usefulRem2).toFixed(3)}
                               </span>
-                              <span className="text-[10px] sm:text-[11px] xl:text-[9px] 2xl:text-[10px] text-amber-600/80 dark:text-amber-500 font-bold uppercase">
-                                тн
-                              </span>
+                              <span className="text-[9px] sm:text-[10px] text-amber-600/80 dark:text-amber-500 font-bold uppercase">тн</span>
                             </div>
                           </div>
 
-                          {/* Item 6: СР. КИМ 2 */}
-                          <div className="shrink-0 xl:shrink-0 snap-start flex flex-col min-w-[130px] sm:min-w-[140px] xl:min-w-max justify-center px-4 py-2.5 sm:py-3 xl:px-4 bg-gradient-to-br from-emerald-50 to-emerald-100/30 dark:from-emerald-950/40 dark:to-emerald-900/10 border border-emerald-200/50 dark:border-emerald-800/50 rounded-xl sm:rounded-2xl shadow-sm relative overflow-hidden group">
+                          {/* Item 6: СР. КИМ */}
+                          <div className="flex flex-col min-w-[110px] justify-center px-3 py-2 sm:py-2.5 bg-gradient-to-br from-emerald-50 to-emerald-100/30 dark:from-emerald-950/40 dark:to-emerald-900/10 border border-emerald-200/50 dark:border-emerald-800/50 rounded-xl shadow-sm relative overflow-hidden group">
                             <div className="flex items-center justify-between gap-1 mb-0.5">
-                              <span className="text-[10px] sm:text-[11px] xl:text-[9px] 2xl:text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-widest leading-tight truncate">
-                                ср. ким 2
+                              <span className="text-[9px] sm:text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-widest leading-tight truncate">
+                                {isProdSupplyView ? "ср. ким пл." : "ср. ким склад"}
                               </span>
-                              <span className="text-[9px] sm:text-[10px] xl:text-[8px] bg-white/60 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded border border-slate-200/50 dark:border-slate-700/50 font-bold uppercase shadow-sm">
+                              <span className="text-[8px] bg-white/60 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded border border-slate-200/50 dark:border-slate-700/50 font-bold uppercase shadow-sm">
                                 ср.
                               </span>
                             </div>
                             <div className="flex items-baseline gap-1">
                               <span
-                                className={`text-xl sm:text-2xl xl:text-lg 2xl:text-xl font-black transition-colors ${activeDashboardTotals.averageKim < 0.98 ?"text-amber-600 dark:text-amber-400" :"text-emerald-600 dark:text-emerald-400"}`}
+                                className={`text-lg sm:text-xl font-black transition-colors ${
+                                  (isProdSupplyView ? supplyMetricsItem.averageKim3 : stockMetricsItem.averageKim) < 0.98 ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400"
+                                }`}
                               >
                                 {Math.max(
                                   0,
-                                  activeDashboardTotals.averageKim || 0,
+                                  isProdSupplyView ? supplyMetricsItem.averageKim3 : stockMetricsItem.averageKim
                                 ).toFixed(3)}
                               </span>
-                              <span className="text-[7px] sm:text-[8px] xl:text-[6px] 2xl:text-[7px] text-slate-400 dark:text-slate-500 font-bold tracking-widest uppercase flex flex-col leading-[1.1] ml-1">
+                              <span className="text-[7px] text-slate-400 dark:text-slate-500 font-bold tracking-widest uppercase flex flex-col leading-[1.1] ml-1">
                                 <span>цель</span>
                                 <span className="text-emerald-500/70 dark:text-emerald-500/50">
                                   ≥ 0.980
@@ -198,7 +199,7 @@ export default function AdminPanelProductionTab(props: any) {
               {/* Sub-navigation for Supply */}
               <div className="flex flex-col gap-2 w-full min-w-0 pb-2">
                 {/* Row 1 */}
-                <div className="flex items-center gap-1.5 sm:gap-2 bg-white dark:bg-[#1A1C19] p-1.5 rounded-[18px] sm:rounded-2xl border border-slate-200 dark:border-slate-800 w-fit overflow-x-auto hide-scrollbar">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 bg-white dark:bg-[#1A1C19] p-1.5 rounded-[18px] sm:rounded-2xl border border-slate-200 dark:border-slate-800 w-full sm:w-auto overflow-hidden">
                   <button
                     onClick={() => setProductionSection("files")}
                     className={`whitespace-nowrap px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all active:scale-[0.98] ${
@@ -243,7 +244,7 @@ export default function AdminPanelProductionTab(props: any) {
 
                 {/* Row 2 */}
                 {productionSection !== "files" && (
-                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 bg-white dark:bg-[#1A1C19] p-1.5 rounded-[18px] sm:rounded-2xl border border-slate-200 dark:border-slate-800 w-full overflow-x-auto hide-scrollbar sm:overflow-visible">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 bg-white dark:bg-[#1A1C19] p-1.5 rounded-[18px] sm:rounded-2xl border border-slate-200 dark:border-slate-800 w-full overflow-hidden sm:overflow-visible">
                     <button
                       onClick={() => setProductionSection("calc")}
                       className={`whitespace-nowrap px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all active:scale-[0.98] ${
@@ -299,11 +300,12 @@ export default function AdminPanelProductionTab(props: any) {
                       productionSection === "calc-supply") && (
                         <button
                           onClick={() => {
+                            const currentSearchQuery = productionSection === "calc-stock" ? stockSearchQuery : supplySearchQuery;
                             const itemsToProcess =
                               supplyCalculationData.matchedDemand.filter(
                                 (res: any) => {
-                                  if (!searchQuery) return true;
-                                  const q = searchQuery.toLowerCase();
+                                  if (!currentSearchQuery) return true;
+                                  const q = currentSearchQuery.toLowerCase();
                                   return (
                                     (res.orderNo || "").toLowerCase().includes(q) ||
                                     (res.client || "").toLowerCase().includes(q) ||
@@ -407,11 +409,21 @@ export default function AdminPanelProductionTab(props: any) {
                 ) : productionSection ==="calc" ? (
                   <CalcSection {...props} />
                 ) : productionSection ==="calc-stock" ? (
-                  <CalcStockSection {...props} />
+                  <CalcStockSection {...props} 
+                    searchQuery={stockSearchQuery} 
+                    setSearchQuery={setStockSearchQuery}
+                    statusFilter={stockStatusFilter}
+                    setStatusFilter={setStockStatusFilter}
+                  />
                 ) : productionSection ==="free-stock" ? (
                   <FreeStockSection {...props} />
                 ) : productionSection ==="calc-supply" ? (
-                  <CalcSupplySection {...props} />
+                  <CalcSupplySection {...props} 
+                    searchQuery={supplySearchQuery} 
+                    setSearchQuery={setSupplySearchQuery}
+                    statusFilter={supplyStatusFilter}
+                    setStatusFilter={setSupplyStatusFilter}
+                  />
                 ) : productionSection ==="supply-plans" ? (
                   <SupplyPlansSection {...props} />
                 ) : null}
