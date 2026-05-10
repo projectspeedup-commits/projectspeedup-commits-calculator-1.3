@@ -1,11 +1,11 @@
 import { AlertCircle, Circle, Hexagon } from "lucide-react";
-import { formatInputValue, handleNumericInput } from "../../lib/constants";
+import { formatInputValue, handleNumericInput, getGostForGrade } from "../../lib/constants";
 
 export function CalculatorInputs({
   profileType,
   setProfileType,
   setFrontCoef,
-  steelGrades,
+  allGrades,
   steelGrade,
   setSteelGrade,
   validationErrors,
@@ -17,7 +17,15 @@ export function CalculatorInputs({
   setRawPrice,
   manualRawPrice,
   setManualRawPrice,
-  currentAdminRawPrice
+  currentAdminRawPrice,
+  adminScrapPrice,
+  adminRemnantPrice,
+  targetOptions,
+  rawOptions,
+  setSelectedTarget,
+  setSelectedRaw,
+  selectedTarget,
+  selectedRaw
 }: any) {
   return (
     <>

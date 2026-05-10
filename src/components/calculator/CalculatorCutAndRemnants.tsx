@@ -1,5 +1,5 @@
-import { Ruler, Sparkles, Wand2 } from "lucide-react";
-import { formatInputValue, handleNumericInput } from "../../lib/constants";
+import { Ruler, Sparkles, Wand2, AlertCircle, ArrowRight, Info, CheckCircle2, AlertTriangle } from "lucide-react";
+import { formatCurrency, formatInputValue, handleNumericInput } from "../../lib/constants";
 
 export function CalculatorCutAndRemnants({
   optimalBilletLengths,
@@ -20,7 +20,27 @@ export function CalculatorCutAndRemnants({
   setRemnantType,
   isRemnantModeAuto,
   setIsRemnantModeAuto,
-  handleBilletLengthInput
+  handleBilletLengthInput,
+  selectedTarget,
+  frontCoef,
+  backCoef,
+  techEndsMm,
+  lengthAfterTechEnds,
+  piecesPerBar,
+  remnantWeight,
+  remnantValue,
+  effectiveRemnantPrice,
+  currentRemnantPricingRule,
+  orderedBarWeight,
+  piecesPerTon,
+  totalPiecesInOrder,
+  advancedRemnantStats,
+  currentAdminRawPrice,
+  displayedRawLength,
+  displayedTargetLength,
+  orderWeight,
+  setOrderedLength,
+  optimalLengths
 }: any) {
   return (
     <>

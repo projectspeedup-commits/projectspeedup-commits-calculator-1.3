@@ -18,17 +18,24 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
+let isPostgresConnected = false;
+
 // Test connection
 pool.connect((err, client, release) => {
   if (err) {
-    return console.error('Error acquiring client', err.stack);
+    console.error('Error acquiring client (PostgreSQL connection failed)', err.stack);
+    isPostgresConnected = false;
+    return;
   }
   client.query('SELECT NOW()', (err, result) => {
     release();
     if (err) {
-      return console.error('Error executing query', err.stack);
+      console.error('Error executing query', err.stack);
+      isPostgresConnected = false;
+      return;
     }
     console.log('Connected to PostgreSQL successfully');
+    isPostgresConnected = true;
   });
 });
 
@@ -42,7 +49,7 @@ async function startServer() {
   // Config API
   app.get("/api/config", (req, res) => {
     res.json({
-      usePostgres: !!process.env.DATABASE_URL,
+      usePostgres: isPostgresConnected,
       isProduction: process.env.NODE_ENV === "production"
     });
   });
@@ -55,6 +62,9 @@ async function startServer() {
   // Calculations API
   app.get("/api/calculations", async (req, res) => {
     const { userId } = req.query;
+    if (!isPostgresConnected) {
+      return res.status(503).json({ error: "Database not connected" });
+    }
     try {
       const result = await pool.query(
         "SELECT * FROM calculations WHERE user_id = $1 ORDER BY created_at DESC",
@@ -233,6 +243,9 @@ async function startServer() {
   // Admin Data API
   app.get("/api/admin-data/:type", async (req, res) => {
     const { type } = req.params;
+    if (!isPostgresConnected) {
+      return res.status(503).json({ error: "Database not connected" });
+    }
     try {
       const result = await pool.query("SELECT * FROM user_settings WHERE user_id = $1", [`admin_${type}`]);
       if (result.rows.length > 0) {

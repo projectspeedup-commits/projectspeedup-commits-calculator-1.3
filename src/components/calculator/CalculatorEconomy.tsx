@@ -1,4 +1,4 @@
-import { AlertCircle, Briefcase, Calculator, Circle, HelpCircle, Minus, PieChart, Plus, TrendingUp } from "lucide-react";
+import { AlertCircle, Briefcase, Calculator, Circle, HelpCircle, Minus, PieChart, Plus, TrendingUp, BarChart3, Info, AlertTriangle } from "lucide-react";
 import { formatCurrency, formatInputValue, handleNumericInput } from "../../lib/constants";
 
 export function CalculatorEconomy({

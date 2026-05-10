@@ -1,12 +1,30 @@
 import { backendService } from "../api/backendService";
+import { doc, onSnapshot, setDoc } from "firebase/firestore";
 
 export const subscribeToUserSettings = (
   db: any,
   userId: string,
   onData: (data: any) => void,
   onError?: (error: any) => void,
+  usePostgres: boolean = false
 ) => {
   if (!userId) return () => {};
+
+  if (!usePostgres && db) {
+    return onSnapshot(
+      doc(db, "users", userId, "settings", "preferences"),
+      (snapshot) => {
+        if (snapshot.exists()) {
+          onData(snapshot.data());
+        } else {
+          onData(null);
+        }
+      },
+      (error) => {
+        if (onError) onError(error);
+      }
+    );
+  }
 
   let isMounted = true;
   let interval: ReturnType<typeof setInterval>;
@@ -33,10 +51,15 @@ export const saveUserSettingsToCloud = async (
   db: any,
   userId: string,
   payload: any,
+  usePostgres: boolean = false
 ) => {
   if (!userId) return;
   try {
-    await backendService.saveSettings(userId, payload);
+    if (usePostgres) {
+      await backendService.saveSettings(userId, payload);
+    } else if (db) {
+      await setDoc(doc(db, "users", userId, "settings", "preferences"), payload);
+    }
   } catch (e) {
     console.error("Failed to save settings", e);
   }
@@ -48,7 +71,24 @@ export const subscribeToSystemData = (
   type: string,
   onData: (data: any) => void,
   onError?: (error: any) => void,
+  usePostgres: boolean = false
 ) => {
+  if (!usePostgres && db) {
+    return onSnapshot(
+      doc(db, collectionName, type),
+      (snapshot) => {
+        if (snapshot.exists()) {
+          onData(snapshot.data());
+        } else {
+          onData(null);
+        }
+      },
+      (error) => {
+        if (onError) onError(error);
+      }
+    );
+  }
+
   let isMounted = true;
   let interval: ReturnType<typeof setInterval>;
 
@@ -75,9 +115,14 @@ export const saveSystemDataToCloud = async (
   collectionName: string,
   type: string,
   payload: any,
+  usePostgres: boolean = false
 ) => {
   try {
-    await backendService.saveAdminData(`${collectionName}_${type}`, payload);
+    if (usePostgres) {
+      await backendService.saveAdminData(`${collectionName}_${type}`, payload);
+    } else if (db) {
+      await setDoc(doc(db, collectionName, type), payload);
+    }
   } catch (e) {
     console.warn("Failed to save system data", e);
   }

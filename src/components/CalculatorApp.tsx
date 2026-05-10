@@ -45,7 +45,7 @@ import {
   CheckCircle2,
   HelpCircle,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, ChangeEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { subscribeToUserHistory, saveCalculationToCloud, deleteCalculationFromCloud, clearUserHistoryFromCloud } from '../services/db/calcHistoryService';
 import { backendService } from '../services/api/backendService';
@@ -76,6 +76,7 @@ interface CalculatorAppProps {
   toggleTheme: () => void;
   onAdminSwitch: () => void;
   onPrintDataUpdate: (data: any) => void;
+  config?: { usePostgres: boolean; isProduction: boolean } | null;
 }
 
 export function CalculatorApp({
@@ -93,6 +94,7 @@ export function CalculatorApp({
   toggleTheme,
   onAdminSwitch,
   onPrintDataUpdate,
+  config,
 }: CalculatorAppProps) {
   const [profileType, setProfileType] = useState<"round" | "hex">("round");
   const [steelGrade, setSteelGrade] = useState("");
@@ -111,13 +113,37 @@ export function CalculatorApp({
 
   const [sellPrice, setSellPrice] = useState("");
 
+  const [dimensions, setDimensions] = useState({ value: "", source: "target" });
+  const [rawPrice, setRawPrice] = useState("");
+  const [manualRawPrice, setManualRawPrice] = useState("");
+  const [cutLength, setCutLength] = useState("");
+  const [cutThickness, setCutThickness] = useState("");
+  const [remnantLengthManual, setRemnantLengthManual] = useState("");
+  const [remnantType, setRemnantType] = useState("6000");
+  const [isRemnantModeAuto, setIsRemnantModeAuto] = useState(true);
+
   const [isCopied, setIsCopied] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [savedCalculations, setSavedCalculations] = useState<any[]>([]);
   const [showHistory, setShowHistory] = useState(false);
-  const { config } = useAppConfig();
+  
+  const suggestedValues = useMemo(() => {
+    return ["6000", "9000", "11700", "12000"];
+  }, []);
+
+  const handleCutLengthChange = (e: ChangeEvent<HTMLInputElement>) => {
+    handleNumericInput(e, setCutLength);
+  };
+
+  const handleCutThicknessChange = (e: ChangeEvent<HTMLInputElement>) => {
+    handleNumericInput(e, setCutThickness);
+  };
+
+  const handleBilletLengthInput = (e: ChangeEvent<HTMLInputElement>) => {
+    handleNumericInput(e, (val) => setLengthInput({ value: val, source: "raw" }));
+  };
 
   useEffect(() => {
     if (config?.usePostgres && user) {
@@ -757,17 +783,18 @@ export function CalculatorApp({
       return;
     }
 
-    if (!db || !user) return;
+    if ((!isCloudActive && !config?.usePostgres) || (!db && !config?.usePostgres) || !user) return;
 
     const unsubscribe = subscribeToUserHistory(
       db,
       user.uid,
       (calcs) => setSavedCalculations(calcs),
-      (error) => console.error(error)
+      (error) => console.error(error),
+      config?.usePostgres
     );
 
-    return () => unsubscribe();
-  }, [user, isCloudActive]);
+    return () => unsubscribe && unsubscribe();
+  }, [user, isCloudActive, config]);
 
   const showNotify = (
     message: string,
@@ -812,17 +839,8 @@ export function CalculatorApp({
         label: `${getProfileGost(profileType)} ${selectedTarget}мм, ${steelGrade}`,
       };
 
-      if (config?.usePostgres && user) {
-        const savedItem = await backendService.saveCalculation(payload);
-        // Transform the saved item for compatibility if needed
-        const newCalc = {
-          ...savedItem,
-          id: savedItem.id.toString(),
-          createdAt: { toDate: () => new Date(savedItem.created_at || Date.now()) }
-        };
-        setSavedCalculations(prev => [newCalc, ...prev]);
-      } else if (isCloudActive && db && user) {
-        await saveCalculationToCloud(db, payload);
+      if ((isCloudActive && db && user) || (config?.usePostgres && user)) {
+        await saveCalculationToCloud(db, payload, config?.usePostgres);
       } else {
         payload.id = Date.now().toString();
         payload.createdAt = { toDate: () => new Date() };
@@ -849,11 +867,9 @@ export function CalculatorApp({
   const deleteCalculation = async (id: string) => {
     if (confirm("Удалить этот расчет?")) {
       try {
-        if (config?.usePostgres) {
-          await backendService.deleteCalculation(id);
+        if ((isCloudActive && db) || config?.usePostgres) {
+          await deleteCalculationFromCloud(db, id, config?.usePostgres);
           setSavedCalculations(prev => prev.filter(c => c.id !== id));
-        } else if (isCloudActive && db) {
-          await deleteCalculationFromCloud(db, id);
         } else {
           const newSaved = savedCalculations.filter(c => c.id !== id);
           setSavedCalculations(newSaved);
@@ -887,11 +903,9 @@ export function CalculatorApp({
     setIsClearing(true);
     try {
       let deletedCount = savedCalculations.length;
-      if (config?.usePostgres && user) {
-        await backendService.clearHistory(user.uid);
+      if ((config?.usePostgres && user) || (isCloudActive && db)) {
+        deletedCount = await clearUserHistoryFromCloud(db, savedCalculations, config?.usePostgres);
         setSavedCalculations([]);
-      } else if (isCloudActive && db) {
-        deletedCount = await clearUserHistoryFromCloud(db, savedCalculations);
       } else {
         setSavedCalculations([]);
         if (typeof window !== "undefined") {
@@ -1388,7 +1402,7 @@ export function CalculatorApp({
                   profileType={profileType}
                   setProfileType={setProfileType}
                   setFrontCoef={setFrontCoef}
-                  steelGrades={steelGrades}
+                  allGrades={allGrades}
                   steelGrade={steelGrade}
                   setSteelGrade={setSteelGrade}
                   validationErrors={validationErrors}
@@ -1401,6 +1415,14 @@ export function CalculatorApp({
                   manualRawPrice={manualRawPrice}
                   setManualRawPrice={setManualRawPrice}
                   currentAdminRawPrice={currentAdminRawPrice}
+                  adminScrapPrice={adminScrapPrice}
+                  adminRemnantPrice={adminRemnantPrice}
+                  targetOptions={targetOptions}
+                  rawOptions={rawOptions}
+                  setSelectedTarget={setSelectedTarget}
+                  setSelectedRaw={setSelectedRaw}
+                  selectedTarget={selectedTarget}
+                  selectedRaw={selectedRaw}
                 />
 
                 <CalculatorCutAndRemnants
@@ -1416,13 +1438,33 @@ export function CalculatorApp({
                   cutThickness={cutThickness}
                   setCutThickness={setCutThickness}
                   handleCutThicknessChange={handleCutThicknessChange}
-                  remnantLength={remnantLength}
-                  setRemnantLength={setRemnantLength}
+                  remnantLength={remnantLengthManual}
+                  setRemnantLength={setRemnantLengthManual}
                   remnantType={remnantType}
                   setRemnantType={setRemnantType}
                   isRemnantModeAuto={isRemnantModeAuto}
                   setIsRemnantModeAuto={setIsRemnantModeAuto}
                   handleBilletLengthInput={handleBilletLengthInput}
+                  selectedTarget={selectedTarget}
+                  frontCoef={frontCoef}
+                  backCoef={backCoef}
+                  techEndsMm={techEndsMm}
+                  lengthAfterTechEnds={lengthAfterTechEnds}
+                  piecesPerBar={piecesPerBar}
+                  remnantWeight={remnantWeight}
+                  remnantValue={remnantValue}
+                  effectiveRemnantPrice={effectiveRemnantPrice}
+                  currentRemnantPricingRule={currentRemnantPricingRule}
+                  orderedBarWeight={orderedBarWeight}
+                  piecesPerTon={piecesPerTon}
+                  totalPiecesInOrder={totalPiecesInOrder}
+                  advancedRemnantStats={advancedRemnantStats}
+                  currentAdminRawPrice={currentAdminRawPrice}
+                  displayedRawLength={displayedRawLength}
+                  displayedTargetLength={displayedTargetLength}
+                  orderWeight={orderWeight}
+                  setOrderedLength={setOrderedLength}
+                  optimalLengths={optimalLengths}
                 />
               </div>
 

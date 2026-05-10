@@ -113,6 +113,7 @@ interface AdminPanelProps {
     | "help";
   isPurchasingMode?: boolean;
   isDeveloperMode?: boolean;
+  config?: { usePostgres: boolean; isProduction: boolean } | null;
 }
 
 export function AdminPanel({
@@ -131,6 +132,7 @@ export function AdminPanel({
   initialTab = "economy",
   isPurchasingMode = false,
   isDeveloperMode = false,
+  config,
 }: AdminPanelProps) {
   const [activeTab, setActiveTab] = useState<
     "files" | "economy" | "supply" | "production" | "logistics" | "help"
@@ -279,7 +281,7 @@ export function AdminPanel({
           skipCloudSave.current = false;
         }, 500);
       }
-    });
+    }, undefined, config?.usePostgres);
 
     const unsubSup = subscribeToAdminData(db, "sup_data", (data) => {
       if (data) {
@@ -288,7 +290,7 @@ export function AdminPanel({
           skipCloudSave.current = false;
         }, 500);
       }
-    });
+    }, undefined, config?.usePostgres);
 
     return () => {
       unsubProd();
@@ -297,9 +299,9 @@ export function AdminPanel({
   }, [isCloudActive]);
 
   const saveToCloud = async (type: string, payload: any) => {
-    if (!isCloudActive || !db || skipCloudSave.current) return;
+    if ((!isCloudActive && !config?.usePostgres) || (!db && !config?.usePostgres) || skipCloudSave.current) return;
     try {
-      await saveAdminDataToCloud(db, type as any, payload);
+      await saveAdminDataToCloud(db, type as any, payload, config?.usePostgres);
     } catch (e) {
       console.warn("Cloud save failed", e);
     }

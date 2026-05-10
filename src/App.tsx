@@ -232,10 +232,9 @@ export default function App() {
 
     isInitialLoad.current = false;
 
-    if (db && isCloudActive && user && !config?.usePostgres) {
-      const unsubscribe = subscribeToSystemData(db, "settings", "prices", (data) => {
+    if (db && isCloudActive && user) {
+      const unsub = subscribeToSystemData(db, "settings", "prices", (data) => {
           if (data) {
-
             const storeState = useStore.getState();
             const resultingCustomGrades =
               data.customGrades || storeState.customGrades;
@@ -344,33 +343,25 @@ export default function App() {
           handleFirestoreError(error, OperationType.GET, "settings/prices");
           setIsCloudActive(false);
         },
+        config?.usePostgres
       );
-      return () => unsubscribe();
+      return () => unsub();
     }
-  }, [user, isCloudActive]);
+  }, [user, isCloudActive, config]);
 
   // Load User Personal Settings
   useEffect(() => {
     if (db && isCloudActive && user) {
-      const unsubscribe = subscribeToUserSettings(db, user.uid, (data) => {
+      const unsub = subscribeToUserSettings(db, user.uid, (data) => {
           if (data) {
             if (data.rawPrices) {
               const loadedPrices = { ...DEFAULT_RAW_PRICES };
-              // Since keys might be sanitized, we match them against all possible grades
-              // Or better: just use the data.rawPrices keys if they don't have dots
-              // But we saved them sanitized. So we need to match them back.
-              // All known grades include DEFAULT + custom
-              // Or we can just iterate the keys and replace _ back to .?
-              // But grade names can have underscores originally? unlikely.
-
-              // Robust approach: match by comparing sanitized versions
               const allPossibleGrades = [...DEFAULT_STEEL_GRADES, ...(data.customGrades || [])];
               Object.entries(data.rawPrices).forEach(([dbKey, val]: [string, any]) => {
                 const match = allPossibleGrades.find(g => sanitizeKey(g) === dbKey);
                 if (match) {
                   loadedPrices[match] = val;
                 } else {
-                  // If it doesn't match a known grade, we still keep it using dbKey as is (might be okay)
                   loadedPrices[dbKey] = val;
                 }
               });
@@ -392,19 +383,18 @@ export default function App() {
             }
             setIsUserSettingsLoaded(true);
           } else {
-            setIsUserSettingsLoaded(true); // Document doesn't exist, we are done loading
+            setIsUserSettingsLoaded(true);
           }
         },
         (error) => {
           console.warn("Ошибка загрузки пользовательских настроек:", error);
           setIsUserSettingsLoaded(true);
-        }
+        },
+        config?.usePostgres
       );
-      return () => unsubscribe();
-    } else {
-      setIsUserSettingsLoaded(true);
+      return () => unsub();
     }
-  }, [user, isCloudActive]);
+  }, [user, isCloudActive, config]);
 
   const handleAnonymousLogin = async (targetView: "manager" | "purchasing" | "admin" | "developer") => {
     if (!user) {
@@ -476,7 +466,7 @@ export default function App() {
       }
     } catch (e) {}
 
-    if (db && isCloudActive && user && !config?.usePostgres) {
+    if ((db || config?.usePostgres) && user) {
       const firestoreRawPricesV2: Record<string, { md: string; nd: string }> =
         {};
       const firestoreRawPricesOld: Record<string, string> = {};
@@ -503,8 +493,8 @@ export default function App() {
       try {
         if (config?.usePostgres) {
           await backendService.saveGlobalSettings(payload);
-        } else {
-          await saveSystemDataToCloud(db, "settings", "prices", payload);
+        } else if (db && isCloudActive) {
+          await saveSystemDataToCloud(db, "settings", "prices", payload, config?.usePostgres);
         }
       } catch (error) {
         // Fallback for non-admins: save only to their personal settings
@@ -531,11 +521,15 @@ export default function App() {
 
         if (config?.usePostgres) {
           await backendService.saveSettings(user.uid, personalPayload);
-        } else {
-          await saveUserSettingsToCloud(db, user.uid, personalPayload);
+        } else if (db && isCloudActive) {
+          await saveUserSettingsToCloud(db, user.uid, personalPayload, config?.usePostgres);
         }
       } catch (error) {
-        handleFirestoreError(error as any, OperationType.WRITE, `users/${user.uid}/settings/preferences`);
+        if (isCloudActive) {
+          handleFirestoreError(error as any, OperationType.WRITE, `users/${user.uid}/settings/preferences`);
+        } else {
+          console.error("Failed to save personal settings:", error);
+        }
       }
     }
   };
@@ -603,7 +597,7 @@ export default function App() {
                   initialScrap={globalScrapPrice}
                   initialRemnant={globalRemnantPrice}
                   initialCustomGrades={customGrades}
-                  initialDeletedGrades={deletedGrades}
+                  initialDeletedGrades={deletedGrades || []}
                   initialRemnantPricing={remnantPricing}
                   initialEconomyItems={economyItems}
                   onSave={handleSaveGlobal}
@@ -612,6 +606,7 @@ export default function App() {
                   isDarkMode={isDarkMode}
                   toggleTheme={toggleTheme}
                   isDeveloperMode={view === "developer"}
+                  config={config}
                 />
               </div>
             </motion.div>
@@ -632,7 +627,7 @@ export default function App() {
                   initialScrap={globalScrapPrice}
                   initialRemnant={globalRemnantPrice}
                   initialCustomGrades={customGrades}
-                  initialDeletedGrades={deletedGrades}
+                  initialDeletedGrades={deletedGrades || []}
                   initialRemnantPricing={remnantPricing}
                   initialEconomyItems={economyItems}
                   onSave={handleSaveGlobal}
@@ -642,6 +637,7 @@ export default function App() {
                   toggleTheme={toggleTheme}
                   initialTab="production"
                   isPurchasingMode={true}
+                  config={config}
                 />
               </div>
             </motion.div>
@@ -662,7 +658,7 @@ export default function App() {
                   adminScrapPrice={globalScrapPrice}
                   adminRemnantPrice={globalRemnantPrice}
                   customGrades={customGrades}
-                  deletedGrades={deletedGrades}
+                  deletedGrades={deletedGrades || []}
                   remnantPricing={remnantPricing}
                   economyItems={economyItems}
                   onLogout={() => setView("login")}
@@ -672,6 +668,7 @@ export default function App() {
                   toggleTheme={toggleTheme}
                   onAdminSwitch={() => setView("login")}
                   onPrintDataUpdate={setPrintData}
+                  config={config}
                 />
               </div>
             </motion.div>
