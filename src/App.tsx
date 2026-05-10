@@ -402,10 +402,12 @@ export default function App() {
     if (!user) {
       try {
         if (!isCloudActive && config?.usePostgres) {
-          // Local fallback user
+          // If Firestore is NOT active, use a local placeholder
           setUser({ uid: "local_manager", isAnonymous: true, displayName: "Локальный пользователь" });
         } else {
-          await signInAnonymously(auth);
+          // If Firestore IS active, use the real Firebase sign-in
+          const result = await signInAnonymously(auth);
+          setUser(result.user);
         }
       } catch (error) {
         console.error("Anonymous login failed:", error);
