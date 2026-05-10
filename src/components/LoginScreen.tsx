@@ -12,6 +12,7 @@ interface LoginScreenProps {
   connectionError?: string | null;
   isDarkMode: boolean;
   toggleTheme: () => void;
+  config?: any;
 }
 
 export function LoginScreen({
@@ -24,6 +25,7 @@ export function LoginScreen({
   connectionError,
   isDarkMode,
   toggleTheme,
+  config,
 }: LoginScreenProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -202,19 +204,30 @@ export function LoginScreen({
               className={`w-2 h-2 rounded-full ${
                 isConnecting
                   ? "bg-amber-400 animate-pulse"
-                  : isCloudActive
-                    ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
-                    : "bg-slate-400"
+                  : config?.usePostgres
+                    ? "bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"
+                    : isCloudActive
+                      ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+                      : "bg-slate-400"
               }`}
             />
             <span
-              className={`text-[10px] font-bold uppercase tracking-widest ${isConnecting ? "text-amber-500 dark:text-amber-400" : isCloudActive ? "text-emerald-500 dark:text-emerald-400" : "text-slate-500 dark:text-slate-400"}`}
+              className={`text-[10px] font-bold uppercase tracking-widest ${
+                isConnecting
+                ? "text-amber-500 dark:text-amber-400"
+                : config?.usePostgres
+                  ? "text-blue-500 dark:text-blue-400"
+                  : isCloudActive
+                    ? "text-emerald-500 dark:text-emerald-400"
+                    : "text-slate-500 dark:text-slate-400"}`}
             >
               {isConnecting
                 ? "Подключение..."
-                : isCloudActive
-                  ? (user?.isAnonymous ? "FIREBASE ACTIVE" : "ОНЛАЙН")
-                  : "АВТОНОМНЫЙ РЕЖИМ"}
+                : config?.usePostgres
+                  ? "ЛОКАЛЬНЫЙ СЕРВЕР"
+                  : isCloudActive
+                    ? (user?.isAnonymous ? "FIREBASE ACTIVE" : "ОНЛАЙН")
+                    : "АВТОНОМНЫЙ РЕЖИМ"}
             </span>
           </div>
           {connectionError && !isCloudActive && !isConnecting && (

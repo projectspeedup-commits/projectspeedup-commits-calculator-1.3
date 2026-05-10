@@ -554,6 +554,7 @@ export default function App() {
                 connectionError={connectionError}
                 isDarkMode={isDarkMode}
                 toggleTheme={toggleTheme}
+                config={config}
               />
             </motion.div>
           )}
