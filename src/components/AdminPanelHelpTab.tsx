@@ -15,7 +15,7 @@ export default function AdminPanelHelpTab(props: any) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="flex flex-col gap-8"
+              className="flex flex-col gap-8 pb-12"
             >
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
@@ -23,13 +23,73 @@ export default function AdminPanelHelpTab(props: any) {
                     Обучение и Инструкции
                   </h2>
                   <p className="text-sm text-[#43483F] dark:text-slate-400 mt-2 max-w-2xl">
-                    Руководство пользователя, алгоритмы работы и требования к
-                    форматам загружаемых данных.
+                    Руководство пользователя, техническое обслуживание и требования к данным.
                   </p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Tech Support - New Section */}
+                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl flex flex-col gap-4 md:col-span-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center">
+                      <LucideIcons.Settings className="w-6 h-6 text-orange-500" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white">
+                      Техническое обслуживание (Для разработчика)
+                    </h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-4">
+                    <div className="space-y-4">
+                      <h4 className="text-emerald-400 font-bold uppercase tracking-wider text-xs">
+                        Шаг 0: Подключение к серверу
+                      </h4>
+                      <p className="text-sm text-slate-300 leading-relaxed">
+                        Сначала нужно «зайти» на сервер Ubuntu через терминал Windows (PowerShell или CMD):
+                      </p>
+                      <div className="bg-black/40 rounded-2xl p-4 border border-slate-800 font-mono text-xs text-emerald-300 space-y-2">
+                        <p className="text-white">ssh user@192.168.1.245</p>
+                        <p className="text-slate-500 italic"># Вместо 'user' ваше имя. Введите пароль (символы не будут видны).</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="text-orange-500 font-bold uppercase tracking-wider text-xs">
+                        Шаг 1: Сохранение кода (GitHub)
+                      </h4>
+                      <p className="text-sm text-slate-300 leading-relaxed">
+                        В интерфейсе AI Studio выполните экспорт, чтобы обновить код в интернете:
+                      </p>
+                      <ul className="space-y-2">
+                        <li className="flex items-center gap-3 text-slate-400 text-sm">
+                          <Check className="w-4 h-4 text-emerald-500" />
+                          <span>Нажмите <b>Settings</b> → <b>Export to GitHub</b></span>
+                        </li>
+                        <li className="flex items-center gap-3 text-slate-400 text-sm">
+                          <Check className="w-4 h-4 text-emerald-500" />
+                          <span>Нажмите кнопку <b>Push Changes</b>.</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="text-sky-400 font-bold uppercase tracking-wider text-xs">
+                        Шаг 2: Обновление (192.168.1.245)
+                      </h4>
+                      <p className="text-sm text-slate-300 leading-relaxed">
+                        Теперь в терминале сервера (из Шага 0) введите по очереди:
+                      </p>
+                      <div className="bg-black/40 rounded-2xl p-4 border border-slate-800 font-mono text-xs text-sky-300 space-y-2">
+                        <p className="text-white">cd ~/zmk-app</p>
+                        <p className="text-white">git pull origin main</p>
+                        <p className="text-white">npm run build</p>
+                        <p className="text-white">pm2 restart zmk-app</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Intro & Benefits */}
                 <div className="bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm flex flex-col gap-4">
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
