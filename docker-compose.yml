@@ -1,0 +1,28 @@
+services:
+  # Проект Снабжения (ZMK Arsenal)
+  zmk_arsenal:
+    image: node:18-slim
+    working_dir: /app
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    command: sh -c "npm install && npm run build && npm run start"
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.8' # Ограничение CPU, чтобы MacBook не грелся
+          memory: '2G'
+
+  # Portainer (Управление контейнерами в браузере)
+  portainer:
+    image: portainer/portainer-ce:latest
+    ports: ["9443:9443", "9000:9000"]
+    volumes: 
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "portainer_data:/data"
+    restart: always
+
+volumes:
+  portainer_data:

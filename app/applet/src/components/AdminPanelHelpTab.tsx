@@ -211,6 +211,71 @@ export default function AdminPanelHelpTab(props: any) {
           </div>
         </div>
 
+        {/* Section 6: Техническая поддержка (Для разработчика) */}
+        <div className="bg-slate-900 border border-indigo-500/30 rounded-3xl p-6 md:p-8 shadow-2xl flex flex-col gap-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+              <Settings className="w-6 h-6 text-indigo-400" />
+              6. Техническая поддержка (Deployment & Support)
+            </h3>
+            <span className="px-3 py-1 bg-indigo-500/20 text-indigo-300 text-[10px] font-bold uppercase rounded-full border border-indigo-500/30">
+              Только для администратора сервера
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-sm">
+            {/* Cloudflare Support */}
+            <div className="space-y-4 bg-black/40 p-5 rounded-2xl border border-slate-800">
+              <h4 className="text-sky-400 font-bold flex items-center gap-2 uppercase text-xs">
+                <LucideIcons.ShieldCheck className="w-4 h-4" /> Cloudflare Tunnel (Решение проблем)
+              </h4>
+              <div className="space-y-3">
+                <p className="text-slate-400 text-xs">Если статус в панели Cloudflare <b>"Down"</b> или ошибка <b>"Service already installed"</b>:</p>
+                <div className="space-y-2">
+                  <p className="text-[10px] text-slate-500 uppercase font-bold">1. Полная очистка:</p>
+                  <code className="block bg-black/60 p-2 rounded text-sky-300 text-[10px] font-mono">sudo cloudflared service uninstall</code>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-[10px] text-slate-500 uppercase font-bold">2. Повторная установка:</p>
+                  <p className="text-[10px] text-slate-400 italic">Скопируйте команду "sudo cloudflared service install [TOKEN]" из панели Cloudflare и запустите её.</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-[10px] text-slate-500 uppercase font-bold">3. Настройка маршрута:</p>
+                  <ul className="text-[10px] text-slate-400 space-y-1 ml-4 list-disc">
+                    <li>Public Hostname: ваш-домен.ru</li>
+                    <li>Service: HTTP</li>
+                    <li>URL: localhost:3000</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* PM2 & Update Support */}
+            <div className="space-y-4 bg-black/40 p-5 rounded-2xl border border-slate-800">
+              <h4 className="text-emerald-400 font-bold flex items-center gap-2 uppercase text-xs">
+                <LucideIcons.Terminal className="w-4 h-4" /> Обновление и PM2
+              </h4>
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <p className="text-[10px] text-slate-500 uppercase font-bold">Быстрое обновление:</p>
+                  <code className="block bg-black/60 p-2 rounded text-emerald-300 text-[10px] font-mono">cd ~/zmk-app && ./server_update.sh</code>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] text-slate-500 uppercase font-bold">Если приложение не стартует:</p>
+                  <div className="bg-black/60 p-2 rounded text-red-300 text-[10px] font-mono space-y-1">
+                    <p>pm2 delete all</p>
+                    <p>npm run build</p>
+                    <p>pm2 start npm --name "zmk-app" -- run start</p>
+                  </div>
+                </div>
+                <p className="text-[10px] text-slate-500 italic">
+                  * Команда "npm run start" запускает "server.ts", который объединяет API и Frontend на порту 3000.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </motion.div>
   );
