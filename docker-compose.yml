@@ -1,7 +1,9 @@
 services:
   # Экземпляр PRODUCTION (Порт 8001)
   app_production:
-    build: .
+    build: 
+      context: .
+    platform: linux/amd64
     container_name: zmk_production
     restart: always
     ports:
@@ -22,7 +24,9 @@ services:
 
   # Экземпляр SUPPLY (Порт 8002)
   app_supply:
-    build: .
+    build:
+      context: .
+    platform: linux/amd64
     container_name: zmk_supply
     restart: always
     ports:
@@ -41,7 +45,7 @@ services:
           cpus: '0.50'
           memory: 1G
 
-  # Portainer для мониторинга
+  # Portainer (Графическая панель)
   portainer:
     image: portainer/portainer-ce:latest
     container_name: portainer
