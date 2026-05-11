@@ -1,38 +1,57 @@
 services:
-  zmk_sales:
-    image: node:20-slim # Используем более свежую версию Node
-    container_name: zmk_arsenal_app
-    working_dir: /app
-    volumes:
-      - .:/app:delegated # Монтируем код (используем delegated для ускорения на Mac)
-      - /app/node_modules # Анонимный том (скрывает маковские папки от контейнера)
-    ports:
-      - "3001:3000" # Заходим через localhost:3001
-    command: sh -c "rm -rf dist node_modules/.vite && npm install && npm run build && npm run start"
+  # Экземпляр PRODUCTION (Порт 8001)
+  app_production:
+    build: .
+    container_name: zmk_production
     restart: always
+    ports:
+      - "8001:3000"
     environment:
       - NODE_ENV=production
-      # Подключение к базе на вашем основном сервере (IP 192.168.1.245)
-      - DATABASE_URL=postgresql://aleksandr:password@192.168.1.245:5432/zmk_db
+      - APP_TYPE=production
+      - DATABASE_URL=postgresql://aleksandr:password@host.docker.internal:5432/zmk_production
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    volumes:
+      - ./logs/production:/app/logs
     deploy:
       resources:
         limits:
-          cpus: '0.8'
-          memory: '2G'
+          cpus: '0.50'
+          memory: 1G
 
-  # Portainer (Управление контейнерами через браузер)
-  # Мы убрали жесткое имя 'container_name', чтобы не было конфликтов
+  # Экземпляр SUPPLY (Порт 8002)
+  app_supply:
+    build: .
+    container_name: zmk_supply
+    restart: always
+    ports:
+      - "8002:3000"
+    environment:
+      - NODE_ENV=production
+      - APP_TYPE=supply
+      - DATABASE_URL=postgresql://aleksandr:password@host.docker.internal:5432/zmk_supply
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./logs/supply:/app/logs
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 1G
+
+  # Portainer для мониторинга
   portainer:
     image: portainer/portainer-ce:latest
-    ports:
-      - "9443:9443"
-      - "9000:9000"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - "portainer_data:/data"
+    container_name: portainer
     restart: always
+    ports:
+      - "9000:9000"
+      - "9443:9443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
 
 volumes:
   portainer_data:
