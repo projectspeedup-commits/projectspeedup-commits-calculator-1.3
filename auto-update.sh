@@ -6,8 +6,8 @@
 
 echo "Запуск скрипта авто-обновления... (проверка каждые 60 секунд)"
 
-# Переход в папку проекта
-cd "/Users/aleksandrtrusin/Documents/my-server/ZMK Prodachion/zmk-arsenal-разработка-блок-производсво." || { echo "Папка не найдена"; exit 1; }
+# Переход в папку, где находится сам скрипт (корень проекта)
+cd "$(dirname "$0")" || { echo "Не удалось перейти в папку проекта"; exit 1; }
 
 while true; do
   # Обновляем информацию из удаленного репозитория (без слияния)
@@ -15,7 +15,7 @@ while true; do
 
   # Получаем хэши локального и удаленного коммитов
   LOCAL=$(git rev-parse HEAD)
-  REMOTE=$(git rev-parse @{u} 2>/dev/null)
+  REMOTE=$(git rev-parse origin/main 2>/dev/null)
 
   # Если произошла ошибка при получении origin (например нет сети), пропускаем цикл
   if [ -z "$REMOTE" ]; then
