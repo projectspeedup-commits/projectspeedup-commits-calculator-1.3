@@ -6,6 +6,9 @@
 
 echo "Запуск скрипта авто-обновления... (проверка каждые 60 секунд)"
 
+# Переход в папку проекта
+cd "/Users/aleksandrtrusin/Documents/my-server/ZMK Prodachion/zmk-arsenal-разработка-блок-производсво." || { echo "Папка не найдена"; exit 1; }
+
 while true; do
   # Обновляем информацию из удаленного репозитория (без слияния)
   git fetch -q origin
