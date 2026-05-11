@@ -1,25 +1,31 @@
 services:
-  # Проект Снабжения (ZMK Arsenal)
-  zmk_arsenal:
-    image: node:18-slim
+  zmk_sales:
+    image: node:20-slim # Используем более свежую версию Node
+    container_name: zmk_arsenal_app
     working_dir: /app
     volumes:
-      - .:/app
+      - .:/app:delegated # Монтируем код (используем delegated для ускорения на Mac)
+      - /app/node_modules # Анонимный том (скрывает маковские папки от контейнера)
     ports:
-      - "3000:3000"
-    command: sh -c "npm install && npm run build && npm run start"
+      - "3001:3000" # Заходим через localhost:3001
+    command: sh -c "rm -rf node_modules/.vite && npm install && npm run build && npm run start"
     restart: always
+    environment:
+      - NODE_ENV=production
     deploy:
       resources:
         limits:
-          cpus: '0.8' # Ограничение CPU, чтобы MacBook не грелся
+          cpus: '0.8'
           memory: '2G'
 
-  # Portainer (Управление контейнерами в браузере)
+  # Portainer (Управление контейнерами через браузер)
+  # Мы убрали жесткое имя 'container_name', чтобы не было конфликтов
   portainer:
     image: portainer/portainer-ce:latest
-    ports: ["9443:9443", "9000:9000"]
-    volumes: 
+    ports:
+      - "9443:9443"
+      - "9000:9000"
+    volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "portainer_data:/data"
     restart: always

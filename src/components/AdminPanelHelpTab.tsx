@@ -231,35 +231,32 @@ export default function AdminPanelHelpTab(props: any) {
                            </h4>
                            <div className="bg-slate-800/50 p-5 rounded-2xl border border-slate-700 space-y-3 shadow-inner">
                               <p className="text-xs text-slate-300">
-                                Скопируйте и вставьте в Терминал, чтобы зайти в вашу папку:
+                                Скопируйте и вставьте, чтобы зайти в папку проекта:
                               </p>
-                              <code className="block bg-black/60 p-3 rounded-xl text-sky-400 text-[10px] font-mono border border-sky-500/10 select-all leading-relaxed">
+                              <code className="block bg-black/60 p-3 rounded-xl text-sky-400 text-[10px] font-mono border border-sky-500/10 select-all leading-relaxed break-all">
                                 cd "/Users/aleksandrtrusin/Documents/my-server/ZMK Prodachion/zmk-arsenal-разработка-блок-производс."
                               </code>
                               <p className="text-[9px] text-slate-500 italic">
-                                * Обязательно используйте кавычки, так как в пути есть пробелы.
+                                * Если папка не находится, проверьте, что точка в конце названия указана.
                               </p>
                            </div>
                         </div>
 
-                        {/* Step 2: Docker Start */}
+                        {/* Step 2: Logging & Status */}
                         <div className="space-y-4">
-                           <h4 className="text-emerald-400 font-bold uppercase tracking-wider text-xs">
-                              2. Запуск через Docker
+                           <h4 className="text-yellow-400 font-bold uppercase tracking-wider text-xs">
+                              2. Проверка статуса (Логи)
                            </h4>
                            <div className="bg-slate-800/50 p-5 rounded-2xl border border-slate-700 space-y-4">
                               <p className="text-xs text-slate-300">
-                                Убедитесь, что Docker Desktop запущен, затем выполните:
+                                Если 3001 не открывается — сборка еще идет. Проверьте логи:
                               </p>
-                              <div className="bg-black/60 p-3 rounded-xl text-emerald-300 text-[10px] font-mono border border-emerald-500/10 space-y-2">
-                                <p className="text-slate-500 italic"># Если это первый запуск:</p>
-                                <p className="select-all">docker compose up -d --build</p>
-                                <p className="text-slate-500 italic mt-2"># Если просто перезапустить:</p>
-                                <p className="select-all">docker compose restart</p>
+                              <div className="bg-black/60 p-3 rounded-xl text-yellow-300 text-[10px] font-mono border border-yellow-500/10 space-y-2">
+                                <p className="text-slate-500 italic"># Посмотреть что делает Docker сейчас:</p>
+                                <p className="select-all">docker compose logs -f zmk_sales</p>
                               </div>
                               <p className="text-[9px] text-slate-500 leading-relaxed border-t border-slate-700 pt-2">
-                                Теперь приложение работает на <b>порт 3000</b> (по умолчанию). 
-                                Вы можете изменить порт в файле <code className="text-slate-400">docker-compose.yml</code>.
+                                Дождитесь надписи <span className="text-emerald-400">"Server running"</span> в терминале.
                               </p>
                            </div>
                         </div>
