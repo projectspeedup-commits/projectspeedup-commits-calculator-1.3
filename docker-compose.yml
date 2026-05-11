@@ -12,6 +12,10 @@ services:
     restart: always
     environment:
       - NODE_ENV=production
+      # Подключение к базе на вашем основном сервере (IP 192.168.1.245)
+      - DATABASE_URL=postgresql://aleksandr:password@192.168.1.245:5432/zmk_db
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     deploy:
       resources:
         limits:
