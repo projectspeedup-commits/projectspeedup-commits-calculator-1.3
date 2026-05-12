@@ -343,7 +343,7 @@ export default function App() {
           handleFirestoreError(error, OperationType.GET, "settings/prices");
           setIsCloudActive(false);
         },
-        config?.usePostgres
+        false // ALWAYS USE FIREBASE FOR PRICES
       );
       return () => unsub();
     }
@@ -491,10 +491,12 @@ export default function App() {
       if (eItems) payload.economyItems = eItems;
 
       try {
+        if (db && isCloudActive) {
+          // ALWAYS USE FIREBASE FOR PRICES, EVEN IF POSTGRES IS ACTIVE
+          await saveSystemDataToCloud(db, "settings", "prices", payload, false);
+        }
         if (config?.usePostgres) {
-          await backendService.saveGlobalSettings(payload);
-        } else if (db && isCloudActive) {
-          await saveSystemDataToCloud(db, "settings", "prices", payload, config?.usePostgres);
+          await backendService.saveGlobalSettings(payload); // Optional backup to server
         }
       } catch (error) {
         // Fallback for non-admins: save only to their personal settings

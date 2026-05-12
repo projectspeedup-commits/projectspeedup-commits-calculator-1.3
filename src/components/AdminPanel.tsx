@@ -335,39 +335,60 @@ export function AdminPanel({
   useEffect(() => {
     const errors: Record<string, string> = {};
 
+    const parseNum = (val: any) => {
+      if (val === undefined || val === null || val === "") return 0;
+      const str = String(val).trim();
+      if (str === "") return 0;
+      return parseFloat(str.replace(/,/g, "."));
+    };
+
     // Validate scrap
-    const scrapVal = parseFloat(scrap.replace(",", "."));
+    const scrapVal = parseNum(scrap);
     if (isNaN(scrapVal) || scrapVal < 0) {
-      errors.scrap = "Цена лома должна быть положительным числом";
+      errors.scrap = "Цена лома должна быть неотрицательным числом";
     }
 
     // Validate remnant
-    const remnantVal = parseFloat(remnant.replace(",", "."));
+    const remnantVal = parseNum(remnant);
     if (isNaN(remnantVal) || remnantVal < 0) {
-      errors.remnant = "Цена делового отхода должна быть положительным числом";
+      errors.remnant = "Цена делового отхода должна быть неотрицательным числом";
     }
 
     // Validate economy items
     economyItems.forEach((item) => {
-      const val = parseFloat(String(item.norm).replace(",", "."));
+      const val = parseNum(item.norm);
       if (isNaN(val) || val < 0) {
         errors[`economy_${item.id}`] =
-          "Значение должно быть положительным числом";
+          "Значение должно быть неотрицательным числом";
       }
     });
 
     // Validate raw prices
-    Object.entries(rawPrices).forEach(([grade, p]: [string, any]) => {
-      const md = parseFloat(p.md.replace(",", "."));
-      const nd = parseFloat(p.nd.replace(",", "."));
+    Object.entries(rawPrices || {}).forEach(([grade, p]: [string, any]) => {
+      if (!p) return;
+      const md = parseNum(p.md);
+      const nd = parseNum(p.nd);
       if (isNaN(md) || md < 0)
         errors[`price_${grade}_md`] = "Некорректная цена МД";
       if (isNaN(nd) || nd < 0)
         errors[`price_${grade}_nd`] = "Некорректная цена НД";
     });
 
+    // Also validate remnant pricing if it exists
+    Object.entries(remnantPricing || {}).forEach(([currGrade, p]: [string, any]) => {
+      if (!p) return;
+      const roundVal = parseNum(p.round);
+      const hexVal = parseNum(p.hex);
+      if (isNaN(roundVal) || roundVal < 0) {
+        errors[`remnant_price_${currGrade}_round`] = "Некорректная цена отхода (круг)";
+      }
+      if (isNaN(hexVal) || hexVal < 0) {
+        errors[`remnant_price_${currGrade}_hex`] = "Некорректная цена отхода (шестигранник)";
+      }
+    });
+
     setValidationErrors(errors);
-  }, [scrap, remnant, economyItems, rawPrices]);
+  }, [scrap, remnant, economyItems, rawPrices, remnantPricing]);
 
   // Search & Filters state
   const [stockSearchQuery, setStockSearchQuery] = useState("");
@@ -1654,8 +1675,9 @@ export function AdminPanel({
 
   const handleSave = async () => {
     if (Object.keys(validationErrors).length > 0) {
-      setSaveError("Пожалуйста, исправьте ошибки валидации перед сохранением.");
-      setTimeout(() => setSaveError(""), 4000);
+      console.warn("Validation errors preventing save:", validationErrors);
+      setSaveError("Пожалуйста, исправьте ошибки валидации перед сохранением. " + Object.keys(validationErrors).join(", "));
+      setTimeout(() => setSaveError(""), 8000);
       return;
     }
     setIsSaving(true);

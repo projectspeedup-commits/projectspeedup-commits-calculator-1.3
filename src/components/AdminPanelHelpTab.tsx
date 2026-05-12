@@ -117,6 +117,47 @@ export default function AdminPanelHelpTab(props: any) {
                         </div>
                       </div>
 
+                      {/* 3. ЖИВУЧЕСТЬ И ВОССТАНОВЛЕНИЕ */}
+                      <div className="lg:col-span-2 space-y-4">
+                        <h4 className="text-orange-400 font-bold uppercase tracking-wider text-sm flex items-center gap-2">
+                          <LucideIcons.ShieldAlert className="w-5 h-5"/>
+                          3. Живучесть и восстановление (macOS Ventura 13.7.8)
+                        </h4>
+                        <div className="bg-orange-950/10 border border-orange-500/20 rounded-2xl p-6">
+                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                              <div className="space-y-3">
+                                <p className="text-xs font-bold text-white uppercase border-b border-orange-500/20 pb-1">АВТОСТАРТ ПОСЛЕ СБОЯ</p>
+                                <ul className="text-[10px] text-slate-400 space-y-2 list-disc ml-4">
+                                  <li>Зайдите в <b className="text-slate-200">Системные настройки</b>.</li>
+                                  <li>Перейдите в раздел <b className="text-slate-200">Энергосбережение</b>.</li>
+                                  <li>Включите галочку <b className="text-orange-400">"Автоматически запускать после сбоя питания"</b>.</li>
+                                </ul>
+                              </div>
+
+                              <div className="space-y-3">
+                                <p className="text-xs font-bold text-white uppercase border-b border-orange-500/20 pb-1">ВХОД БЕЗ ПАРОЛЯ (Авто-вход)</p>
+                                <ul className="text-[10px] text-slate-400 space-y-2 list-disc ml-4">
+                                  <li><b className="text-red-400">Важно:</b> Сначала отключите <b className="text-slate-200">FileVault</b> (Настройки → Конфиденциальность и безопасность → FileVault).</li>
+                                  <li>Зайдите в <b className="text-slate-200">Пользователи и группы</b>.</li>
+                                  <li>Нажмите <b className="text-slate-200">"Автоматический вход"</b> и выберите пользователя <b className="text-indigo-400">aleksandrtrusin</b>.</li>
+                                  <li>В настройках <b className="text-slate-200">Docker Desktop</b> включите <b className="text-sky-400">"Start Docker when you log in"</b>.</li>
+                                </ul>
+                              </div>
+
+                              <div className="space-y-3">
+                                <p className="text-xs font-bold text-white uppercase border-b border-orange-500/20 pb-1">АВТОЗАПУСК ТУННЕЛЯ</p>
+                                <p className="text-[10px] text-slate-400 leading-relaxed">
+                                  Все скрипты (обновление и проброс портов) работают как <b>LaunchAgents</b>. Они стартуют автоматически сразу после логина Mac.
+                                </p>
+                                <div className="bg-black/40 p-2 rounded text-[9px] font-mono text-emerald-400 flex flex-col gap-1">
+                                   <span># Проверить что всё запустилось:</span>
+                                   <span className="text-emerald-200 select-all">launchctl list | grep zmk</span>
+                                </div>
+                              </div>
+                           </div>
+                        </div>
+                      </div>
+
                       {/* БЛОК АВТООБНОВЛЕНИЯ И КОМАНДЫ */}
                       <div className="lg:col-span-2 mt-4">
                         <div className="bg-blue-900/10 p-6 rounded-2xl border border-blue-500/20">

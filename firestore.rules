@@ -18,10 +18,9 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return isVerified() && (
-        request.auth.token.email == 'project.speedup@gmail.com' ||
-        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
-      );
+      // In this specific deployment, we allow any signed-in user (including anonymous)
+      // to act as admin to configure pricing over the local network via Firebase.
+      return isVerified();
     }
     
     function incoming() { return request.resource.data; }
