@@ -31,316 +31,138 @@ export default function AdminPanelHelpTab(props: any) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Tech Support - Only for Developer Mode */}
                 {props.isDeveloperMode && (
-                  <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl flex flex-col gap-4 md:col-span-2">
-                    <div className="flex items-center gap-3">
+                  <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl flex flex-col gap-6 md:col-span-2">
+                    <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
                       <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center">
-                        <LucideIcons.Settings className="w-6 h-6 text-orange-500" />
+                        <LucideIcons.Server className="w-6 h-6 text-orange-500" />
                       </div>
-                      <h3 className="text-xl font-bold text-white">
-                        Техническое обслуживание (Для разработчика)
-                      </h3>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-4">
-                      <div className="space-y-4">
-                        <h4 className="text-emerald-400 font-bold uppercase tracking-wider text-xs">
-                          Шаг 0: Подключение к серверу
-                        </h4>
-                        <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700 space-y-3 shadow-inner">
-                          <div className="space-y-1">
-                             <p className="text-[10px] font-bold text-slate-400 uppercase">macOS (MacBook):</p>
-                             <p className="text-xs text-slate-300 leading-relaxed">
-                                Откройте <b>Терминал</b> и введите:
-                             </p>
-                             <code className="block bg-black/40 p-2 rounded text-emerald-400 text-[10px] select-all">ssh aleksandr@192.168.1.245</code>
-                          </div>
-                          <div className="space-y-1 mt-3">
-                             <p className="text-[10px] font-bold text-slate-400 uppercase">Windows:</p>
-                             <p className="text-xs text-slate-300 leading-relaxed">
-                                Откройте <b>PowerShell</b> и введите:
-                             </p>
-                             <code className="block bg-black/40 p-2 rounded text-sky-400 text-[10px] select-all">ssh aleksandr@192.168.1.245</code>
-                          </div>
-                          <p className="text-[9px] text-slate-500 italic mt-2 italic"># Пароль при вводе не отображается — это нормально.</p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-4">
-                        <h4 className="text-orange-500 font-bold uppercase tracking-wider text-xs">
-                          Шаг 1: Сохранение кода (GitHub)
-                        </h4>
-                        <p className="text-sm text-slate-300 leading-relaxed">
-                          Чтобы ваши изменения в AI Studio попали на сервер:
-                        </p>
-                        <ul className="space-y-2">
-                          <li className="flex items-center gap-3 text-slate-400 text-sm">
-                            <Check className="w-4 h-4 text-emerald-500" />
-                            <span>В меню <b>Settings</b> → <b>Export to GitHub</b></span>
-                          </li>
-                          <li className="flex items-center gap-3 text-slate-400 text-sm">
-                            <Check className="w-4 h-4 text-emerald-500" />
-                            <span>Нажмите <b>Push Changes</b>.</span>
-                          </li>
-                        </ul>
-                      </div>
-
-                      <div className="space-y-4">
-                        <h4 className="text-sky-400 font-bold uppercase tracking-wider text-xs">
-                          Шаг 2: Обновление (192.168.1.245)
-                        </h4>
-                        <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700 space-y-3">
-                          <p className="text-xs text-slate-300">
-                             Введите в терминале сервера:
-                          </p>
-                          <div className="bg-black/40 rounded-lg p-3 font-mono text-[10px] text-sky-300 space-y-1">
-                            <p>cd ~/zmk-app</p>
-                            <p>./server_update.sh</p>
-                          </div>
-                          <p className="text-[9px] text-slate-500">
-                            Сервер сам скачает код, соберет проект и перезапустится через PM2.
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-6 lg:col-span-3 border-t border-slate-800 pt-6">
-                        <div className="flex items-center justify-between">
-                          <h4 className="text-fuchsia-400 font-bold uppercase tracking-wider text-xs">
-                            Шаг 3: Внешний доступ (Туннели)
-                          </h4>
-                          <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
-                            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                            <span className="text-[10px] text-emerald-400 font-bold uppercase">Рекомендуемый метод: Cloudflare</span>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {/* Option 1: Cloudflare Tunnel (Primary) */}
-                          <div className="bg-sky-950/20 p-6 rounded-2xl border border-sky-500/30 shadow-2xl col-span-1 md:col-span-2 lg:col-span-1">
-                            <div className="flex items-center gap-3 mb-4">
-                              <div className="p-3 bg-sky-500/20 rounded-xl">
-                                <LucideIcons.ShieldCheck className="w-5 h-5 text-sky-400" />
-                              </div>
-                              <div>
-                                <p className="text-base font-bold text-white">Cloudflare Tunnel (Постоянный)</p>
-                                <p className="text-[10px] text-sky-400 font-mono tracking-widest uppercase">Status: Production Ready</p>
-                              </div>
-                            </div>
-                            
-                            <div className="space-y-5">
-                               <div className="space-y-2">
-                                 <p className="text-[10px] font-bold text-sky-400 uppercase flex items-center gap-2">
-                                   <span className="w-4 h-4 rounded-full bg-sky-500/20 flex items-center justify-center text-[8px]">1</span>
-                                   Активация домена (Activation Steps):
-                                 </p>
-                                 <div className="text-[10px] text-slate-300 leading-relaxed bg-black/30 p-3 rounded-lg border border-sky-500/10 space-y-2">
-                                   <p>1. Нажмите <b>Continue to activation</b> в Cloudflare.</p>
-                                   <p>2. Скопируйте <b>Nameservers</b> (NS-сервера).</p>
-                                   <p>3. У регистратора удалите старые записи (напр. ns1.reg.ru) и оставьте <b>ТОЛЬКО</b> сервера Cloudflare.</p>
-                                   <p className="text-yellow-500/80 text-[9px] italic">Нужно подождать (от 1ч), пока статус домена станет "Active".</p>
-                                 </div>
-                               </div>
-
-                               <div className="space-y-2">
-                                 <p className="text-[10px] font-bold text-sky-400 uppercase flex items-center gap-2">
-                                   <span className="w-4 h-4 rounded-full bg-sky-500/20 flex items-center justify-center text-[8px]">2</span>
-                                   Привязка к туннелю (Public Hostname):
-                                 </p>
-                                 <div className="text-[10px] text-slate-300 leading-relaxed bg-black/30 p-3 rounded-lg border border-sky-500/10 space-y-1">
-                                   <p>• В туннеле <b>zmk-server</b> → <b>Public Hostname</b>.</p>
-                                   <p>• <b>Domain:</b> выберите свой домен из списка.</p>
-                                   <p>• <b>Service:</b> <span className="text-white font-bold">HTTP</span> | <b>URL:</b> <span className="text-sky-300">localhost:3000</span></p>
-                                 </div>
-                               </div>
-
-                               <div className="space-y-2">
-                                 <p className="text-[10px] font-bold text-sky-400 uppercase flex items-center gap-2">
-                                   <span className="w-4 h-4 rounded-full bg-sky-500/20 flex items-center justify-center text-[8px]">2</span>
-                                   Настройка маршрута (Public Hostname):
-                                 </p>
-                                 <div className="text-[10px] text-slate-300 space-y-2 bg-black/40 p-4 rounded-xl border border-sky-500/10 shadow-inner">
-                                   <div className="flex justify-between border-b border-slate-700 pb-1">
-                                      <span className="text-slate-500 italic">Domain:</span>
-                                      <span className="text-white font-bold">твой-домен.ru</span>
-                                   </div>
-                                   <div className="flex justify-between border-b border-slate-700 pb-1">
-                                      <span className="text-slate-500 italic">Service Type:</span>
-                                      <span className="text-white font-bold uppercase underline decoration-sky-500">HTTP</span>
-                                   </div>
-                                   <div className="flex justify-between">
-                                      <span className="text-slate-500 italic">URL:</span>
-                                      <span className="text-sky-300 font-mono font-bold">localhost:3000</span>
-                                   </div>
-                                 </div>
-                               </div>
-
-                               <div className="pt-2 border-t border-sky-500/20">
-                                 <p className="text-[10px] text-emerald-400 flex items-center gap-2 font-medium">
-                                   <LucideIcons.CloudLightning className="w-3 h-3" /> 
-                                   Приложение будет доступно всегда по адресу вашего домена 24/7.
-                                 </p>
-                               </div>
-                            </div>
-                          </div>
-
-                          {/* Emergency Backup */}
-                          <div className="flex flex-col gap-4">
-                            <div className="bg-indigo-950/20 p-5 rounded-2xl border border-indigo-500/20">
-                              <div className="flex items-center gap-3 mb-3">
-                                <LucideIcons.Zap className="w-4 h-4 text-indigo-400" />
-                                <p className="text-xs font-bold text-indigo-300">Резерв: Pinggy (Без установки)</p>
-                              </div>
-                              <code className="block bg-black/60 p-2 rounded text-[9px] text-indigo-300 select-all border border-indigo-500/10 font-mono">
-                                ssh -p 443 -R0:localhost:3000 a.pinggy.io
-                              </code>
-                            </div>
-
-                            <div className="bg-red-950/20 p-5 rounded-2xl border border-red-500/20">
-                              <div className="flex items-center gap-3 mb-3 text-red-400">
-                                <LucideIcons.RefreshCw className="w-4 h-4" />
-                                <p className="text-xs font-bold uppercase">Полный перезапуск PM2</p>
-                              </div>
-                              <div className="bg-black/60 rounded-lg p-3 font-mono text-[9px] text-red-300 space-y-1">
-                                <p>pm2 delete all</p>
-                                <p className="text-white">cd ~/zmk-app && npm run build && pm2 start npm --name "zmk-app" -- run start</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-white">
+                          Техническое обслуживание (Инфраструктура)
+                        </h3>
+                        <p className="text-sm text-slate-400">Логины, пароли и основные команды</p>
                       </div>
                     </div>
 
-                    {/* Section 6: Migration & Multi-App Support */}
-                    <div className="mt-8 pt-8 border-t border-slate-800">
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30">
-                          <LucideIcons.Laptop className="w-6 h-6 text-indigo-400" />
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-bold text-white">
-                            Перенос на MacBook Pro (Server)
-                          </h3>
-                          <p className="text-[10px] text-indigo-400 uppercase tracking-widest font-mono">Step-by-step terminal commands</p>
-                        </div>
-                      </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4">
+                      {/* СЕРВЕР 1: VDS UBUNTU */}
+                      <div className="space-y-4">
+                        <h4 className="text-sky-400 font-bold uppercase tracking-wider text-sm flex items-center gap-2">
+                          <LucideIcons.Globe className="w-5 h-5"/>
+                          1. Облачный Сервер (VDS Ubuntu)
+                        </h4>
+                        <div className="bg-slate-800/50 p-5 rounded-2xl border border-slate-700 space-y-3 shadow-inner">
+                          <p className="text-xs text-slate-300">Принимает домены, раздает HTTPS и перенаправляет на MacBook.</p>
+                          
+                          <div className="bg-black/40 p-3 rounded-lg border border-slate-700 space-y-2 text-xs">
+                             <div className="flex justify-between"><span className="text-slate-400">IP-адрес:</span><span className="font-mono text-white">194.87.234.241</span></div>
+                             <div className="flex justify-between"><span className="text-slate-400">Логин:</span><span className="font-mono text-sky-400">root</span></div>
+                             <div className="flex justify-between"><span className="text-slate-400">Пароль:</span><span className="font-mono text-orange-400">[Укажите ваш пароль VDS]</span></div>
+                             <div className="flex justify-between"><span className="text-slate-400">SSH:</span><code className="text-emerald-400 select-all">ssh root@194.87.234.241</code></div>
+                          </div>
 
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 text-sm">
-                        {/* Step 1: Navigation */}
-                        <div className="space-y-4">
-                           <h4 className="text-sky-400 font-bold uppercase tracking-wider text-xs">
-                              1. Переход в папку (Терминал)
-                           </h4>
-                           <div className="bg-slate-800/50 p-5 rounded-2xl border border-slate-700 space-y-3 shadow-inner">
-                              <p className="text-xs text-slate-300">
-                                Скопируйте и вставьте, чтобы зайти в папку проекта:
-                              </p>
-                              <code className="block bg-black/60 p-3 rounded-xl text-sky-400 text-[10px] font-mono border border-sky-500/10 select-all leading-relaxed break-all">
-                                cd "/Users/aleksandrtrusin/Documents/my-server/ZMK Prodachion/zmk-arsenal-разработка-блок-производс."
-                              </code>
-                              <p className="text-[9px] text-slate-500 italic">
-                                * Если папка не находится, проверьте, что точка в конце названия указана.
-                              </p>
-                           </div>
-                        </div>
+                          <div className="mt-3 space-y-2">
+                             <p className="text-[10px] uppercase text-slate-400 font-bold">Настройки и где они лежат:</p>
+                             <ul className="text-xs text-slate-300 space-y-1 list-disc ml-4">
+                               <li><b>Nginx Конфиг:</b> <code className="text-sky-300">/etc/nginx/sites-enabled/zmk</code></li>
+                               <li><b>SSHD Конфиг:</b> <code className="text-sky-300">/etc/ssh/sshd_config</code> (важно: GatewayPorts yes)</li>
+                               <li><b>Домены:</b> zmk-project.ru (→ 8001), supply.zmk-project.ru (→ 8002)</li>
+                             </ul>
+                          </div>
 
-                        {/* Step 2: Logging & Status */}
-                        <div className="space-y-4">
-                           <h4 className="text-yellow-400 font-bold uppercase tracking-wider text-xs">
-                              2. Проверка статуса (Логи)
-                           </h4>
-                           <div className="bg-slate-800/50 p-5 rounded-2xl border border-slate-700 space-y-4">
-                              <p className="text-xs text-slate-300">
-                                Если 3001 не открывается — сборка еще идет. Проверьте логи:
-                              </p>
-                              <div className="bg-black/60 p-3 rounded-xl text-yellow-300 text-[10px] font-mono border border-yellow-500/10 space-y-2">
-                                <p className="text-slate-500 italic"># Посмотреть что делает Docker сейчас:</p>
-                                <p className="select-all">docker compose logs -f zmk_sales</p>
-                              </div>
-                              <p className="text-[9px] text-slate-500 leading-relaxed border-t border-slate-700 pt-2">
-                                Дождитесь надписи <span className="text-emerald-400">"Server running"</span> в терминале.
-                              </p>
-                           </div>
-                        </div>
-
-                        {/* Final Check */}
-                        <div className="lg:col-span-2 bg-blue-900/10 p-5 rounded-2xl border border-blue-500/20">
-                          <div className="flex items-start gap-4">
-                             <LucideIcons.Search className="w-5 h-5 text-blue-400 shrink-0 mt-1" />
-                             <div>
-                               <h5 className="text-sm font-bold text-blue-300 mb-1 uppercase">Как проверить работу?</h5>
-                               <p className="text-xs text-slate-400 leading-relaxed">
-                                 1. Откройте <b className="text-white">localhost:3000</b> в браузере на MacBook.<br/>
-                                 2. Откройте <b className="text-white">localhost:9000</b> — это Portainer, там вы увидите статус контейнера "Running".<br/>
-                                 3. Если нужно остановить: <code className="text-slate-300">docker compose down</code>
-                               </p>
+                          <div className="mt-3 space-y-2">
+                             <p className="text-[10px] uppercase text-slate-400 font-bold">Полезные команды (Ubuntu):</p>
+                             <div className="bg-black/40 rounded p-3 text-[10px] font-mono text-slate-300 space-y-2 border border-slate-700">
+                               <p className="flex flex-col gap-1"><span className="text-slate-500 italic"># Перезапуск веб-сервера</span><span className="text-green-400 select-all">systemctl restart nginx</span></p>
+                               <p className="flex flex-col gap-1"><span className="text-slate-500 italic"># Обновить SSL-сертификаты</span><span className="text-green-400 select-all">certbot --nginx</span></p>
+                               <p className="flex flex-col gap-1"><span className="text-slate-500 italic"># Статус фаервола (должны быть открыты порты 22, 80, 443)</span><span className="text-green-400 select-all">ufw status</span></p>
                              </div>
                           </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Section 7: Docker Compose Config */}
-                    <div className="mt-8 pt-8 border-t border-slate-800">
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 rounded-xl bg-pink-500/20 flex items-center justify-center border border-pink-500/30">
-                          <LucideIcons.FileCode className="w-6 h-6 text-pink-400" />
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-bold text-white">
-                            Конфигурация (docker-compose.yml)
-                          </h3>
-                          <p className="text-[10px] text-pink-400 uppercase tracking-widest font-mono">Create this file in the project folder</p>
-                        </div>
-                      </div>
-
-                      <div className="bg-slate-900/50 p-6 rounded-3xl border border-slate-700 space-y-4">
-                        <p className="text-xs text-slate-400">
-                          Если файла <code className="text-pink-300">docker-compose.yml</code> нет в папке, создайте его и вставьте этот код:
-                        </p>
-                        <pre className="bg-black/60 p-5 rounded-2xl text-[10px] font-mono text-pink-200 border border-pink-500/20 overflow-x-auto leading-relaxed">
-{`services:
-  # Проект Снабжения (Этот код)
-  zmk_arsenal:
-    image: node:18-slim
-    working_dir: /app
-    volumes:
-      - .:/app
-    ports:
-      - "3000:3000"
-    command: sh -c "npm install && npm run build && npm run start"
-    restart: always
-    deploy:
-      resources:
-        limits:
-          cpus: '0.8' # Ограничение CPU, чтобы MacBook не грелся
-          memory: '2G'
-
-  # Portainer (Управление контейнерами в браузере)
-  portainer:
-    image: portainer/portainer-ce:latest
-    ports: ["9443:9443", "9000:9000"]
-    volumes: 
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - "portainer_data:/data"
-    restart: always
-
-volumes:
-  portainer_data:`}
-                        </pre>
-                      </div>
-                    </div>
-
-                    {/* Automation Setup */}
-                    <div className="mt-8 pt-8 border-t border-slate-800">
-                       <h4 className="text-emerald-400 font-bold uppercase tracking-wider text-xs mb-4">
-                          Настройка авто-обновления (Cron)
+                      {/* СЕРВЕР 2: MACBOOK */}
+                      <div className="space-y-4">
+                        <h4 className="text-indigo-400 font-bold uppercase tracking-wider text-sm flex items-center gap-2">
+                          <LucideIcons.Laptop className="w-5 h-5"/>
+                          2. Локальный Сервер (MacBook Pro)
                         </h4>
-                        <p className="text-sm text-slate-400 mb-4">
-                          Выполните это ОДИН РАЗ, чтобы сервер проверял обновления каждые 5 минут:
-                        </p>
-                        <div className="bg-black/60 rounded-2xl p-5 border border-slate-700 font-mono text-xs text-emerald-400 leading-relaxed">
-                          chmod +x ~/zmk-app/server_update.sh <br/>
-                          (crontab -l 2&gt;/dev/null; echo "*/5 * * * * ~/zmk-app/server_update.sh &gt;&gt; ~/zmk-app/update.log 2&gt;&amp;1") | crontab -
+                        <div className="bg-slate-800/50 p-5 rounded-2xl border border-slate-700 space-y-3 shadow-inner">
+                          <p className="text-xs text-slate-300">Реально работает код через Docker, отправляет порты в Облако.</p>
+                          
+                          <div className="bg-black/40 p-3 rounded-lg border border-slate-700 space-y-2 text-xs">
+                             <div className="flex justify-between"><span className="text-slate-400">Локальный IP:</span><span className="font-mono text-white">192.168.1.46</span></div>
+                             <div className="flex justify-between"><span className="text-slate-400">Логин:</span><span className="font-mono text-indigo-400">aleksandrtrusin</span></div>
+                             <div className="flex justify-between"><span className="text-slate-400">Пароль:</span><span className="font-mono text-orange-400">[Пароль от Mac]</span></div>
+                             <div className="flex justify-between"><span className="text-slate-400">SSH:</span><code className="text-emerald-400 select-all">ssh aleksandrtrusin@192.168.1.46</code></div>
+                             <div className="flex justify-between border-t border-slate-700 pt-2"><span className="text-slate-400 w-1/3">Папка проекта:</span><span className="font-mono text-[9px] text-sky-200 text-right">~/Documents/my-server/ZMK Prodachion/zmk-server</span></div>
+                          </div>
+
+                          <div className="mt-3 space-y-2">
+                             <p className="text-[10px] uppercase text-slate-400 font-bold">Контейнеры (Docker Compose):</p>
+                             <ul className="text-xs text-slate-300 space-y-1 list-disc ml-4">
+                               <li><b>zmk_production:</b> Порт 8001</li>
+                               <li><b>zmk_supply:</b> Порт 8002</li>
+                               <li><b>zmk_postgres:</b> Порт 5432</li>
+                             </ul>
+                          </div>
+
+                          <div className="mt-3 space-y-2">
+                             <p className="text-[10px] uppercase text-slate-400 font-bold">Туннель и Скрипты:</p>
+                             <ul className="text-[10px] text-slate-300 space-y-1 list-disc ml-4">
+                               <li><b>Туннель:</b> <code className="text-indigo-300">~/Library/LaunchAgents/com.zmk.tunnel.plist</code> <br/>(авто-проброс ssh -R 8001, 8002 к VDS)</li>
+                               <li><b>Обновление:</b> <code className="text-indigo-300">auto-update.sh</code> (ищет обновления в Github 24/7)</li>
+                             </ul>
+                          </div>
                         </div>
+                      </div>
+
+                      {/* БЛОК АВТООБНОВЛЕНИЯ И КОМАНДЫ */}
+                      <div className="lg:col-span-2 mt-4">
+                        <div className="bg-blue-900/10 p-6 rounded-2xl border border-blue-500/20">
+                          <h4 className="text-emerald-400 font-bold uppercase tracking-wider text-sm mb-4 flex items-center gap-2">
+                            <LucideIcons.RefreshCw className="w-5 h-5"/>
+                            Как обновлять сайт и полезные команды
+                          </h4>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-3">
+                              <p className="text-sm text-slate-300 font-bold">1. Выгрузка из AI Studio</p>
+                              <p className="text-xs text-slate-400 leading-relaxed">
+                                Хотите применить новые изменения из AI Studio на рабочем сервере?
+                                В меню AI Studio нажмите <b>Settings → Export to GitHub</b> и сделайте Push. 
+                              </p>
+                              <div className="bg-slate-900/80 p-4 rounded-xl border border-slate-700">
+                                <p className="text-xs text-emerald-300 leading-relaxed font-medium">
+                                  Скрипт <code className="text-emerald-200 bg-emerald-900/40 px-1 rounded">auto-update.sh</code> сам увидит изменения (через github), сделает pull из ветки main и аккуратно перезапустит контейнеры в фоне. <b className="text-white">Вам ничего в терминале нажимать не надо.</b>
+                                </p>
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-3">
+                              <p className="text-sm text-slate-300 font-bold">2. Инструменты макбука (Терминал)</p>
+                              <div className="bg-black/50 p-4 rounded-xl border border-slate-700 space-y-3 text-[11px] font-mono leading-relaxed">
+                                <div className="space-y-1">
+                                  <p className="text-slate-500 italic"># Посмотреть работают ли контейнеры (Up X hours)</p>
+                                  <p className="text-blue-300 select-all">docker ps</p>
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="text-slate-500 italic"># Вручную перезапустить скрипт авто-обновления в фоне</p>
+                                  <p className="text-emerald-400 text-[10px] select-all">nohup ./auto-update.sh &gt; update.log 2&gt;&amp;1 &amp;</p>
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="text-slate-500 italic"># Посмотреть логи работы Production (что сейчас происходит)</p>
+                                  <p className="text-yellow-300 select-all">docker compose logs -f zmk_production</p>
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="text-slate-500 italic"># Посмотреть логи работы Supply</p>
+                                  <p className="text-orange-300 select-all">docker compose logs -f zmk_supply</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
