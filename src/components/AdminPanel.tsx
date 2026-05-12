@@ -374,19 +374,6 @@ export function AdminPanel({
         errors[`price_${grade}_nd`] = "Некорректная цена НД";
     });
 
-    // Also validate remnant pricing if it exists
-    Object.entries(remnantPricing || {}).forEach(([currGrade, p]: [string, any]) => {
-      if (!p) return;
-      const roundVal = parseNum(p.round);
-      const hexVal = parseNum(p.hex);
-      if (isNaN(roundVal) || roundVal < 0) {
-        errors[`remnant_price_${currGrade}_round`] = "Некорректная цена отхода (круг)";
-      }
-      if (isNaN(hexVal) || hexVal < 0) {
-        errors[`remnant_price_${currGrade}_hex`] = "Некорректная цена отхода (шестигранник)";
-      }
-    });
-
     setValidationErrors(errors);
   }, [scrap, remnant, economyItems, rawPrices, remnantPricing]);
 
