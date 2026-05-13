@@ -83,7 +83,7 @@ export function LoginScreen({
             transition={{ delay: 0.2 }}
             className="text-xl sm:text-4xl tracking-tight text-[#1A1C19] dark:text-white mb-0.5 sm:mb-2 font-light"
           >
-            Система расчетов 1.3
+            Система расчетов
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}

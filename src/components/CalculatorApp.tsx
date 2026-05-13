@@ -1303,7 +1303,7 @@ export function CalculatorApp({
             <div className="pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 print-hide transition-colors duration-300">
               <div className="flex flex-col mb-1 sm:mb-0">
                 <h1 className="text-xl font-medium tracking-tight text-[#1A1C19] dark:text-[#E2E3DE]">
-                  Система расчетов 1.3
+                  Система расчетов
                 </h1>
                 <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 tracking-wide">
                   ООО "ЗМК Арсенал"
