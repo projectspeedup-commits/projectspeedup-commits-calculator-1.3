@@ -354,24 +354,18 @@ export default function App() {
     if (db && isCloudActive && user) {
       const unsub = subscribeToUserSettings(db, user.uid, (data) => {
           if (data) {
-            if (data.rawPrices) {
-              const loadedPrices = { ...DEFAULT_RAW_PRICES };
-              const allPossibleGrades = [...DEFAULT_STEEL_GRADES, ...(data.customGrades || [])];
-              Object.entries(data.rawPrices).forEach(([dbKey, val]: [string, any]) => {
-                const match = allPossibleGrades.find(g => sanitizeKey(g) === dbKey);
-                if (match) {
-                  loadedPrices[match] = val;
-                } else {
-                  loadedPrices[dbKey] = val;
-                }
-              });
-              setGlobalRawPrices(loadedPrices);
-            }
-            if (data.scrapPrice !== undefined) setGlobalScrapPrice(data.scrapPrice);
-            if (data.remnantPrice !== undefined) setGlobalRemnantPrice(data.remnantPrice);
-            if (data.remnantPricing) setRemnantPricing(data.remnantPricing);
-            if (data.customGrades) setCustomGrades(data.customGrades);
-            if (data.deletedGrades) setDeletedGrades(data.deletedGrades);
+            // We only load personal settings if they don't conflict with global settings 
+            // OR if we want to store specific UI preferences here.
+            // For prices, global (settings/prices) should have priority.
+            
+            // If global settings haven't loaded yet, or if we purposefully allow personal override 
+            // (not requested by user), we would set it here.
+            // For this app, let's keep personal settings for non-pricing data if needed.
+            
+            if (data.scrapPrice !== undefined && !globalScrapPrice) setGlobalScrapPrice(data.scrapPrice);
+            if (data.remnantPrice !== undefined && !globalRemnantPrice) setGlobalRemnantPrice(data.remnantPrice);
+            if (data.remnantPricing && Object.keys(remnantPricing).length === 0) setRemnantPricing(data.remnantPricing);
+            
             if (data.economyItems) {
               const initialMap = new Map(
                 data.economyItems.map((item: any) => [item.id, item]),
@@ -552,7 +546,17 @@ export default function App() {
           printText={printData.reportText}
         />
       )}
-      <div className="min-h-screen overflow-x-hidden bg-[#F0F4F4] dark:bg-[#111310] flex flex-col font-sans print:hidden">
+      <div className="min-h-screen overflow-x-hidden bg-[#F0F4F4] dark:bg-[#111310] flex flex-col font-sans print:hidden relative">
+        {/* Status Indicator Bar */}
+        <div className="fixed top-0 left-0 right-0 z-[100] h-1 pointer-events-none overflow-hidden">
+          <div 
+            className={`h-full transition-all duration-1000 ${
+              isCloudActive ? 'bg-emerald-500 opacity-60' : 'bg-amber-500 opacity-80 animate-pulse'
+            }`} 
+            style={{ width: '100%' }}
+          />
+        </div>
+
         <AnimatePresence mode="wait">
           {view === "login" && (
             <motion.div
