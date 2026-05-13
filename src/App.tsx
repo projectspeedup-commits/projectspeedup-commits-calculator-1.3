@@ -314,7 +314,7 @@ export default function App() {
             setIsCloudActive(false);
           }
         },
-        config?.usePostgres
+        config?.usePostgres && !isCloudActive
       );
       return () => unsub();
     }
@@ -355,7 +355,7 @@ export default function App() {
           console.warn("Ошибка загрузки пользовательских настроек:", error);
           setIsUserSettingsLoaded(true);
         },
-        config?.usePostgres
+        config?.usePostgres && !isCloudActive
       );
       return () => unsub();
     }

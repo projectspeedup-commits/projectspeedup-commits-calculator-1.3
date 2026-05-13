@@ -28,7 +28,8 @@ export interface CalculationData {
 
 export const backendService = {
   async getCalculations(userId: string): Promise<CalculationData[]> {
-    const response = await fetch(`${API_URL}/api/calculations?userId=${userId}`);
+    const timestamp = Date.now();
+    const response = await fetch(`${API_URL}/api/calculations?userId=${userId}&_t=${timestamp}`);
     if (!response.ok) throw new Error('Failed to fetch calculations');
     return response.json();
   },
@@ -60,7 +61,8 @@ export const backendService = {
   },
 
   async getSettings(userId: string): Promise<any> {
-    const response = await fetch(`${API_URL}/api/settings/${userId}`);
+    const timestamp = Date.now();
+    const response = await fetch(`${API_URL}/api/settings/${userId}?_t=${timestamp}`);
     if (!response.ok) throw new Error('Failed to fetch settings');
     return response.json();
   },
@@ -77,7 +79,8 @@ export const backendService = {
   },
 
   async getGlobalSettings(): Promise<any> {
-    const response = await fetch(`${API_URL}/api/global-settings`);
+    const timestamp = Date.now();
+    const response = await fetch(`${API_URL}/api/global-settings?_t=${timestamp}`);
     if (!response.ok) throw new Error('Failed to fetch global settings');
     return response.json();
   },
@@ -94,7 +97,8 @@ export const backendService = {
   },
   
   async getAdminData(type: string): Promise<any> {
-    const response = await fetch(`${API_URL}/api/admin-data/${type}`);
+    const timestamp = Date.now();
+    const response = await fetch(`${API_URL}/api/admin-data/${type}?_t=${timestamp}`);
     if (!response.ok) throw new Error('Failed to fetch admin data');
     const text = await response.text();
     if (!text) return null;
