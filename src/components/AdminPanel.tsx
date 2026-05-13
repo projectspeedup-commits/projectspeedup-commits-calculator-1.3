@@ -1702,7 +1702,7 @@ export function AdminPanel({
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                <div className={`lg:col-span-${planFiles.length > 0 ? "5" : "12"} relative group`}>
+                <div className={`${planFiles.length > 0 ? "lg:col-span-5 xl:col-span-4" : "lg:col-span-8 xl:col-span-6"} relative group`}>
                   <motion.div
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
@@ -1716,28 +1716,28 @@ export function AdminPanel({
                         handleFileUpload(event);
                       }
                     }}
-                    className={`relative bg-white dark:bg-[#1A1C19] rounded-[32px] border-2 border-dashed ${planFiles.length === 0 ? "border-blue-400 dark:border-blue-500 animate-pulse-border shadow-[0_0_20px_rgba(59,130,246,0.15)]" : "border-slate-200 dark:border-slate-800"} p-8 flex flex-col items-center justify-center text-center gap-5 cursor-pointer hover:border-blue-500 dark:hover:border-blue-400 transition-all min-h-[220px]`}
+                    className={`relative bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed ${planFiles.length === 0 ? "border-blue-400 dark:border-blue-500 animate-pulse-border shadow-[0_0_20px_rgba(59,130,246,0.15)]" : "border-slate-200 dark:border-slate-800"} p-5 flex flex-col items-center justify-center text-center gap-3 cursor-pointer hover:border-blue-500 dark:hover:border-blue-400 transition-all min-h-[140px]`}
                   >
                     <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" multiple accept=".pdf,.xlsx,.csv,.txt,.docx" />
-                    <div className="relative w-20 h-20 bg-blue-50 dark:bg-blue-900/30 rounded-3xl flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform duration-300">
-                      <Upload className="w-8 h-8" />
+                    <div className="relative w-14 h-14 bg-blue-50 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform duration-300">
+                      <Upload className="w-6 h-6" />
                       {planFiles.length === 0 && (
-                        <div className="absolute inset-0 rounded-3xl border-2 border-blue-400 animate-ping opacity-75"></div>
+                        <div className="absolute inset-0 rounded-2xl border-2 border-blue-400 animate-ping opacity-75"></div>
                       )}
                     </div>
                     <div>
-                      <p className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none mb-2">
+                      <p className="text-base font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none mb-1">
                         Загрузить план
                       </p>
-                      <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-relaxed max-w-[200px]">
-                        Перетащите файлы 1С или кликните для выбора
+                      <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-relaxed max-w-[200px]">
+                        Перетащите файлы 1С или кликните
                       </p>
                     </div>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={(e) => { e.stopPropagation(); setIsBatchManualOpen(true); }}
-                      className="mt-4 text-[10px] uppercase font-black tracking-widest text-slate-400"
+                      className="mt-2 text-[10px] uppercase font-black tracking-widest text-slate-400"
                       leftIcon={<BookOpen className="w-4 h-4" />}
                     >
                       Как загружать?
@@ -1746,7 +1746,7 @@ export function AdminPanel({
                 </div>
 
                 {planFiles.length > 0 && (
-                  <div className="lg:col-span-7 h-full">
+                  <div className="lg:col-span-7 xl:col-span-8 h-full">
                     <Card isPadded={false} className="h-full border-slate-200/60 transition-all hover:shadow-md">
                       <div className="divide-y divide-slate-100 dark:divide-slate-800 max-h-[230px] overflow-auto custom-scrollbar">
                         {planFiles.map((file) => (
@@ -1815,7 +1815,7 @@ export function AdminPanel({
                   </div>
 
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                    <div className={`lg:col-span-${stockFiles.length > 0 ? "5" : "12"} relative group`}>
+                    <div className={`${stockFiles.length > 0 ? "lg:col-span-5 xl:col-span-4" : "lg:col-span-8 xl:col-span-6"} relative group`}>
                       <motion.div
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.99 }}
@@ -1829,25 +1829,25 @@ export function AdminPanel({
                             handleStockFileUpload(event);
                           }
                         }}
-                        className={`relative bg-white dark:bg-[#1A1C19] rounded-[32px] border-2 border-dashed ${stockFiles.length === 0 ? "border-emerald-400 dark:border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.1)]" : "border-slate-200 dark:border-slate-800"} p-8 flex flex-col items-center justify-center text-center gap-5 cursor-pointer hover:border-emerald-500 transition-all min-h-[220px]`}
+                        className={`relative bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed ${stockFiles.length === 0 ? "border-emerald-400 dark:border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.1)]" : "border-slate-200 dark:border-slate-800"} p-5 flex flex-col items-center justify-center text-center gap-3 cursor-pointer hover:border-emerald-500 transition-all min-h-[140px]`}
                       >
                         <input type="file" ref={stockFileInputRef} onChange={handleStockFileUpload} className="hidden" multiple accept=".pdf,.xlsx,.csv,.txt,.docx" />
-                        <div className="relative w-20 h-20 bg-emerald-50 dark:bg-emerald-900/30 rounded-3xl flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform duration-300">
-                          <Layers className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+                        <div className="relative w-14 h-14 bg-emerald-50 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform duration-300">
+                          <Layers className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                         </div>
-                        <div className="flex flex-col gap-2">
-                          <p className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none">
+                        <div className="flex flex-col gap-1">
+                          <p className="text-base font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none">
                             Складской реестр
                           </p>
-                          <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-relaxed max-w-[200px]">
-                            Загрузите актуальные остатки г/к проката
+                          <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-relaxed max-w-[200px]">
+                            Загрузите актуальные остатки
                           </p>
                         </div>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={(e) => { e.stopPropagation(); setIsStockManualOpen(true); }}
-                          className="mt-4 text-[10px] uppercase font-black tracking-widest text-emerald-600/70"
+                          className="mt-2 text-[10px] uppercase font-black tracking-widest text-emerald-600/70"
                           leftIcon={<BookOpen className="w-4 h-4" />}
                         >
                           Как подготовить файл?
@@ -1856,7 +1856,7 @@ export function AdminPanel({
                     </div>
 
                     {stockFiles.length > 0 && (
-                      <div className="lg:col-span-7 h-full">
+                      <div className="lg:col-span-7 xl:col-span-8 h-full">
                         <Card isPadded={false} className="h-full border-slate-200/60 transition-all hover:shadow-md">
                           <div className="divide-y divide-slate-100 dark:divide-slate-800 max-h-[230px] overflow-auto custom-scrollbar">
                             {stockFiles.map((file) => (
@@ -1922,7 +1922,7 @@ export function AdminPanel({
                   </div>
 
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                    <div className={`lg:col-span-${supplyPlanFiles.length > 0 ? "5" : "12"} relative group`}>
+                    <div className={`${supplyPlanFiles.length > 0 ? "lg:col-span-5 xl:col-span-4" : "lg:col-span-8 xl:col-span-6"} relative group`}>
                       <motion.div
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.99 }}
@@ -1936,25 +1936,25 @@ export function AdminPanel({
                             handleSupplyPlanFileUpload(event);
                           }
                         }}
-                        className={`relative bg-white dark:bg-[#1A1C19] rounded-[32px] border-2 border-dashed ${supplyPlanFiles.length === 0 ? "border-sky-400 dark:border-sky-500 shadow-[0_0_20px_rgba(14,165,233,0.1)]" : "border-slate-200 dark:border-slate-800"} p-8 flex flex-col items-center justify-center text-center gap-5 cursor-pointer hover:border-sky-500 transition-all min-h-[220px]`}
+                        className={`relative bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed ${supplyPlanFiles.length === 0 ? "border-sky-400 dark:border-sky-500 shadow-[0_0_20px_rgba(14,165,233,0.1)]" : "border-slate-200 dark:border-slate-800"} p-5 flex flex-col items-center justify-center text-center gap-3 cursor-pointer hover:border-sky-500 transition-all min-h-[140px]`}
                       >
                         <input type="file" ref={supplyPlanFileInputRef} onChange={handleSupplyPlanFileUpload} className="hidden" multiple accept=".pdf,.xlsx,.csv,.txt,.docx" />
-                        <div className="relative w-20 h-20 bg-sky-50 dark:bg-sky-900/20 rounded-3xl flex items-center justify-center text-sky-500 group-hover:scale-110 transition-transform duration-300">
-                          <ShoppingCart className="w-8 h-8 text-sky-600 dark:text-sky-400" />
+                        <div className="relative w-14 h-14 bg-sky-50 dark:bg-sky-900/20 rounded-2xl flex items-center justify-center text-sky-500 group-hover:scale-110 transition-transform duration-300">
+                          <ShoppingCart className="w-6 h-6 text-sky-600 dark:text-sky-400" />
                         </div>
-                        <div className="flex flex-col gap-2">
-                          <p className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none">
+                        <div className="flex flex-col gap-1">
+                          <p className="text-base font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none">
                             Реестр поставок
                           </p>
-                          <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-relaxed max-w-[200px]">
-                            График ожидаемых поступлений (счёт, машина)
+                          <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-relaxed max-w-[200px]">
+                            График ожидаемых поступлений
                           </p>
                         </div>
                       </motion.div>
                     </div>
 
                     {supplyPlanFiles.length > 0 && (
-                      <div className="lg:col-span-7 h-full">
+                      <div className="lg:col-span-7 xl:col-span-8 h-full">
                         <Card isPadded={false} className="h-full border-slate-200/60 transition-all hover:shadow-md">
                           <div className="divide-y divide-slate-100 dark:divide-slate-800 max-h-[230px] overflow-auto custom-scrollbar">
                             {supplyPlanFiles.map((file) => (

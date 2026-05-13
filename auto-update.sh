@@ -29,10 +29,9 @@ while true; do
     # Сбрасываем до состояния origin/main (быстрее чем pull)
     git reset --hard origin/main
 
-    # Пересобираем и перезапускаем Docker контейнеры:
-    # docker compose up без down работает быстрее и обновляет только нужное
+    # пересобираем и перезапускаем Docker контейнеры:
     echo "Обновляю Docker-контейнеры..."
-    docker compose up -d --build
+    docker-compose up -d --build
 
     echo "$(date '+%Y-%m-%d %H:%M:%S') - Обновление успешно завершено."
   fi
