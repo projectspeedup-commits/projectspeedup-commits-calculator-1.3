@@ -2,6 +2,9 @@
 import React from 'react';
 import { Search, Trash2 } from 'lucide-react';
 import { PriceInput } from '../ui/PriceInput';
+import { Card } from '../ui/Card';
+import { Input } from '../ui/Input';
+import { Button } from '../ui/Button';
 
 interface PricingTableProps {
   filteredGrades: string[];
@@ -21,32 +24,34 @@ export const PricingTable: React.FC<PricingTableProps> = ({
   setGradeSearch,
 }) => {
   return (
-    <div className="bg-white dark:bg-[#1A1C19] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col transition-colors">
-      <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <h3 className="text-base font-medium text-[#1A1C19] dark:text-white shrink-0">
-          Цены заготовки
-        </h3>
-        <div className="relative w-full sm:w-64 group">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-slate-600 transition-colors" />
-          <input
-            type="text"
-            placeholder="Поиск по марке..."
+    <Card 
+      id="price-table"
+      isPadded={false}
+      header={
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <h3 className="text-base font-bold text-[#1A1C19] dark:text-white uppercase tracking-tight">
+            Цены закупки заготовки
+          </h3>
+          <Input
+            placeholder="Поиск марки..."
             value={gradeSearch}
             onChange={(e) => setGradeSearch(e.target.value)}
-            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 focus:border-slate-400 dark:focus:border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none transition-all shadow-sm focus:ring-4 focus:ring-slate-100 dark:focus:ring-slate-800/50"
+            leftElement={<Search className="w-4 h-4" />}
+            className="h-10 text-xs"
+            containerClassName="w-full sm:w-64"
           />
         </div>
-      </div>
-
+      }
+    >
       <div className="overflow-x-auto max-h-[60vh] custom-scrollbar">
         <table className="w-full text-left border-collapse">
-          <thead className="sticky top-0 z-20 bg-white dark:bg-[#1A1C19] border-b border-slate-200 dark:border-slate-800 shadow-sm">
+          <thead className="sticky top-0 z-20 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
             <tr>
-              <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Марка стали
               </th>
-              <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">
-                Цена НД (руб/тн)
+              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">
+                Цена НД (₽ / тн)
               </th>
               <th className="px-6 py-4 w-16"></th>
             </tr>
@@ -57,10 +62,10 @@ export const PricingTable: React.FC<PricingTableProps> = ({
               return (
                 <tr
                   key={grade}
-                  className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors"
+                  className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors"
                 >
                   <td className="px-6 py-4">
-                    <span className="text-sm font-bold text-[#1A1C19] dark:text-slate-100">
+                    <span className="text-sm font-bold text-slate-900 dark:text-slate-100">
                       {grade}
                     </span>
                   </td>
@@ -68,20 +73,21 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                     <div className="w-full max-w-[140px] ml-auto">
                       <PriceInput
                         compact
-                        value={prices.nd}
+                        value={prices.nd !== undefined ? prices.nd : "0"}
                         onChange={(val) => handlePriceChange(grade, "nd", val)}
-                        className="text-right"
+                        className="text-right font-black"
                       />
                     </div>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => handleRemoveGrade(grade)}
-                      className="text-slate-300 hover:text-red-500 transition-all p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20"
-                      title="Удалить марку"
+                      className="text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20"
                     >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </td>
                 </tr>
               );
@@ -89,6 +95,6 @@ export const PricingTable: React.FC<PricingTableProps> = ({
           </tbody>
         </table>
       </div>
-    </div>
+    </Card>
   );
 };

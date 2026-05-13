@@ -39,7 +39,7 @@ export const subscribeToUserSettings = (
   };
 
   fetchData();
-  interval = setInterval(fetchData, 60000); // 1 minute poll
+  interval = setInterval(fetchData, 10000); // 10 seconds poll
 
   return () => {
     isMounted = false;
@@ -102,7 +102,7 @@ export const subscribeToSystemData = (
   };
 
   fetchData();
-  interval = setInterval(fetchData, 60000);
+  interval = setInterval(fetchData, 10000);
 
   return () => {
     isMounted = false;

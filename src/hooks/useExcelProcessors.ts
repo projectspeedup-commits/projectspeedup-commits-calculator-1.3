@@ -1,8 +1,10 @@
 import * as XLSX from "xlsx-js-style";
 import { HEX_DATA, ROUND_DATA, getGostForGrade } from "../lib/constants";
 import { CalculationResult } from "../types";
+import { useAdminStore } from "../store/useAdminStore";
 
-export const useExcelProcessors = (props: any) => {
+export const useExcelProcessors = () => {
+  const store = useAdminStore();
   const {
     rawPrices,
     setIsProcessing,
@@ -16,7 +18,7 @@ export const useExcelProcessors = (props: any) => {
     setIsProcessingStock,
     setProcessedStockProd,
     setProcessedStockSup,
-  } = props;
+  } = store;
 
   const formatDate = (input: any) => {
     if (!input) return "";

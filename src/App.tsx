@@ -73,37 +73,6 @@ export default function App() {
   
   const isInitialLoad = useRef(true);
 
-  // Load data from PostgreSQL if enabled
-  useEffect(() => {
-    if (config?.usePostgres && user) {
-      const loadPostgresData = async () => {
-        try {
-          // Load shared global settings first
-          const globalData = await backendService.getGlobalSettings();
-          if (globalData) {
-            if (globalData.rawPrices) setGlobalRawPrices(globalData.rawPrices);
-            if (globalData.scrapPrice !== undefined) setGlobalScrapPrice(globalData.scrapPrice);
-            if (globalData.remnantPrice !== undefined) setGlobalRemnantPrice(globalData.remnantPrice);
-            if (globalData.remnantPricing) setRemnantPricing(globalData.remnantPricing);
-            if (globalData.customGrades) setCustomGrades(globalData.customGrades);
-            if (globalData.deletedGrades) setDeletedGrades(globalData.deletedGrades);
-            if (globalData.economyItems) setEconomyItems(globalData.economyItems);
-          }
-
-          // Then load personal user overrides if any
-          const personalData = await backendService.getSettings(user.uid);
-          if (personalData) {
-            if (personalData.rawPrices) setGlobalRawPrices(personalData.rawPrices);
-            // ... add other overrides if needed
-          }
-        } catch (err) {
-          console.error("PostgreSQL settings load failed", err);
-        }
-      };
-      loadPostgresData();
-    }
-  }, [config, user]);
-
   useEffect(() => {
     const handleOnline = () => {
       setIsCloudActive(true);
@@ -232,7 +201,7 @@ export default function App() {
 
     isInitialLoad.current = false;
 
-    if (db && isCloudActive && user) {
+    if (user && ((db && isCloudActive) || config?.usePostgres)) {
       const unsub = subscribeToSystemData(db, "settings", "prices", (data) => {
           if (data) {
             const storeState = useStore.getState();
@@ -340,10 +309,12 @@ export default function App() {
         },
         (error) => {
           console.warn("Облако недоступно, работаем локально:", error);
-          handleFirestoreError(error, OperationType.GET, "settings/prices");
-          setIsCloudActive(false);
+          if (isCloudActive) {
+            handleFirestoreError(error, OperationType.GET, "settings/prices");
+            setIsCloudActive(false);
+          }
         },
-        false // ALWAYS USE FIREBASE FOR PRICES
+        config?.usePostgres
       );
       return () => unsub();
     }
@@ -351,7 +322,7 @@ export default function App() {
 
   // Load User Personal Settings
   useEffect(() => {
-    if (db && isCloudActive && user) {
+    if (user && ((db && isCloudActive) || config?.usePostgres)) {
       const unsub = subscribeToUserSettings(db, user.uid, (data) => {
           if (data) {
             // We only load personal settings if they don't conflict with global settings 

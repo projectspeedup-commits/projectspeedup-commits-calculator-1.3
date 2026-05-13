@@ -10,10 +10,16 @@
 - **Process Manager:** Docker Compose (services: `zmk_production`, `zmk_supply`, `zmk_postgres`, `portainer`)
 - **Git Repo:** GitHub (main branch)
 
+## Engineering Standards (Optimization)
+1. **Modular UI**: Large components must be split into sub-components in `src/components/`.
+2. **Global State**: Use Zustand store in `src/store/` for cross-component data (prices, settings). 
+3. **Data Access**: All backend calls must go through `src/services/api/` or `src/services/db/`.
+4. **Environment**: Production uses Multi-stage Docker build. 
+
 ## Update Workflow
 *(Настроен автоматический пуллинг из GitHub через скрипт `auto-update.sh`)*
 1. Выгрузка изменений в GitHub через меню AI Studio.
-2. Скрипт `auto-update.sh` на MacBook автоматически каждые 60 секунд проверяет изменения в GitHub.
+2. Скрипт `auto-update.sh` на MacBook автоматически каждые 10 секунд проверяет изменения в GitHub.
 3. Если есть новые коммиты, скрипт делает `git fetch` и `git reset --hard origin/main`, затем перезапускает контейнеры.
 
 ## Custom Instructions
