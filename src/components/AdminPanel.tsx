@@ -1455,60 +1455,7 @@ export function AdminPanel({
     else setCalcResultsSup([]);
   }, [planFilesSup]);
 
-  useEffect(() => {
-    setRawPrices((prev) =>
-      JSON.stringify(prev) === JSON.stringify(initialRawPrices)
-        ? prev
-        : initialRawPrices,
-    );
-  }, [initialRawPrices]);
-
-  useEffect(() => {
-    setScrap((prev) => (prev === initialScrap ? prev : initialScrap));
-  }, [initialScrap]);
-
-  useEffect(() => {
-    setRemnant((prev) => (prev === initialRemnant ? prev : initialRemnant));
-  }, [initialRemnant]);
-
-  useEffect(() => {
-    setCustomGrades((prev) =>
-      JSON.stringify(prev) === JSON.stringify(initialCustomGrades || [])
-        ? prev
-        : initialCustomGrades || [],
-    );
-  }, [initialCustomGrades]);
-
-  useEffect(() => {
-    setDeletedGrades((prev) =>
-      JSON.stringify(prev) === JSON.stringify(initialDeletedGrades || [])
-        ? prev
-        : initialDeletedGrades || [],
-    );
-  }, [initialDeletedGrades]);
-
-  useEffect(() => {
-    setRemnantPricing((prev) =>
-      JSON.stringify(prev) === JSON.stringify(initialRemnantPricing || {})
-        ? prev
-        : initialRemnantPricing || {},
-    );
-  }, [initialRemnantPricing]);
-
-  useEffect(() => {
-    if (initialEconomyItems && initialEconomyItems.length > 0) {
-      setEconomyItems((prev) => {
-        const initialMap = new Map(
-          initialEconomyItems.map((item) => [item.id, item]),
-        );
-        const merged = DEFAULT_ECONOMY_ITEMS.map(
-          (defaultItem) => initialMap.get(defaultItem.id) || defaultItem,
-        );
-        if (JSON.stringify(prev) === JSON.stringify(merged)) return prev;
-        return merged;
-      });
-    }
-  }, [initialEconomyItems]);
+  // Removed aggressive sync useEffects which overwrote user input
 
   const allGrades = [...DEFAULT_STEEL_GRADES, ...customGrades].filter(
     (g) => !deletedGrades.includes(g),

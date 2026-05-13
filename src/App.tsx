@@ -462,6 +462,7 @@ export default function App() {
         }
         if (config?.usePostgres) {
           await backendService.saveGlobalSettings(payload); // Optional backup to server
+          await saveSystemDataToCloud(db, "settings", "prices", payload, true);
         }
       } catch (error) {
         // Fallback for non-admins: save only to their personal settings
