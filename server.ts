@@ -187,7 +187,8 @@ async function startServer() {
     try {
       const result = await pool.query("SELECT * FROM user_settings WHERE user_id = $1", [userId]);
       if (result.rows.length > 0) {
-        res.json(result.rows[0].data);
+        const jsonData = typeof result.rows[0].data === 'string' ? JSON.parse(result.rows[0].data) : result.rows[0].data;
+        res.json(jsonData);
       } else {
         res.json(null);
       }
@@ -216,7 +217,8 @@ async function startServer() {
     try {
       const result = await pool.query("SELECT * FROM user_settings WHERE user_id = 'global'");
       if (result.rows.length > 0) {
-        res.json(result.rows[0].data);
+        const jsonData = typeof result.rows[0].data === 'string' ? JSON.parse(result.rows[0].data) : result.rows[0].data;
+        res.json(jsonData);
       } else {
         res.json(null);
       }
@@ -249,7 +251,8 @@ async function startServer() {
     try {
       const result = await pool.query("SELECT * FROM user_settings WHERE user_id = $1", [`admin_${type}`]);
       if (result.rows.length > 0) {
-        res.json(result.rows[0].data);
+        const jsonData = typeof result.rows[0].data === 'string' ? JSON.parse(result.rows[0].data) : result.rows[0].data;
+        res.json(jsonData);
       } else {
         res.json(null);
       }

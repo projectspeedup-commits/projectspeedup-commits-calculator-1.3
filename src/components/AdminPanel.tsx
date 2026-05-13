@@ -140,17 +140,37 @@ export function AdminPanel({
 }: AdminPanelProps) {
   const store = useAdminStore();
 
-  // Sync props to store on mount
+  // Sync props to store when they change from parent (from DB polling)
   useEffect(() => {
     store.setRawPrices(initialRawPrices);
-    store.setScrap(initialScrap);
-    store.setRemnant(initialRemnant);
-    store.setCustomGrades(initialCustomGrades || []);
-    store.setDeletedGrades(initialDeletedGrades || []);
-    store.setRemnantPricing(initialRemnantPricing || {});
-    if (initialEconomyItems) store.setEconomyItems(initialEconomyItems);
+  }, [initialRawPrices, store.setRawPrices]);
 
-    // Load from localStorage
+  useEffect(() => {
+    store.setScrap(initialScrap);
+  }, [initialScrap, store.setScrap]);
+
+  useEffect(() => {
+    store.setRemnant(initialRemnant);
+  }, [initialRemnant, store.setRemnant]);
+
+  useEffect(() => {
+    store.setCustomGrades(initialCustomGrades || []);
+  }, [initialCustomGrades, store.setCustomGrades]);
+
+  useEffect(() => {
+    store.setDeletedGrades(initialDeletedGrades || []);
+  }, [initialDeletedGrades, store.setDeletedGrades]);
+
+  useEffect(() => {
+    store.setRemnantPricing(initialRemnantPricing || {});
+  }, [initialRemnantPricing, store.setRemnantPricing]);
+
+  useEffect(() => {
+    if (initialEconomyItems) store.setEconomyItems(initialEconomyItems);
+  }, [initialEconomyItems, store.setEconomyItems]);
+
+  // Load from localStorage on mount
+  useEffect(() => {
     try {
       const prodResults = localStorage.getItem("ais_prod_calc_results");
       if (prodResults) store.setCalcResultsProd(JSON.parse(prodResults));
@@ -1701,8 +1721,8 @@ export function AdminPanel({
                 )}
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                <div className={`${planFiles.length > 0 ? "lg:col-span-5 xl:col-span-4" : "lg:col-span-8 xl:col-span-6"} relative group`}>
+              <div className="flex flex-col lg:flex-row gap-6 items-start">
+                <div className={`${planFiles.length > 0 ? "w-full lg:w-[280px] xl:w-[320px] shrink-0" : "w-full"} relative group`}>
                   <motion.div
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
@@ -1746,7 +1766,7 @@ export function AdminPanel({
                 </div>
 
                 {planFiles.length > 0 && (
-                  <div className="lg:col-span-7 xl:col-span-8 h-full">
+                  <div className="w-full flex-1 min-w-0 h-full">
                     <Card isPadded={false} className="h-full border-slate-200/60 transition-all hover:shadow-md">
                       <div className="divide-y divide-slate-100 dark:divide-slate-800 max-h-[230px] overflow-auto custom-scrollbar">
                         {planFiles.map((file) => (
@@ -1814,8 +1834,8 @@ export function AdminPanel({
                     )}
                   </div>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                    <div className={`${stockFiles.length > 0 ? "lg:col-span-5 xl:col-span-4" : "lg:col-span-8 xl:col-span-6"} relative group`}>
+                  <div className="flex flex-col lg:flex-row gap-6 items-start">
+                    <div className={`${stockFiles.length > 0 ? "w-full lg:w-[280px] xl:w-[320px] shrink-0" : "w-full"} relative group`}>
                       <motion.div
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.99 }}
@@ -1856,7 +1876,7 @@ export function AdminPanel({
                     </div>
 
                     {stockFiles.length > 0 && (
-                      <div className="lg:col-span-7 xl:col-span-8 h-full">
+                      <div className="w-full flex-1 min-w-0 h-full">
                         <Card isPadded={false} className="h-full border-slate-200/60 transition-all hover:shadow-md">
                           <div className="divide-y divide-slate-100 dark:divide-slate-800 max-h-[230px] overflow-auto custom-scrollbar">
                             {stockFiles.map((file) => (
@@ -1921,8 +1941,8 @@ export function AdminPanel({
                     )}
                   </div>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                    <div className={`${supplyPlanFiles.length > 0 ? "lg:col-span-5 xl:col-span-4" : "lg:col-span-8 xl:col-span-6"} relative group`}>
+                  <div className="flex flex-col lg:flex-row gap-6 items-start">
+                    <div className={`${supplyPlanFiles.length > 0 ? "w-full lg:w-[280px] xl:w-[320px] shrink-0" : "w-full"} relative group`}>
                       <motion.div
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.99 }}
@@ -1954,7 +1974,7 @@ export function AdminPanel({
                     </div>
 
                     {supplyPlanFiles.length > 0 && (
-                      <div className="lg:col-span-7 xl:col-span-8 h-full">
+                      <div className="w-full flex-1 min-w-0 h-full">
                         <Card isPadded={false} className="h-full border-slate-200/60 transition-all hover:shadow-md">
                           <div className="divide-y divide-slate-100 dark:divide-slate-800 max-h-[230px] overflow-auto custom-scrollbar">
                             {supplyPlanFiles.map((file) => (
