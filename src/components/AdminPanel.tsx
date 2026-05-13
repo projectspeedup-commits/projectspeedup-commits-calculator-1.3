@@ -140,34 +140,61 @@ export function AdminPanel({
 }: AdminPanelProps) {
   const store = useAdminStore();
 
-  // Sync props to store when they change from parent (from DB polling)
+  const lastPrices = useRef(initialRawPrices);
   useEffect(() => {
-    store.setRawPrices(initialRawPrices);
-  }, [initialRawPrices, store.setRawPrices]);
+    if (JSON.stringify(lastPrices.current) !== JSON.stringify(initialRawPrices) || !Object.keys(store.rawPrices || {}).length) {
+      store.setRawPrices(initialRawPrices);
+      lastPrices.current = initialRawPrices;
+    }
+  }, [initialRawPrices]);
 
+  const lastScrap = useRef(initialScrap);
   useEffect(() => {
-    store.setScrap(initialScrap);
-  }, [initialScrap, store.setScrap]);
+    if (lastScrap.current !== initialScrap || !store.scrap) {
+      store.setScrap(initialScrap);
+      lastScrap.current = initialScrap;
+    }
+  }, [initialScrap]);
 
+  const lastRemnant = useRef(initialRemnant);
   useEffect(() => {
-    store.setRemnant(initialRemnant);
-  }, [initialRemnant, store.setRemnant]);
+    if (lastRemnant.current !== initialRemnant || !store.remnant) {
+      store.setRemnant(initialRemnant);
+      lastRemnant.current = initialRemnant;
+    }
+  }, [initialRemnant]);
 
+  const lastCustomGrades = useRef(initialCustomGrades);
   useEffect(() => {
-    store.setCustomGrades(initialCustomGrades || []);
-  }, [initialCustomGrades, store.setCustomGrades]);
+    if (JSON.stringify(lastCustomGrades.current) !== JSON.stringify(initialCustomGrades) || !store.customGrades.length) {
+      store.setCustomGrades(initialCustomGrades || []);
+      lastCustomGrades.current = initialCustomGrades || [];
+    }
+  }, [initialCustomGrades]);
 
+  const lastDeletedGrades = useRef(initialDeletedGrades);
   useEffect(() => {
-    store.setDeletedGrades(initialDeletedGrades || []);
-  }, [initialDeletedGrades, store.setDeletedGrades]);
+    if (JSON.stringify(lastDeletedGrades.current) !== JSON.stringify(initialDeletedGrades)) {
+      store.setDeletedGrades(initialDeletedGrades || []);
+      lastDeletedGrades.current = initialDeletedGrades || [];
+    }
+  }, [initialDeletedGrades]);
 
+  const lastRemnantPricing = useRef(initialRemnantPricing);
   useEffect(() => {
-    store.setRemnantPricing(initialRemnantPricing || {});
-  }, [initialRemnantPricing, store.setRemnantPricing]);
+    if (JSON.stringify(lastRemnantPricing.current) !== JSON.stringify(initialRemnantPricing)) {
+      store.setRemnantPricing(initialRemnantPricing || {});
+      lastRemnantPricing.current = initialRemnantPricing || {};
+    }
+  }, [initialRemnantPricing]);
 
+  const lastEconomyItems = useRef(initialEconomyItems);
   useEffect(() => {
-    if (initialEconomyItems) store.setEconomyItems(initialEconomyItems);
-  }, [initialEconomyItems, store.setEconomyItems]);
+    if (JSON.stringify(lastEconomyItems.current) !== JSON.stringify(initialEconomyItems)) {
+      if (initialEconomyItems) store.setEconomyItems(initialEconomyItems);
+      lastEconomyItems.current = initialEconomyItems;
+    }
+  }, [initialEconomyItems]);
 
   // Load from localStorage on mount
   useEffect(() => {

@@ -51,7 +51,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                 Марка стали
               </th>
               <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">
-                Цена НД (₽ / тн)
+                Цена (₽ / тн)
               </th>
               <th className="px-6 py-4 w-16"></th>
             </tr>
@@ -74,7 +74,10 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                       <PriceInput
                         compact
                         value={prices.nd !== undefined ? prices.nd : "0"}
-                        onChange={(val) => handlePriceChange(grade, "nd", val)}
+                        onChange={(val) => {
+                          handlePriceChange(grade, "nd", val);
+                          handlePriceChange(grade, "md", val);
+                        }}
                         className="text-right font-black"
                       />
                     </div>
