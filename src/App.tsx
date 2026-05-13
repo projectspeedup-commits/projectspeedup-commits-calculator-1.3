@@ -202,8 +202,13 @@ export default function App() {
     isInitialLoad.current = false;
 
     if (user && ((db && isCloudActive) || config?.usePostgres)) {
-      const unsub = subscribeToSystemData(db, "settings", "prices", (data) => {
+      const unsub = subscribeToSystemData(
+        db,
+        "settings",
+        "prices",
+        (data) => {
           if (data) {
+            console.log("System data updated from server");
             const storeState = useStore.getState();
             const resultingCustomGrades =
               data.customGrades || storeState.customGrades;
@@ -456,17 +461,19 @@ export default function App() {
       if (eItems) payload.economyItems = eItems;
 
       try {
+        const promises = [];
         if (db && isCloudActive) {
-          // ALWAYS USE FIREBASE FOR PRICES, EVEN IF POSTGRES IS ACTIVE
-          await saveSystemDataToCloud(db, "settings", "prices", payload, false);
+          promises.push(saveSystemDataToCloud(db, "settings", "prices", payload, false));
         }
         if (config?.usePostgres) {
-          await backendService.saveGlobalSettings(payload); // Optional backup to server
-          await saveSystemDataToCloud(db, "settings", "prices", payload, true);
+          promises.push(backendService.saveGlobalSettings(payload));
+          promises.push(saveSystemDataToCloud(db, "settings", "prices", payload, true));
         }
+        
+        await Promise.allSettled(promises);
+        console.log("Global prices save attempts finished");
       } catch (error) {
-        // Fallback for non-admins: save only to their personal settings
-        console.warn("Could not save to global settings, saving to personal only.");
+        console.error("Global settings save process error:", error);
       }
 
       // Always save to personal settings for the user

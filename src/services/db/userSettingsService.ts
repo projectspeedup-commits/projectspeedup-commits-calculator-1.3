@@ -119,11 +119,15 @@ export const saveSystemDataToCloud = async (
 ) => {
   try {
     if (usePostgres) {
+      console.log(`Saving to Postgres: ${collectionName}_${type}`);
       await backendService.saveAdminData(`${collectionName}_${type}`, payload);
+      console.log(`Successfully saved to Postgres: ${collectionName}_${type}`);
     } else if (db) {
+      console.log(`Saving to Firebase: ${collectionName}/${type}`);
       await setDoc(doc(db, collectionName, type), payload);
+      console.log(`Successfully saved to Firebase: ${collectionName}/${type}`);
     }
   } catch (e) {
-    console.warn("Failed to save system data", e);
+    console.warn(`Failed to save system data to ${usePostgres ? 'Postgres' : 'Firebase'}:`, e);
   }
 };
