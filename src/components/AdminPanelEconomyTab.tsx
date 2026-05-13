@@ -2,6 +2,7 @@
 import {
   EconomyItem,
   DEFAULT_STEEL_GRADES,
+  DEFAULT_RAW_PRICES,
 } from '../lib/constants';
 
 import React, { useState, useMemo } from 'react';
@@ -84,6 +85,19 @@ export default function AdminPanelEconomyTab({
             <Badge variant="error" className="px-4 py-2 lowercase h-12 rounded-xl flex items-center">
               {saveError}
             </Badge>
+          )}
+          {adminSection === "prices" && (
+            <Button
+              onClick={() => {
+                if (window.confirm("Вы уверены, что хотите сбросить все цены на значения по умолчанию? Дальнейшее сохранение применит эти цены для всех пользователей.")) {
+                  store.setRawPrices(DEFAULT_RAW_PRICES);
+                }
+              }}
+              variant="outline"
+              size="lg"
+            >
+              Сбросить цены (по умолчанию)
+            </Button>
           )}
           <Button
             onClick={handleSave}
