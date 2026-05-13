@@ -72,7 +72,7 @@ export default function AdminPanelEconomyTab({
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl sm:text-3xl font-normal tracking-tight text-[#1A1C19] dark:text-white">
-            Экономика производства
+            Система расчетов 1.3
           </h2>
           <p className="text-sm text-[#43483F] dark:text-slate-400 mt-2 max-w-2xl">
             Управление ценами заготовок, марками стали и прямыми затратами.
