@@ -11,15 +11,30 @@ export const subscribeToUserSettings = (
   if (!userId) return () => {};
 
   let unsubFirebase = () => {};
+  let latestUpdatedAt = 0;
+
+  const handleIncomingData = (data: any) => {
+    if (!data) {
+      if (!usePostgres) onData(null);
+      return;
+    }
+    
+    // Pick the newest data using updatedAt 
+    const dataTime = data.updatedAt ? new Date(data.updatedAt).getTime() : 0;
+    if (dataTime >= latestUpdatedAt) {
+      latestUpdatedAt = dataTime;
+      onData(data);
+    }
+  };
 
   if (db) {
     unsubFirebase = onSnapshot(
       doc(db, "users", userId, "settings", "preferences"),
       (snapshot) => {
         if (snapshot.exists()) {
-          onData(snapshot.data());
+          handleIncomingData(snapshot.data());
         } else if (!usePostgres) {
-          onData(null);
+          handleIncomingData(null);
         }
       },
       (error) => {
@@ -35,7 +50,7 @@ export const subscribeToUserSettings = (
     const fetchData = async () => {
       try {
         const data = await backendService.getSettings(userId);
-        if (isMounted && data) onData(data);
+        if (isMounted && data) handleIncomingData(data);
       } catch (e) {
         if (isMounted && onError) onError(e);
       }
@@ -82,15 +97,30 @@ export const subscribeToSystemData = (
   usePostgres: boolean = false
 ) => {
   let unsubFirebase = () => {};
+  let latestUpdatedAt = 0;
+
+  const handleIncomingData = (data: any) => {
+    if (!data) {
+      if (!usePostgres) onData(null);
+      return;
+    }
+    
+    // Pick the newest data using updatedAt 
+    const dataTime = data.updatedAt ? new Date(data.updatedAt).getTime() : 0;
+    if (dataTime >= latestUpdatedAt) {
+      latestUpdatedAt = dataTime;
+      onData(data);
+    }
+  };
 
   if (db) {
     unsubFirebase = onSnapshot(
       doc(db, collectionName, type),
       (snapshot) => {
         if (snapshot.exists()) {
-          onData(snapshot.data());
+          handleIncomingData(snapshot.data());
         } else if (!usePostgres) {
-          onData(null);
+          handleIncomingData(null);
         }
       },
       (error) => {
@@ -106,7 +136,7 @@ export const subscribeToSystemData = (
     const fetchData = async () => {
       try {
         const data = await backendService.getAdminData(`${collectionName}_${type}`);
-        if (isMounted && data) onData(data);
+        if (isMounted && data) handleIncomingData(data);
       } catch (e) {
         if (isMounted && onError) onError(e);
       }
