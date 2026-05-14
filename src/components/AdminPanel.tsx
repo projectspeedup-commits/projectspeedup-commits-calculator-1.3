@@ -1260,11 +1260,11 @@ export function AdminPanel({
       // Status filter
       let matchesStatus = true;
       if (stockStatusFilter === "OK") {
-        matchesStatus = item.allocatedStock > 0;
+        matchesStatus = item.shortageStock <= 0.001;
       } else if (stockStatusFilter === "DEFICIT") {
-        matchesStatus = item.remainingToProcess > item.allocatedStock;
+        matchesStatus = item.shortageStock > 0.001 && item.allocatedStock > 0.001;
       } else if (stockStatusFilter === "NOT_PROVIDED") {
-        matchesStatus = item.allocatedStock === 0;
+        matchesStatus = item.allocatedStock <= 0.001;
       }
 
       return matchesSearch && matchesStatus;
@@ -1287,11 +1287,11 @@ export function AdminPanel({
       // Status filter
       let matchesStatus = true;
       if (supplyStatusFilter === "OK") {
-        matchesStatus = item.allocatedFromSupply > 0;
+        matchesStatus = item.finalShortage <= 0.001;
       } else if (supplyStatusFilter === "DEFICIT") {
-        matchesStatus = item.finalShortage > 0;
+        matchesStatus = item.finalShortage > 0.001 && (item.allocatedFromSupply > 0.001 || item.allocatedFromStock > 0.001);
       } else if (supplyStatusFilter === "NOT_PROVIDED") {
-        matchesStatus = item.allocatedFromSupply === 0 && item.allocatedFromStock === 0;
+        matchesStatus = item.allocatedFromSupply <= 0.001 && item.allocatedFromStock <= 0.001;
       }
 
       return matchesSearch && matchesStatus;
@@ -2401,6 +2401,18 @@ export function AdminPanel({
               isFreeStockDragging={isFreeStockDragging}
               stockTotals={stockTotals}
               freeStock={freeStock}
+              stockSearchQuery={stockSearchQuery}
+              setStockSearchQuery={setStockSearchQuery}
+              stockStatusFilter={stockStatusFilter}
+              setStockStatusFilter={setStockStatusFilter}
+              supplySearchQuery={supplySearchQuery}
+              setSupplySearchQuery={setSupplySearchQuery}
+              supplyStatusFilter={supplyStatusFilter}
+              setSupplyStatusFilter={setSupplyStatusFilter}
+              isCopied={isCopied}
+              setIsCopied={setIsCopied}
+              copySuccess={copySuccess}
+              setCopySuccess={setCopySuccess}
             />
           )}
           {activeTab === "logistics" && (
