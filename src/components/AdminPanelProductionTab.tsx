@@ -39,7 +39,9 @@ export default function AdminPanelProductionTab(props: any) {
     matchedDemand,
     supplyCalculationData,
     filteredMatchedDemand,
+    filteredSupplyMatchedDemand,
     filteredTotals,
+    filteredSupplyTotals,
     getSupplyNomenclature,
     handleCopyForSheets,
     handleExportStock,
@@ -340,6 +342,8 @@ export default function AdminPanelProductionTab(props: any) {
                     setSearchQuery={setSupplySearchQuery}
                     statusFilter={supplyStatusFilter}
                     setStatusFilter={setSupplyStatusFilter}
+                    filteredTotals={filteredSupplyTotals}
+                    filteredMatchedDemand={filteredSupplyMatchedDemand}
                   />
                 ) : productionSection ==="supply-plans" ? (
                   <SupplyPlansSection {...{...props, calculationResults, processedStock, processedSupplyPlans, isProcessing}} />

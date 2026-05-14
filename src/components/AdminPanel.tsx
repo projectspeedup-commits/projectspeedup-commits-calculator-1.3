@@ -140,39 +140,39 @@ export function AdminPanel({
 }: AdminPanelProps) {
   const store = useAdminStore();
 
-  const lastPrices = useRef(initialRawPrices);
+  const lastPrices = useRef<any>(null);
   useEffect(() => {
-    if (JSON.stringify(lastPrices.current) !== JSON.stringify(initialRawPrices) || !Object.keys(store.rawPrices || {}).length) {
+    if (JSON.stringify(lastPrices.current) !== JSON.stringify(initialRawPrices)) {
       store.setRawPrices(initialRawPrices);
       lastPrices.current = initialRawPrices;
     }
   }, [initialRawPrices]);
 
-  const lastScrap = useRef(initialScrap);
+  const lastScrap = useRef<any>(null);
   useEffect(() => {
-    if (lastScrap.current !== initialScrap || !store.scrap) {
+    if (lastScrap.current !== initialScrap) {
       store.setScrap(initialScrap);
       lastScrap.current = initialScrap;
     }
   }, [initialScrap]);
 
-  const lastRemnant = useRef(initialRemnant);
+  const lastRemnant = useRef<any>(null);
   useEffect(() => {
-    if (lastRemnant.current !== initialRemnant || !store.remnant) {
+    if (lastRemnant.current !== initialRemnant) {
       store.setRemnant(initialRemnant);
       lastRemnant.current = initialRemnant;
     }
   }, [initialRemnant]);
 
-  const lastCustomGrades = useRef(initialCustomGrades);
+  const lastCustomGrades = useRef<any>(null);
   useEffect(() => {
-    if (JSON.stringify(lastCustomGrades.current) !== JSON.stringify(initialCustomGrades) || !store.customGrades.length) {
+    if (JSON.stringify(lastCustomGrades.current) !== JSON.stringify(initialCustomGrades)) {
       store.setCustomGrades(initialCustomGrades || []);
       lastCustomGrades.current = initialCustomGrades || [];
     }
   }, [initialCustomGrades]);
 
-  const lastDeletedGrades = useRef(initialDeletedGrades);
+  const lastDeletedGrades = useRef<any>(null);
   useEffect(() => {
     if (JSON.stringify(lastDeletedGrades.current) !== JSON.stringify(initialDeletedGrades)) {
       store.setDeletedGrades(initialDeletedGrades || []);
@@ -180,7 +180,7 @@ export function AdminPanel({
     }
   }, [initialDeletedGrades]);
 
-  const lastRemnantPricing = useRef(initialRemnantPricing);
+  const lastRemnantPricing = useRef<any>(null);
   useEffect(() => {
     if (JSON.stringify(lastRemnantPricing.current) !== JSON.stringify(initialRemnantPricing)) {
       store.setRemnantPricing(initialRemnantPricing || {});
@@ -188,7 +188,7 @@ export function AdminPanel({
     }
   }, [initialRemnantPricing]);
 
-  const lastEconomyItems = useRef(initialEconomyItems);
+  const lastEconomyItems = useRef<any>(null);
   useEffect(() => {
     if (JSON.stringify(lastEconomyItems.current) !== JSON.stringify(initialEconomyItems)) {
       if (initialEconomyItems) store.setEconomyItems(initialEconomyItems);
@@ -1238,6 +1238,12 @@ export function AdminPanel({
     totals: stockTotals,
   } = stockCalculationData;
 
+  const {
+    matchedDemand: supplyMatchedDemand,
+    freeSupply,
+    totals: supplyTotals,
+  } = supplyCalculationData;
+
   const filteredMatchedDemand = useMemo(() => {
     return matchedDemand.filter((item) => {
       // Free text search
@@ -1265,30 +1271,32 @@ export function AdminPanel({
     });
   }, [matchedDemand, stockSearchQuery, stockStatusFilter]);
 
-  const groupedByOrderDemand = useMemo(() => {
-    const groups: Record<string, any> = {};
-    filteredMatchedDemand.forEach((item) => {
-      const key = item.orderNo || "Без заказа";
-      if (!groups[key]) {
-        groups[key] = {
-          orderNo: key,
-          client: item.client || "—",
-          allocatedStock: 0,
-          shortageStock: 0,
-          totalWeight: 0,
-          weightTons: 0,
-          nomenclature: key, // Using orderNo as label for Top-5 chart
-        };
+  const filteredSupplyMatchedDemand = useMemo(() => {
+    return supplyMatchedDemand.filter((item: any) => {
+      // Free text search
+      const query = supplySearchQuery.toLowerCase();
+      const matchesSearch =
+        !query ||
+        (item.orderNo && String(item.orderNo).toLowerCase().includes(query)) ||
+        (item.client && String(item.client).toLowerCase().includes(query)) ||
+        (item.nomenclature &&
+          String(item.nomenclature).toLowerCase().includes(query)) ||
+        (item.internalNo &&
+          String(item.internalNo).toLowerCase().includes(query));
+
+      // Status filter
+      let matchesStatus = true;
+      if (supplyStatusFilter === "OK") {
+        matchesStatus = item.allocatedFromSupply > 0;
+      } else if (supplyStatusFilter === "DEFICIT") {
+        matchesStatus = item.finalShortage > 0;
+      } else if (supplyStatusFilter === "NOT_PROVIDED") {
+        matchesStatus = item.allocatedFromSupply === 0 && item.allocatedFromStock === 0;
       }
-      groups[key].allocatedStock += item.allocatedStock || 0;
-      groups[key].shortageStock += item.shortageStock || 0;
-      groups[key].totalWeight += item.totalWeight || 0;
-      groups[key].weightTons += item.weightTons || 0;
+
+      return matchesSearch && matchesStatus;
     });
-    return Object.values(groups).sort(
-      (a, b) => b.shortageStock - a.shortageStock,
-    );
-  }, [filteredMatchedDemand]);
+  }, [supplyMatchedDemand, supplySearchQuery, supplyStatusFilter]);
 
   const filteredTotals = useMemo(() => {
     return filteredMatchedDemand.reduce(
@@ -1308,6 +1316,19 @@ export function AdminPanel({
       { allocated: 0, deficit: 0, techWaste2: 0, usefulRem2: 0 },
     );
   }, [filteredMatchedDemand]);
+
+  const filteredSupplyTotals = useMemo(() => {
+    return filteredSupplyMatchedDemand.reduce(
+      (acc, row: any) => {
+        acc.allocated += row.allocatedFromSupply || 0;
+        acc.deficit += row.finalShortage || 0;
+        acc.techWaste3 += row.combinedTechWaste3 || 0;
+        acc.usefulRem3 += row.combinedUsefulRem3 || 0;
+        return acc;
+      },
+      { allocated: 0, deficit: 0, techWaste3: 0, usefulRem3: 0 },
+    );
+  }, [filteredSupplyMatchedDemand]);
 
   // Format supply nomenclature based on profile and marka
   const getSupplyNomenclature = (sp: any) => {
@@ -2356,7 +2377,9 @@ export function AdminPanel({
               matchedDemand={matchedDemand}
               supplyCalculationData={supplyCalculationData}
               filteredMatchedDemand={filteredMatchedDemand}
+              filteredSupplyMatchedDemand={filteredSupplyMatchedDemand}
               filteredTotals={filteredTotals}
+              filteredSupplyTotals={filteredSupplyTotals}
               getSupplyNomenclature={getSupplyNomenclature}
               handleCopyForSheets={handleCopyForSheets}
               handleExportStock={handleExportStock}

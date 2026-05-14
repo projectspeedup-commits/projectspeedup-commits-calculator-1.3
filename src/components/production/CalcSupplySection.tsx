@@ -13,41 +13,14 @@ export function CalcSupplySection(props: any) {
     supplyCalculationData, activeTab, setSupplySection, setProductionSection, setActiveTab,
     searchQuery, setSearchQuery, statusFilter, setStatusFilter, filteredTotals,
     isCopied, setIsCopied, supplyTableRef, onSupplyMouseDown, handleMouseLeaveOrUp,
-    handleMouseMove, isSupplyDragging, formatCurrency, getSupplyNomenclature
+    handleMouseMove, isSupplyDragging, formatCurrency, getSupplyNomenclature,
+    filteredMatchedDemand
   } = props;
   
-  const validMatchedDemand = useMemo(() => {
-    return (supplyCalculationData?.matchedDemand || []).filter((res: any) => {
-      let matchesSearch = true;
-      if (searchQuery) {
-        const q = searchQuery.toLowerCase();
-        matchesSearch = (
-          (res.orderNo || "").toLowerCase().includes(q) ||
-          (res.client || "").toLowerCase().includes(q) ||
-          (res.nomenclature || "").toLowerCase().includes(q)
-        );
-      }
-
-      let matchesStatus = true;
-      const totalAllocated = (res.allocatedFromStock || 0) + (res.allocatedFromSupply || 0);
-      if (statusFilter === "OK") {
-        matchesStatus = totalAllocated > 0;
-      } else if (statusFilter === "DEFICIT") {
-        matchesStatus = (res.finalShortage || 0) > 0.001;
-      } else if (statusFilter === "NOT_PROVIDED") {
-        matchesStatus = totalAllocated === 0;
-      }
-      return matchesSearch && matchesStatus;
-    });
-  }, [supplyCalculationData?.matchedDemand, searchQuery, statusFilter]);
+  const validMatchedDemand = filteredMatchedDemand || [];
   
-  const validAllocatedFromSupply = useMemo(() => {
-    return supplyCalculationData?.totals?.allocatedSupply || 0;
-  }, [supplyCalculationData]);
-
-  const validDeficit = useMemo(() => {
-    return supplyCalculationData?.totals?.deficit || 0;
-  }, [supplyCalculationData]);
+  const validAllocatedFromSupply = filteredTotals?.allocated || 0;
+  const validDeficit = filteredTotals?.deficit || 0;
 
   return (
     <React.Fragment>

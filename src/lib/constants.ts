@@ -218,6 +218,14 @@ export const DEFAULT_ECONOMY_ITEMS: EconomyItem[] = [
     price: "0",
   },
   {
+    id: "feed",
+    name: "Корма",
+    category: "direct",
+    type: "variable",
+    norm: "0",
+    price: "0",
+  },
+  {
     id: "tools",
     name: "Произв. инструмент",
     category: "overhead",
