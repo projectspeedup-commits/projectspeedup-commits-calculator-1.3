@@ -354,21 +354,18 @@ export default function App() {
   }, [user, isCloudActive, config]);
 
   const handleAnonymousLogin = async (targetView: "manager" | "purchasing" | "admin" | "developer") => {
-    if (!user) {
+    if (!user || user.uid.startsWith("local_")) {
       try {
-        if (!isCloudActive && config?.usePostgres) {
-          // If Firestore is NOT active, use a local placeholder
+        const result = await signInAnonymously(auth);
+        setUser(result.user);
+        setIsCloudActive(true);
+      } catch (error) {
+        console.error("Anonymous login failed, falling back to local:", error);
+        
+        if (config?.usePostgres) {
           setUser({ uid: "local_manager", isAnonymous: true, displayName: "Локальный пользователь" });
         } else {
-          // If Firestore IS active, use the real Firebase sign-in
-          const result = await signInAnonymously(auth);
-          setUser(result.user);
-        }
-      } catch (error) {
-        console.error("Anonymous login failed:", error);
-        // Even if both fail, we might want to let them see the UI in offline mode if we have local storage
-        if (config?.usePostgres) {
-           setUser({ uid: "local_emergency", isAnonymous: true });
+          setUser({ uid: "local_emergency", isAnonymous: true });
         }
       }
     }
