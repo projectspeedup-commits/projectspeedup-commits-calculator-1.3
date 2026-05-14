@@ -50,7 +50,7 @@ export function SupplyCalcSection(props: any) {
  setProductionSection("files");
  }
  }}
- className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-[0_4px_20px_rgba(37,99,235,0.2)] hover:shadow-[0_4px_24px_rgba(37,99,235,0.3)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center gap-2"
+ className="px-6 py-3  hover: text-white rounded-xl font-bold shadow-[0_4px_20px_rgba(37,99,235,0.2)] hover:shadow-[0_4px_24px_rgba(37,99,235,0.3)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center gap-2"
  >
  Перейти к загрузке файлов
  <ArrowRight className="w-4 h-4 ml-1" />
@@ -58,7 +58,7 @@ export function SupplyCalcSection(props: any) {
 
  {isProcessing && (
  <div className="mt-8 flex items-center gap-3 h-12 px-8 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-2xl font-bold text-sm shadow-sm border border-slate-200 dark:border-slate-700">
- <div className="w-4 h-4 border-2 border-sky-500/30 border-t-sky-500 rounded-full animate-spin"></div>
+ <div className="w-4 h-4 border-2 border-slate-200 dark:border-slate-800 border-t-sky-500 rounded-full animate-spin"></div>
  Идет расчет...
  </div>
  )}
@@ -146,11 +146,11 @@ export function SupplyCalcSection(props: any) {
  </div>
  )}
  <div className="bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 p-6 rounded-[24px] flex flex-col relative shadow-sm transition-all hover:shadow-md">
- <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 dark:bg-sky-500/10 rounded-bl-[64px] rounded-tr-[24px] pointer-events-none"></div>
+ <div className="absolute top-0 right-0 w-32 h-32  dark: rounded-bl-[64px] rounded-tr-[24px] pointer-events-none"></div>
  <div className="z-10 flex items-start justify-between">
  <div>
  <div className="flex items-center gap-2 mb-1">
- <div className="w-2 h-2 rounded-full bg-sky-500"></div>
+ <div className="w-2 h-2 rounded-full "></div>
  <h3 className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
  Итого заготовка
  </h3>
@@ -171,7 +171,7 @@ export function SupplyCalcSection(props: any) {
  </div>
  <button
  onClick={() => {
- const headers = ["НТД","Профиль","Марка заг.","Размер мм.","Длина","Кол-во тн",
+ const headers = ["НТД","Профиль","Марка заг.","Размер","Длина","Кол-во тн",
  ];
  if (!isPurchasingMode)
  headers.push("Сумма (руб)");
@@ -221,7 +221,7 @@ export function SupplyCalcSection(props: any) {
  grade,
  parseFloat(size) || size,
  length,
- parseFloat(data.weight.toFixed(3)),
+ parseFloat((res.weightTons||res.totalWeight||0).toFixed(3)),
  ];
  if (!isPurchasingMode)
  row.push(Math.round(data.cost));
@@ -236,7 +236,7 @@ export function SupplyCalcSection(props: any) {
  0,
  );
  const totalRow = ["ИТОГО","","","","",
- parseFloat(totalWeight.toFixed(3)),
+ parseFloat((res.weightTons||res.totalWeight||0).toFixed(3)),
  ];
  if (!isPurchasingMode) {
  const totalCost = rows.reduce(
@@ -312,7 +312,7 @@ export function SupplyCalcSection(props: any) {
  getTimestampedFilename("Заказ поставщику"),
  );
  }}
- className="flex items-center gap-1.5 px-3 py-1.5 bg-sky-50 dark:bg-sky-500/10 hover:bg-sky-100 dark:hover:bg-sky-500/20 text-sky-600 dark:text-sky-400 rounded-lg text-xs font-bold transition-colors border border-sky-200 dark:border-sky-500/20 shadow-sm"
+ className="flex items-center gap-1.5 px-3 py-1.5  dark: hover: dark:hover: text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 rounded-lg text-xs font-bold transition-colors border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800 shadow-sm"
  title="Скачать сводку по заготовке в Excel"
  >
  <svg
@@ -376,7 +376,7 @@ export function SupplyCalcSection(props: any) {
  return (
  <div
  key={key}
- className="flex justify-between items-center group bg-slate-50 dark:bg-slate-800/30 hover:bg-sky-50 dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-800/50 px-2 py-1.5 rounded-lg transition-colors"
+ className="flex justify-between items-center group bg-slate-50 dark:bg-slate-800/30 hover: dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-800/50 px-2 py-1.5 rounded-lg transition-colors"
  >
  <div className="flex items-center gap-1.5">
  <span className="text-slate-700 dark:text-slate-300 font-bold text-[10px] min-w-[32px]">
@@ -385,15 +385,15 @@ export function SupplyCalcSection(props: any) {
  <span className="text-slate-500 dark:text-slate-400 font-semibold text-[9px] min-w-[20px]">
  {size}
  </span>
- <span className="text-[8px] text-sky-600 dark:text-sky-400 bg-sky-100 dark:bg-sky-900/30 px-1 py-0.5 rounded font-bold uppercase">
+ <span className="text-[8px] text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark: px-1 py-0.5 rounded font-bold uppercase">
  {length}
  </span>
  </div>
  <div className="flex flex-col items-end leading-none gap-0.5">
  <div className="flex items-baseline gap-1.5">
- <span className="text-sky-700 dark:text-sky-400 font-black text-[10px]">
- {data.weight.toFixed(3)}{""}
- <span className="font-medium text-[8px] text-sky-600/60 uppercase">
+ <span className="text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-black text-[10px]">
+ {(res.weightTons||res.totalWeight||0).toFixed(3)}{""}
+ <span className="font-medium text-[8px] text-slate-800 dark:text-slate-200/60 uppercase">
  тн
  </span>
  </span>
@@ -415,15 +415,15 @@ export function SupplyCalcSection(props: any) {
  </div>
 
  <div className="bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 p-6 rounded-[24px] flex flex-col relative shadow-sm transition-all hover:shadow-md">
- <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 dark:bg-amber-500/10 rounded-bl-[64px] rounded-tr-[24px] pointer-events-none"></div>
+ <div className="absolute top-0 right-0 w-32 h-32  dark: rounded-bl-[64px] rounded-tr-[24px] pointer-events-none"></div>
  <div className="z-10">
  <div className="flex items-center justify-between mb-1">
  <div className="flex items-center gap-2">
- <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+ <div className="w-2 h-2 rounded-full "></div>
  <h3 className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
  Коэф. Использования (КИМ)
  <div className="group relative z-[100]">
- <Info className="w-3.5 h-3.5 text-amber-500/70 hover:text-amber-500 cursor-help transition-colors" />
+ <Info className="w-3.5 h-3.5 text-slate-800 dark:text-slate-200/70 hover:text-slate-800 dark:text-slate-200 cursor-help transition-colors" />
  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-2.5 bg-slate-900 dark:bg-slate-800 border border-slate-700 text-white text-[10.5px] rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 translate-y-1 group-hover:translate-y-0 shadow-xl normal-case tracking-normal">
  Показывает, какая часть заготовки идет в
  продукцию. Чем ближе к 1.0, тем лучше.
@@ -432,7 +432,7 @@ export function SupplyCalcSection(props: any) {
  </div>
  </h3>
  </div>
- <div className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 bg-emerald-50 dark:bg-emerald-500/10 px-1.5 py-0.5 rounded-md">
+ <div className="text-[9px] font-bold text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800  dark: px-1.5 py-0.5 rounded-md">
  Цель ≥ 0.980
  </div>
  </div>
@@ -450,7 +450,7 @@ export function SupplyCalcSection(props: any) {
  ) || 1)
  ).toFixed(3)}
  </span>
- <span className="text-sm font-bold text-amber-500/80">
+ <span className="text-sm font-bold text-slate-800 dark:text-slate-200/80">
  средний
  </span>
  </div>
@@ -484,12 +484,12 @@ export function SupplyCalcSection(props: any) {
  </div>
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2">
- <div className="w-1.5 h-1.5 rounded-full bg-sky-500/80"></div>
+ <div className="w-1.5 h-1.5 rounded-full "></div>
  <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
  Деловые остатки
  </span>
  </div>
- <div className="font-bold text-sky-500 dark:text-sky-400 tracking-tight">
+ <div className="font-bold text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 tracking-tight">
  {calculationResults
  .reduce(
  (acc, res) =>
@@ -524,7 +524,7 @@ export function SupplyCalcSection(props: any) {
  <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider mr-3 shrink-0">
  Итого к обеспечению
  </span>
- <span className="text-sm font-black text-sky-600 dark:text-sky-400">
+ <span className="text-sm font-black text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200">
  {validSupplyResults
  .reduce(
  (sum, res) =>
@@ -545,7 +545,7 @@ export function SupplyCalcSection(props: any) {
 
  <button
  onClick={applyAllOptimizations}
- className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-600/20 active:scale-95 w-full sm:w-auto order-first sm:order-none"
+ className="flex items-center justify-center gap-2 px-4 py-2  hover: text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-600/20 active:scale-95 w-full sm:w-auto order-first sm:order-none"
  title="Применить рекомендуемую длину заготовки ко всем строкам для максимизации КИМ"
  >
  <TrendingUp className="w-4 h-4 shadow-sm" />
@@ -557,7 +557,7 @@ export function SupplyCalcSection(props: any) {
 
  <button
  onClick={() => {
- const headers = ["Внутренняя нумерация","Дата отгрузки","№ Заказа","Клиент","Номенклатура","Профиль","Марка","Размер мм.","Длина","Кол-во тн в заказе","ИТОГО остаток к выполнению","Номенклатура (заг)","Марка заг.","Размер мм. (заг)","Кол-во тн заг.","Длина мм.","Тех. отходы","Делов. остаток","КИМ / Совет"
+ const headers = ["Внутренняя нумерация","Дата отгрузки","№ Заказа","Клиент","Номенклатура","Профиль","Марка","Размер","Длина","Кол-во тн в заказе","ИТОГО остаток к выполнению","Номенклатура (заг)","Марка заг.","Размер (заг)","Кол-во тн заг.","Длина","Тех. отходы","Делов. остаток","КИМ / Совет"
  ];
  if (!isPurchasingMode)
  headers.push("Цена (руб)","Сумма (руб)");
@@ -579,12 +579,12 @@ export function SupplyCalcSection(props: any) {
  String(res.weightTons).replace(".",",",
  ),
  String(
- res.remainingToProcess.toFixed(3),
+ (res.weightTons||res.totalWeight||0).toFixed(3),
  ).replace(".",","),
  `Круг ${getGostForGrade(res.grade)}/ГОСТ 2590-2006`,
  res.grade ||"",
- String(parseFloat(res.billetDia.toFixed(2))).replace(".",","),
- String(res.totalWeight.toFixed(3)).replace(".",","),
+ String(parseFloat((res.diameter||0).toFixed(2))).replace(".",","),
+ String((res.weightTons||res.totalWeight||0).toFixed(3)).replace(".",","),
  res.lengthType ==="НД" ?"НД" : `МД ${res.billetLength}`,
  String((res.drawLength > 0 ? (res.techEnds / res.drawLength) * res.totalWeight : 0).toFixed(3)).replace(".",","),
  String((res.lengthType ==="НД" || res.drawLength <= 0 ? 0 : ((res.usefulLength - res.pcsPerBillet * res.length) / res.drawLength) * res.totalWeight).toFixed(3)).replace(".",","),
@@ -594,7 +594,7 @@ export function SupplyCalcSection(props: any) {
  row.push(
  String(res.price).replace(".",","),
  String(
- res.totalCost.toFixed(0),
+ (res.length||0).toFixed(0),
  ).replace(".",","),
  );
  }
@@ -620,16 +620,16 @@ export function SupplyCalcSection(props: any) {
  );
  totalRowSh[0] ="ИТОГО";
  totalRowSh[10] = String(
- totalWeightSh.toFixed(3),
+ (res.weightTons||res.totalWeight||0).toFixed(3),
  ).replace(".",",");
  totalRowSh[14] = String(
- totalZagSh.toFixed(3)
+ (res.weightTons||res.totalWeight||0).toFixed(3)
  ).replace(".",",");
  totalRowSh[16] = String(
- totalTechSh.toFixed(3)
+ (res.weightTons||res.totalWeight||0).toFixed(3)
  ).replace(".",",");
  totalRowSh[17] = String(
- totalDelovSh.toFixed(3)
+ (res.weightTons||res.totalWeight||0).toFixed(3)
  ).replace(".",",");
  totalRowSh[18] = String(
  (totalZagSh > 0 ? totalWeightSh / totalZagSh : 0).toFixed(3)
@@ -644,7 +644,7 @@ export function SupplyCalcSection(props: any) {
  }}
  className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm w-[calc(50%-0.25rem)] sm:w-auto ${
  copySuccess
- ?"bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+ ?" text-slate-800 dark:text-slate-200 dark: dark:text-slate-800 dark:text-slate-200"
  :"bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
  }`}
  title="Скопировать для вставки (Ctrl+V) в Google Таблицы"
@@ -698,7 +698,7 @@ export function SupplyCalcSection(props: any) {
  onClick={() => {
  if (validSupplyResults.length === 0) return;
 
- const headers = ["Внутренняя нумерация","Дата отгрузки","№ Заказа","Клиент","Номенклатура","Профиль","Марка","Размер мм.","Длина","Кол-во тн в заказе","ИТОГО остаток к выполнению","Номенклатура (заг)","Марка заг.","Размер мм. (заг)","Кол-во тн заг.","Длина мм.","Тех. Отходы","Делов. Остаток","КИМ / Совет"
+ const headers = ["Внутренняя нумерация","Дата отгрузки","№ Заказа","Клиент","Номенклатура","Профиль","Марка","Размер","Длина","Кол-во тн в заказе","ИТОГО остаток к выполнению","Номенклатура (заг)","Марка заг.","Размер (заг)","Кол-во тн заг.","Длина","Тех. Отходы","Делов. Остаток","КИМ / Совет"
  ];
  if (!isPurchasingMode)
  headers.push("Цена (руб)","Сумма (руб)");
@@ -719,12 +719,12 @@ export function SupplyCalcSection(props: any) {
  parseFloat(res.weightTons) ||
  res.weightTons,
  parseFloat(
- res.remainingToProcess.toFixed(3),
+ (res.weightTons||res.totalWeight||0).toFixed(3),
  ),
  `Круг ${getGostForGrade(res.grade)}/ГОСТ 2590-2006`,
  res.grade ||"",
- parseFloat(res.billetDia.toFixed(2)),
- parseFloat(res.totalWeight.toFixed(3)),
+ parseFloat((res.diameter||0).toFixed(2)),
+ parseFloat((res.weightTons||res.totalWeight||0).toFixed(3)),
  res.lengthType ==="НД" ?"НД" : `МД ${res.billetLength}`,
  parseFloat((res.drawLength > 0 ? (res.techEnds / res.drawLength) * res.totalWeight : 0).toFixed(3)),
  parseFloat((res.lengthType ==="НД" || res.drawLength <= 0 ? 0 : ((res.usefulLength - res.pcsPerBillet * res.length) / res.drawLength) * res.totalWeight).toFixed(3)),
@@ -760,14 +760,14 @@ export function SupplyCalcSection(props: any) {
  );
  totalRowEX[0] ="ИТОГО";
  totalRowEX[9] = parseFloat(
- totalInOrderEX.toFixed(3),
+ (res.weightTons||res.totalWeight||0).toFixed(3),
  );
  totalRowEX[10] = parseFloat(
- totalRemainingEX.toFixed(3),
+ (res.weightTons||res.totalWeight||0).toFixed(3),
  );
- totalRowEX[14] = parseFloat(totalZagEX.toFixed(3));
- totalRowEX[16] = parseFloat(totalTechEX.toFixed(3));
- totalRowEX[17] = parseFloat(totalDelovEX.toFixed(3));
+ totalRowEX[14] = parseFloat((res.weightTons||res.totalWeight||0).toFixed(3));
+ totalRowEX[16] = parseFloat((res.weightTons||res.totalWeight||0).toFixed(3));
+ totalRowEX[17] = parseFloat((res.weightTons||res.totalWeight||0).toFixed(3));
  totalRowEX[18] = parseFloat((totalZagEX > 0 ? totalRemainingEX / totalZagEX : 0).toFixed(3));
 
  if (!isPurchasingMode) {
@@ -883,7 +883,7 @@ export function SupplyCalcSection(props: any) {
  getTimestampedFilename("Расчет потребности в заготовке"),
  );
  }}
- className="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-colors shadow-sm w-[calc(50%-0.25rem)] sm:w-auto"
+ className="flex items-center justify-center gap-2 px-4 py-2  hover: text-white rounded-xl text-xs font-bold transition-colors shadow-sm w-[calc(50%-0.25rem)] sm:w-auto"
  >
  <svg
  xmlns="http://www.w3.org/2000/svg"
@@ -911,78 +911,78 @@ export function SupplyCalcSection(props: any) {
  onMouseLeave={handleMouseLeaveOrUp}
  onMouseUp={handleMouseLeaveOrUp}
  onMouseMove={handleMouseMove}
- className={`overflow-auto max-h-[60vh] custom-scrollbar relative ${isDragging ?"select-none cursor-grabbing" :"cursor-grab"}`}
+ className={`overflow-auto max-h-[calc(100vh-350px)] custom-scrollbar relative ${isDragging ?"select-none cursor-grabbing" :"cursor-grab"}`}
  >
- <table className="w-full border-separate border-spacing-0 pointer-events-auto">
- <thead className="sticky top-0 z-20">
- <tr className="bg-slate-50/95 dark:bg-[#1A1C19]/95 backdrop-blur-sm shadow-[0_1px_0_rgba(241,245,249,1)] dark:shadow-[0_1px_0_rgba(30,41,59,1)]">
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest w-20">
+ <table className="w-full text-left border-collapse text-xs whitespace-nowrap text-slate-800 dark:text-slate-200">
+ <thead>
+ <tr className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 group">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Внутренняя нумерация
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest w-16">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Дата отгрузки
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  № Заказа
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Клиент
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Номенклатура
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Профиль
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Марка
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
- Размер мм.
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
+ Размер
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Длина
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Кол-во тн в заказе
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-sky-600 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Итого к обеспечению
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Номенклатура
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Марка
  <br />
  заг.
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
- Размер мм.
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
+ Размер
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap text-emerald-600">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Кол-во тн
  <br />
  заг.
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
- Длина мм.
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
+ Длина
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap text-amber-500/80">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Тех.
  <br />
  Отходы
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap text-amber-500/80">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Делов.
  <br />
  Остаток
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-amber-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  <div className="flex items-center justify-center gap-1.5">
  КИМ / Совет
  <div className="group relative z-[100]">
- <Info className="w-3.5 h-3.5 text-amber-500/70 hover:text-amber-500 cursor-help transition-colors" />
+ <Info className="w-3.5 h-3.5 text-slate-800 dark:text-slate-200/70 hover:text-slate-800 dark:text-slate-200 cursor-help transition-colors" />
  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-2.5 bg-slate-900 dark:bg-slate-800 border border-slate-700 text-white text-[10.5px] rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 translate-y-1 group-hover:translate-y-0 shadow-xl normal-case tracking-normal whitespace-normal">
  Показывает, какая часть заготовки идет
  в продукцию. Чем ближе к 1.0, тем
@@ -994,10 +994,10 @@ export function SupplyCalcSection(props: any) {
  </th>
  {!isPurchasingMode && (
  <>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Цена за 1т
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Сумма
  </th>
  </>
@@ -1005,32 +1005,29 @@ export function SupplyCalcSection(props: any) {
  </tr>
  </thead>
  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-[11px] -row-group">
- {validSupplyResults.map((res) => (
- <tr
- key={res.id}
- className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors"
- >
- <td className="px-5 py-3">
+ {validSupplyResults.map((res, i) => (
+ <tr key={i} className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors group">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  <div className="text-center text-slate-600 dark:text-slate-400 whitespace-nowrap">
  {res.internalNo}
  </div>
  </td>
- <td className="px-5 py-3">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  <div className="text-center text-slate-600 dark:text-slate-400 whitespace-nowrap">
  {res.shippingDate}
  </div>
  </td>
- <td className="px-5 py-3">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  <div className="text-center font-bold text-slate-600 dark:text-slate-400 whitespace-nowrap">
  {res.orderNo}
  </div>
  </td>
- <td className="px-5 py-3">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  <div className="text-center font-medium text-slate-800 dark:text-slate-200 whitespace-nowrap">
  {res.client}
  </div>
  </td>
- <td className="px-5 py-3 md:max-w-[200px]">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  <div
  className="max-w-[150px] md:mx-auto truncate font-mono text-[10px] text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors text-center"
  title={res.nomenclature}
@@ -1038,41 +1035,41 @@ export function SupplyCalcSection(props: any) {
  {res.nomenclature}
  </div>
  </td>
- <td className="px-5 py-3">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 ml-auto md:ml-0 md:mx-auto">
  {res.type}
  </span>
  </td>
- <td className="px-5 py-3">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  <div className="text-center font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap">
  {res.grade}
  </div>
  </td>
- <td className="px-5 py-3">
- <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded ml-auto md:ml-0 md:mx-auto">
- {parseFloat(res.diameter.toFixed(2))}
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
+ <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded ml-auto md:ml-0 md:mx-auto">
+ {parseFloat((res.diameter||0).toFixed(2))}
  </span>
  </td>
- <td className="px-5 py-3">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  <span
- className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType ==="НД" ?"text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10" :"text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10"} ml-auto md:ml-0 md:mx-auto`}
+ className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType ==="НД" ?"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:" :"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:"} ml-auto md:ml-0 md:mx-auto`}
  >
  {res.lengthType ==="НД"
  ?"НД"
  : `МД ${res.length}`}
  </span>
  </td>
- <td className="px-5 py-3">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  <div className="text-center font-black text-slate-900 dark:text-white whitespace-nowrap">
- {res.weightTons.toFixed(3)}
+ {(res.weightTons||res.totalWeight||0).toFixed(3)}
  </div>
  </td>
- <td className="px-5 py-3 bg-sky-50/50 dark:bg-sky-900/10">
- <div className="text-center font-bold text-sky-600 dark:text-sky-400 whitespace-nowrap">
- {res.remainingToProcess.toFixed(3)}
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
+ <div className="text-center font-bold text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 whitespace-nowrap">
+ {(res.weightTons||res.totalWeight||0).toFixed(3)}
  </div>
  </td>
- <td className="px-5 py-3">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  <div
  className="max-w-[150px] md:mx-auto truncate font-medium text-[10px] text-slate-500 text-center"
  title={`Круг ${getGostForGrade(res.grade)}/ГОСТ 2590-2006`}
@@ -1081,31 +1078,31 @@ export function SupplyCalcSection(props: any) {
  2590-2006
  </div>
  </td>
- <td className="px-5 py-3">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  <div className="text-center font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap">
  {res.grade}
  </div>
  </td>
- <td className="px-5 py-3">
- <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded ml-auto md:ml-0 md:mx-auto">
- {parseFloat(res.billetDia.toFixed(2))}
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
+ <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded ml-auto md:ml-0 md:mx-auto">
+ {parseFloat((res.diameter||0).toFixed(2))}
  </span>
  </td>
- <td className="px-5 py-3">
- <div className="text-center font-black text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
- {res.totalWeight.toFixed(3)}
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
+ <div className="text-center font-black text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 whitespace-nowrap">
+ {(res.weightTons||res.totalWeight||0).toFixed(3)}
  </div>
  </td>
- <td className="px-5 py-3">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  <span
- className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType ==="НД" ?"text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10" :"text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10"} ml-auto md:ml-0 md:mx-auto`}
+ className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType ==="НД" ?"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:" :"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:"} ml-auto md:ml-0 md:mx-auto`}
  >
  {res.lengthType ==="НД"
  ?"НД"
  : `МД ${res.billetLength}`}
  </span>
  </td>
- <td className="px-5 py-3">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  <div className="text-center whitespace-nowrap">
  <span
  className={`font-bold text-red-500/80 block`}
@@ -1135,10 +1132,10 @@ export function SupplyCalcSection(props: any) {
  </span>
  </div>
  </td>
- <td className="px-5 py-3">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  <div className="text-center whitespace-nowrap">
  <span
- className={`font-bold text-sky-500/80 block`}
+ className={`font-bold text-slate-800 dark:text-slate-200/80 block`}
  >
  {(res.lengthType ==="НД" ||
  res.drawLength <= 0
@@ -1167,12 +1164,12 @@ export function SupplyCalcSection(props: any) {
  </span>
  </div>
  </td>
- <td className="px-5 py-3">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  <div
  className={`flex flex-col items-end md:items-center gap-1`}
  >
  <span
- className={`font-black text-[10px] ${res.remainingToProcess / res.totalWeight < 0.92 ?"text-red-500" :"text-amber-600"}`}
+ className={`font-black text-[10px] ${res.remainingToProcess / res.totalWeight < 0.92 ?"text-red-500" :"text-slate-800 dark:text-slate-200"}`}
  >
  {(
  res.remainingToProcess /
@@ -1300,8 +1297,8 @@ export function SupplyCalcSection(props: any) {
  }),
  );
  }}
- className={`px-2 py-0.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[9px] font-bold rounded-full shadow-sm shadow-emerald-500/20 active:scale-95 transition-all flex items-center gap-1`}
- title={`Улучшить КИМ до ${res.optimizedKim.toFixed(3)} используя L заг. ${res.optimizedBilletLength}`}
+ className={`px-2 py-0.5  hover: text-white text-[9px] font-bold rounded-full shadow-sm shadow-emerald-500/20 active:scale-95 transition-all flex items-center gap-1`}
+ title={`Улучшить КИМ до ${(res.weightTons||res.totalWeight||0).toFixed(3)} используя L заг. ${res.optimizedBilletLength}`}
  >
  <TrendingUp
  className={`w-2.5 h-2.5`}
@@ -1313,7 +1310,7 @@ export function SupplyCalcSection(props: any) {
  </td>
  {!isPurchasingMode && (
  <>
- <td className="px-5 py-3">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  <div
  className={`text-center font-medium text-slate-600 dark:text-slate-400 whitespace-nowrap`}
  >
@@ -1322,7 +1319,7 @@ export function SupplyCalcSection(props: any) {
  :"—"}
  </div>
  </td>
- <td className="px-5 py-3">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  <div
  className={`text-center font-bold text-slate-900 dark:text-white whitespace-nowrap`}
  >

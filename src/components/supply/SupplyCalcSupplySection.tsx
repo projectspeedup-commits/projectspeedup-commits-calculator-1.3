@@ -27,7 +27,7 @@ export function SupplyCalcSupplySection(props: any) {
  className={`bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-[32px] p-12 flex flex-col items-center justify-center min-h-[400px]`}
  >
  <div
- className={`w-20 h-20 bg-sky-50 dark:bg-sky-900/20 rounded-[30px] flex items-center justify-center text-sky-500 mb-6`}
+ className={`w-20 h-20  dark: rounded-[30px] flex items-center justify-center text-slate-800 dark:text-slate-200 mb-6`}
  >
  <Activity className={`w-10 h-10`} />
  </div>
@@ -59,8 +59,8 @@ export function SupplyCalcSupplySection(props: any) {
  Расчет с учетом поставок
  </h4>
  <div className="flex flex-wrap gap-2 sm:gap-4 w-full 2xl:w-auto">
- <div className="flex items-baseline justify-between sm:justify-start px-3 sm:px-4 py-2 text-sky-600 font-black bg-sky-50/80 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800/30 rounded-xl sm:rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
- <span className="text-[10px] sm:text-[11px] mr-2 uppercase font-bold text-sky-600/80 tracking-widest">
+ <div className="flex items-baseline justify-between sm:justify-start px-3 sm:px-4 py-2 text-slate-800 dark:text-slate-200 font-black  dark: border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+ <span className="text-[10px] sm:text-[11px] mr-2 uppercase font-bold text-slate-800 dark:text-slate-200/80 tracking-widest">
  Обеспечено плановыми поставками
  </span>
  <div>
@@ -69,22 +69,22 @@ export function SupplyCalcSupplySection(props: any) {
  3,
  )}
  </span>
- <span className="text-[9px] sm:text-[10px] ml-1 uppercase font-bold text-sky-600/70">
+ <span className="text-[9px] sm:text-[10px] ml-1 uppercase font-bold text-slate-800 dark:text-slate-200/70">
  тн
  </span>
  </div>
  </div>
- <div className="flex items-baseline justify-between sm:justify-start px-3 sm:px-4 py-2 text-rose-600 font-black bg-rose-50/80 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800/30 rounded-xl sm:rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
- <span className="text-[10px] sm:text-[11px] mr-2 uppercase font-bold text-rose-600/80 tracking-widest">
+ <div className="flex items-baseline justify-between sm:justify-start px-3 sm:px-4 py-2 text-slate-800 dark:text-slate-200 font-black  dark: border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+ <span className="text-[10px] sm:text-[11px] mr-2 uppercase font-bold text-slate-800 dark:text-slate-200/80 tracking-widest">
  Дефицит
  </span>
  <div>
  <span className="text-lg sm:text-xl tracking-tight leading-none">
- {supplyCalculationData.totals.deficit.toFixed(
+ {supplyCalculationData.totalWeight.toFixed(
  3,
  )}
  </span>
- <span className="text-[9px] sm:text-[10px] ml-1 uppercase font-bold text-rose-600/70">
+ <span className="text-[9px] sm:text-[10px] ml-1 uppercase font-bold text-slate-800 dark:text-slate-200/70">
  тн
  </span>
  </div>
@@ -111,7 +111,7 @@ export function SupplyCalcSupplySection(props: any) {
  0
  )
  return;
- const headers = ["Внутренняя нумерация","Дата отгрузки","№ Заказа","Клиент","Номенклатура","Профиль","Марка","Размер мм.","Длина","Кол-во тн в заказе","ИТОГО остаток к выполнению","Взято со склада (тн)","Тех. отходы склад г/к","Дел. Остатки склад г/к","КИМ склад г/к","ИТОГО ост. к завершению / после склада г/к","Номенклатура склад г/к","Профиль наличия","НТД","Марка наличия","Размер наличия","Длина (склад г/к)","Остаток на складе г/к. (тн)","Взято со склада г/к (тн)","Свободный остаток г/к склад (тн)","Тех. отходы / плановое поступление","Дел. Остатки / плановое поступление","КИМ / плановое поступление","ИТОГО остаток выполнения заказа после расчета / плановое поступление","Номенклатура / плановое поступление","Профиль / плановое поступление","Марка / плановое поступление","Размер / плановое поступление","Кол-во тн. / плановое поступление","Длина / плановое поступление","Дата размещения","Поставщик","Ожидаемая дата поставки","Входящий остаток / плановое поступление","Взято / плановое поступление","Свободный остаток / плановое поступление",
+ const headers = ["Внутренняя нумерация","Дата отгрузки","№ Заказа","Клиент","Номенклатура","Профиль","Марка","Размер","Длина","Кол-во тн в заказе","ИТОГО остаток к выполнению","Взято со склада (тн)","Тех. отходы склад г/к","Дел. Остатки склад г/к","КИМ склад г/к","ИТОГО ост. к завершению / после склада г/к","Номенклатура склад г/к","Профиль наличия","НТД","Марка наличия","Размер наличия","Длина (склад г/к)","Остаток на складе г/к. (тн)","Взято со склада г/к (тн)","Свободный остаток г/к склад (тн)","Тех. отходы / плановое поступление","Дел. Остатки / плановое поступление","КИМ / плановое поступление","ИТОГО остаток выполнения заказа после расчета / плановое поступление","Номенклатура / плановое поступление","Профиль / плановое поступление","Марка / плановое поступление","Размер / плановое поступление","Кол-во тн. / плановое поступление","Длина / плановое поступление","Дата размещения","Поставщик","Ожидаемая дата поставки","Входящий остаток / плановое поступление","Взято / плановое поступление","Свободный остаток / плановое поступление",
  ];
  const rows: string[][] = [];
  supplyCalculationData.matchedDemand.forEach(
@@ -140,19 +140,19 @@ export function SupplyCalcSupplySection(props: any) {
  res.allocatedFromStock > 0 &&
  res.combinedTechWaste2 > 0
  ? String(
- res.combinedTechWaste2.toFixed(3),
+ (res.weightTons||res.totalWeight||0).toFixed(3),
  ).replace(".",",")
  :"0",
  res.allocatedFromStock > 0 &&
  res.combinedUsefulRem2 > 0
  ? String(
- res.combinedUsefulRem2.toFixed(3),
+ (res.weightTons||res.totalWeight||0).toFixed(3),
  ).replace(".",",")
  :"0",
  res.allocatedFromStock > 0 &&
  res.combinedKim2 > 0
  ? String(
- res.combinedKim2.toFixed(3),
+ (res.weightTons||res.totalWeight||0).toFixed(3),
  ).replace(".",",")
  :"0",
  String(
@@ -175,19 +175,19 @@ export function SupplyCalcSupplySection(props: any) {
  res.allocatedFromSupply > 0 &&
  res.combinedTechWaste3 > 0
  ? String(
- res.combinedTechWaste3.toFixed(3),
+ (res.weightTons||res.totalWeight||0).toFixed(3),
  ).replace(".",",")
  :"0",
  res.allocatedFromSupply > 0 &&
  res.combinedUsefulRem3 > 0
  ? String(
- res.combinedUsefulRem3.toFixed(3),
+ (res.weightTons||res.totalWeight||0).toFixed(3),
  ).replace(".",",")
  :"0",
  res.allocatedFromSupply > 0 &&
  res.combinedKim3 > 0
  ? String(
- res.combinedKim3.toFixed(3),
+ (res.weightTons||res.totalWeight||0).toFixed(3),
  ).replace(".",",")
  :"0",
  String(res.finalShortage || 0).replace(".",",",
@@ -280,7 +280,7 @@ export function SupplyCalcSupplySection(props: any) {
  title="Скопировать для Excel"
  >
  {isCopied ? (
- <Check className="w-4 h-4 text-emerald-500" />
+ <Check className="w-4 h-4 text-slate-800 dark:text-slate-200" />
  ) : (
  <Copy className="w-4 h-4" />
  )}
@@ -292,7 +292,7 @@ export function SupplyCalcSupplySection(props: any) {
  0
  )
  return;
- const headers = ["Внутренняя нумерация","Дата отгрузки","№ Заказа","Клиент","Номенклатура","Профиль","Марка","Размер мм.","Длина","Кол-во тн в заказе","ИТОГО остаток к выполнению","Взято со склада (тн)","Тех. отходы склад г/к","Дел. Остатки склад г/к","КИМ склад г/к","ИТОГО ост. к завершению / после склада г/к","Номенклатура склад г/к","Профиль наличия","НТД","Марка наличия","Размер наличия","Длина (склад г/к)","Остаток на складе г/к. (тн)","Взято со склада г/к (тн)","Свободный остаток г/к склад (тн)","Тех. отходы / плановое поступление","Дел. Остатки / плановое поступление","КИМ / плановое поступление","ИТОГО остаток выполнения заказа после расчета / плановое поступление","Номенклатура / плановое поступление","Профиль / плановое поступление","Марка / плановое поступление","Размер / плановое поступление","Кол-во тн. / плановое поступление","Длина / плановое поступление","Дата размещения","Поставщик","Ожидаемая дата поставки","Входящий остаток / плановое поступление","Взято / плановое поступление","Свободный остаток / плановое поступление",
+ const headers = ["Внутренняя нумерация","Дата отгрузки","№ Заказа","Клиент","Номенклатура","Профиль","Марка","Размер","Длина","Кол-во тн в заказе","ИТОГО остаток к выполнению","Взято со склада (тн)","Тех. отходы склад г/к","Дел. Остатки склад г/к","КИМ склад г/к","ИТОГО ост. к завершению / после склада г/к","Номенклатура склад г/к","Профиль наличия","НТД","Марка наличия","Размер наличия","Длина (склад г/к)","Остаток на складе г/к. (тн)","Взято со склада г/к (тн)","Свободный остаток г/к склад (тн)","Тех. отходы / плановое поступление","Дел. Остатки / плановое поступление","КИМ / плановое поступление","ИТОГО остаток выполнения заказа после расчета / плановое поступление","Номенклатура / плановое поступление","Профиль / плановое поступление","Марка / плановое поступление","Размер / плановое поступление","Кол-во тн. / плановое поступление","Длина / плановое поступление","Дата размещения","Поставщик","Ожидаемая дата поставки","Входящий остаток / плановое поступление","Взято / плановое поступление","Свободный остаток / плановое поступление",
  ];
  const rows: any[][] = [];
  supplyCalculationData.matchedDemand.forEach(
@@ -316,18 +316,18 @@ export function SupplyCalcSupplySection(props: any) {
  res.allocatedFromStock > 0 &&
  res.combinedTechWaste2 > 0
  ? Number(
- res.combinedTechWaste2.toFixed(3),
+ (res.weightTons||res.totalWeight||0).toFixed(3),
  )
  : 0,
  res.allocatedFromStock > 0 &&
  res.combinedUsefulRem2 > 0
  ? Number(
- res.combinedUsefulRem2.toFixed(3),
+ (res.weightTons||res.totalWeight||0).toFixed(3),
  )
  : 0,
  res.allocatedFromStock > 0 &&
  res.combinedKim2 > 0
- ? Number(res.combinedKim2.toFixed(3))
+ ? Number((res.weightTons||res.totalWeight||0).toFixed(3))
  : 0,
  Number(res.shortageAfterStock || 0),
  ];
@@ -347,18 +347,18 @@ export function SupplyCalcSupplySection(props: any) {
  res.allocatedFromSupply > 0 &&
  res.combinedTechWaste3 > 0
  ? Number(
- res.combinedTechWaste3.toFixed(3),
+ (res.weightTons||res.totalWeight||0).toFixed(3),
  )
  : 0,
  res.allocatedFromSupply > 0 &&
  res.combinedUsefulRem3 > 0
  ? Number(
- res.combinedUsefulRem3.toFixed(3),
+ (res.weightTons||res.totalWeight||0).toFixed(3),
  )
  : 0,
  res.allocatedFromSupply > 0 &&
  res.combinedKim3 > 0
- ? Number(res.combinedKim3.toFixed(3))
+ ? Number((res.weightTons||res.totalWeight||0).toFixed(3))
  : 0,
  Number(res.finalShortage || 0),
  ];
@@ -471,7 +471,7 @@ export function SupplyCalcSupplySection(props: any) {
  getTimestampedFilename("Заявка на обеспечение"),
  );
  }}
- className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
+ className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl  dark: text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 transition-colors border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800 hover: dark:hover:"
  title="Скачать в Excel"
  >
  <Download className="w-4 h-4" />
@@ -484,150 +484,150 @@ export function SupplyCalcSupplySection(props: any) {
  onMouseLeave={handleMouseLeaveOrUp}
  onMouseUp={handleMouseLeaveOrUp}
  onMouseMove={handleMouseMove}
- className={`overflow-x-auto overflow-y-auto max-h-[600px] custom-scrollbar ${isSupplyDragging ?"select-none cursor-grabbing" :"cursor-grab"}`}
+ className={`overflow-auto max-h-[calc(100vh-350px)] custom-scrollbar ${isSupplyDragging ?"select-none cursor-grabbing" :"cursor-grab"}`}
  >
- <table className="w-full text-left border-separate border-spacing-0">
- <thead className="bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 z-20 shadow-sm shadow-slate-200 dark:shadow-slate-800 outline outline-1 outline-slate-200 dark:outline-slate-800 [&_th]:bg-[#F8FAFC] dark:[&_th]:bg-[#1A1C19]">
- <tr>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+ <table className="w-full text-left border-collapse text-xs whitespace-nowrap text-slate-800 dark:text-slate-200">
+ <thead>
+ <tr className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 group">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Внутренняя нумерация
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Дата отгрузки
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  № Заказа
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Клиент
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap border-r border-slate-200 dark:border-slate-700">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Номенклатура
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Профиль
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Марка
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
- Размер мм.
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
+ Размер
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Длина
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Кол-во тн в заказе
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-sky-600 uppercase tracking-widest whitespace-nowrap border-r border-slate-200 dark:border-slate-700">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  ИТОГО остаток к выполнению
  </th>
 
- <th className="px-5 py-4 text-center text-[10px] font-bold text-emerald-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Взято со склада (тн)
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-amber-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Тех. отходы склад г/к
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-amber-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Дел. Остатки склад г/к
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-amber-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  КИМ склад г/к
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-rose-500 uppercase tracking-widest whitespace-nowrap border-r border-slate-200 dark:border-slate-700">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  ИТОГО ост. к завершению /<br />
  после склада г/к
  </th>
 
- <th className="px-5 py-4 text-left text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Номенклатура склад г/к
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Профиль наличия
  </th>
- <th className="px-5 py-4 text-left text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  НТД
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Марка наличия
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Размер наличия
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Длина (склад г/к)
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Остаток на складе г/к. (тн)
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-emerald-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Взято со склада г/к (тн)
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-sky-500 uppercase tracking-widest whitespace-nowrap border-r border-slate-200 dark:border-slate-700">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Свободный остаток г/к склад (тн)
  </th>
 
- <th className="px-5 py-4 text-center text-[10px] font-bold text-amber-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Тех. отходы /<br />
  плановое поступление
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-amber-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Дел. Остатки /<br />
  плановое поступление
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-amber-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  КИМ /<br />
  плановое поступление
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-rose-500 uppercase tracking-widest whitespace-nowrap border-r border-slate-200 dark:border-slate-700">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  ИТОГО остаток выполнения заказа после расчета
  /<br />
  плановое поступление
  </th>
 
- <th className="px-5 py-4 text-left text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Номенклатура /<br />
  плановое поступление
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Профиль /<br />
  плановое поступление
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Марка /<br />
  плановое поступление
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Размер /<br />
  плановое поступление
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Кол-во тн. /<br />
  плановое поступление
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Длина /<br />
  плановое поступление
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Дата размещения
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Поставщик
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Ожидаемая дата поставки
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap border-l border-slate-100 dark:border-slate-800">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Входящий остаток /<br />
  плановое поступление
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-emerald-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Взято /<br />
  плановое поступление
  </th>
- <th className="px-5 py-4 text-center text-[10px] font-bold text-sky-500 uppercase tracking-widest whitespace-nowrap">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Свободный остаток /<br />
  плановое поступление
  </th>
@@ -670,40 +670,22 @@ export function SupplyCalcSupplySection(props: any) {
  const isSubRow = i > 0;
 
  renderRows.push(
- <tr
- key={`${res._dId}-${i}`}
- className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors"
- >
+ <tr className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors group" key={Math.random()}>
  {!isSubRow && (
  <>
- <td
- className={`px-5 py-3 align-middle whitespace-nowrap text-center text-slate-600 dark:text-slate-400`}
- rowSpan={maxRows}
- >
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
  {res.internalNo ||""}
  </td>
- <td
- className={`px-5 py-3 align-middle whitespace-nowrap text-center text-slate-600 dark:text-slate-400`}
- rowSpan={maxRows}
- >
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
  {res.shippingDate}
  </td>
- <td
- className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-slate-600 dark:text-slate-400`}
- rowSpan={maxRows}
- >
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
  {res.orderNo}
  </td>
- <td
- className={`px-5 py-3 align-middle text-center font-medium text-slate-800 dark:text-slate-200 whitespace-nowrap`}
- rowSpan={maxRows}
- >
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
  {res.client}
  </td>
- <td
- className={`px-5 py-3 align-middle text-center max-w-[200px] border-r border-slate-100 dark:border-slate-800`}
- rowSpan={maxRows}
- >
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
  <div
  className="max-w-[150px] mx-auto truncate font-mono text-[10px] text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors"
  title={res.nomenclature}
@@ -711,25 +693,16 @@ export function SupplyCalcSupplySection(props: any) {
  {res.nomenclature}
  </div>
  </td>
- <td
- className={`px-5 py-3 align-middle whitespace-nowrap text-center`}
- rowSpan={maxRows}
- >
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
  <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
  {res.type}
  </span>
  </td>
- <td
- className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-slate-700 dark:text-slate-200`}
- rowSpan={maxRows}
- >
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
  {res.grade}
  </td>
- <td
- className={`px-5 py-3 align-middle whitespace-nowrap text-center`}
- rowSpan={maxRows}
- >
- <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
+ <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded">
  {parseFloat(
  Number(res.diameter).toFixed(
  2,
@@ -737,32 +710,23 @@ export function SupplyCalcSupplySection(props: any) {
  )}
  </span>
  </td>
- <td
- className={`px-5 py-3 align-middle whitespace-nowrap text-center`}
- rowSpan={maxRows}
- >
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
  <span
- className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType ==="НД" ?"text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10" :"text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10"}`}
+ className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType ==="НД" ?"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:" :"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:"}`}
  >
  {res.lengthType ==="НД"
  ?"НД"
  : `МД ${res.length}`}
  </span>
  </td>
- <td
- className={`px-5 py-3 align-middle whitespace-nowrap text-center font-black text-slate-900 dark:text-white`}
- rowSpan={maxRows}
- >
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
  {res.weightTons
  ? Number(
  res.weightTons,
  ).toFixed(3)
  :"0.000"}
  </td>
- <td
- className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-sky-600 dark:text-sky-400 border-r border-slate-100 dark:border-slate-800`}
- rowSpan={maxRows}
- >
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
  {res.remainingToProcess
  ? Number(
  res.remainingToProcess,
@@ -770,53 +734,42 @@ export function SupplyCalcSupplySection(props: any) {
  :"0.000"}
  </td>
 
- <td
- className={`px-5 py-3 align-middle whitespace-nowrap text-center font-black ${res.allocatedFromStock > 0 ?"text-emerald-600 dark:text-emerald-500" :"text-slate-400"}`}
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center"
  rowSpan={maxRows}
  >
  {res.allocatedFromStock > 0
- ? res.allocatedFromStock.toFixed(
+ ? (res.weightTons||res.totalWeight||0).toFixed(
  3,
  )
  :"0.000"}
  </td>
- <td
- className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-amber-600`}
- rowSpan={maxRows}
- >
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
  {res.allocatedFromStock > 0 &&
  res.combinedTechWaste2 > 0
- ? res.combinedTechWaste2.toFixed(
+ ? (res.weightTons||res.totalWeight||0).toFixed(
  3,
  )
  :"0.000"}
  </td>
- <td
- className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-amber-600`}
- rowSpan={maxRows}
- >
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
  {res.allocatedFromStock > 0 &&
  res.combinedUsefulRem2 > 0
- ? res.combinedUsefulRem2.toFixed(
+ ? (res.weightTons||res.totalWeight||0).toFixed(
  3,
  )
  :"0.000"}
  </td>
- <td
- className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-amber-600`}
- rowSpan={maxRows}
- >
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
  {res.allocatedFromStock > 0 &&
  res.combinedKim2 > 0
- ? res.combinedKim2.toFixed(3)
+ ? (res.weightTons||res.totalWeight||0).toFixed(3)
  :"0.000"}
  </td>
- <td
- className={`px-5 py-3 align-middle whitespace-nowrap text-center font-black border-r border-slate-100 dark:border-slate-800 ${res.shortageAfterStock > 0.0005 ?"text-rose-600 dark:text-rose-500" :"text-slate-400"}`}
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center"
  rowSpan={maxRows}
  >
  {res.shortageAfterStock > 0
- ? res.shortageAfterStock.toFixed(
+ ? (res.weightTons||res.totalWeight||0).toFixed(
  3,
  )
  :"0.000"}
@@ -825,7 +778,7 @@ export function SupplyCalcSupplySection(props: any) {
  )}
 
  {/* Stock Item details (per row) */}
- <td className="px-5 py-3 align-middle whitespace-nowrap text-left text-slate-500">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  {stockItem ? (
  <div
  className="max-w-[150px] truncate font-medium text-[10px]"
@@ -842,7 +795,7 @@ export function SupplyCalcSupplySection(props: any) {
  ) : (""
  )}
  </td>
- <td className="px-5 py-3 align-middle whitespace-nowrap text-center text-slate-500">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  {stockItem && stockItem["Профиль"] ? (
  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-100 dark:bg-slate-800">
  {stockItem["Профиль"]}
@@ -850,49 +803,49 @@ export function SupplyCalcSupplySection(props: any) {
  ) : (""
  )}
  </td>
- <td className="px-5 py-3 align-middle whitespace-nowrap text-left text-slate-500 font-mono text-[9px]">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  {stockItem
  ? stockItem["НТД"] ||""
  :""}
  </td>
- <td className="px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-slate-500">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  {stockItem
  ? stockItem["Марка стали"] ||""
  :""}
  </td>
- <td className="px-5 py-3 align-middle whitespace-nowrap text-center">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  {stockItem && stockItem["Размер"] ? (
- <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded">
+ <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded">
  {stockItem["Размер"]}
  </span>
  ) : (""
  )}
  </td>
- <td className="px-5 py-3 align-middle whitespace-nowrap text-center">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  {stockItem && stockItem["Длина"] ? (
  <span
- className={`inline-flex items-center px-2 py-1 rounded-md text-[9px] font-bold ${stockItem["Длина"] ==="НД" ?"text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10" :"text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10"}`}
+ className={`inline-flex items-center px-2 py-1 rounded-md text-[9px] font-bold ${stockItem["Длина"] ==="НД" ?"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:" :"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:"}`}
  >
  {stockItem["Длина"]}
  </span>
  ) : (""
  )}
  </td>
- <td className="px-5 py-3 align-middle whitespace-nowrap text-center font-black text-slate-400">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  {stockItem
  ? Number(
  stockItem.stockBeforeTaking,
  ).toFixed(3)
  :""}
  </td>
- <td className="px-5 py-3 align-middle whitespace-nowrap text-center font-black text-emerald-600 dark:text-emerald-500">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  {stockItem
  ? Number(
  stockItem.allocatedAmount,
  ).toFixed(3)
  :""}
  </td>
- <td className="px-5 py-3 align-middle whitespace-nowrap text-center font-black text-sky-500 border-r border-slate-100 dark:border-slate-800">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  {stockItem
  ? Number(
  stockItem.stockAfterTaking,
@@ -903,50 +856,40 @@ export function SupplyCalcSupplySection(props: any) {
  {/* Supply general metrics (rowSpan) */}
  {!isSubRow && (
  <>
- <td
- className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-amber-600`}
- rowSpan={maxRows}
- >
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
  {res.allocatedFromSupply > 0 &&
  res.combinedTechWaste3 > 0
- ? res.combinedTechWaste3.toFixed(
+ ? (res.weightTons||res.totalWeight||0).toFixed(
  3,
  )
  :"0.000"}
  </td>
- <td
- className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-amber-600`}
- rowSpan={maxRows}
- >
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
  {res.allocatedFromSupply > 0 &&
  res.combinedUsefulRem3 > 0
- ? res.combinedUsefulRem3.toFixed(
+ ? (res.weightTons||res.totalWeight||0).toFixed(
  3,
  )
  :"0.000"}
  </td>
- <td
- className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-amber-600`}
- rowSpan={maxRows}
- >
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
  {res.allocatedFromSupply > 0 &&
  res.combinedKim3 > 0
- ? res.combinedKim3.toFixed(3)
+ ? (res.weightTons||res.totalWeight||0).toFixed(3)
  :"0.000"}
  </td>
- <td
- className={`px-5 py-3 align-middle whitespace-nowrap text-center font-black border-r border-slate-100 dark:border-slate-800 ${res.finalShortage > 0.0005 ?"text-rose-600 dark:text-rose-500" :"text-slate-400"}`}
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center"
  rowSpan={maxRows}
  >
  {res.finalShortage > 0
- ? res.finalShortage.toFixed(3)
+ ? (res.weightTons||res.totalWeight||0).toFixed(3)
  :"0.000"}
  </td>
  </>
  )}
 
  {/* Supply Item details (per row) */}
- <td className="px-5 py-3 align-middle whitespace-nowrap text-left text-slate-500">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  {supplyItem ? (
  <div
  className="max-w-[150px] truncate font-medium text-[10px]"
@@ -961,7 +904,7 @@ export function SupplyCalcSupplySection(props: any) {
  ) : (""
  )}
  </td>
- <td className="px-5 py-3 align-middle whitespace-nowrap text-center text-slate-500">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  {supplyItem &&
  supplyItem["Профиль"] ? (
  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-100 dark:bg-slate-800">
@@ -970,70 +913,70 @@ export function SupplyCalcSupplySection(props: any) {
  ) : (""
  )}
  </td>
- <td className="px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-slate-500">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  {supplyItem
  ? supplyItem["Марка стали"] ||""
  :""}
  </td>
- <td className="px-5 py-3 align-middle whitespace-nowrap text-center">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  {supplyItem &&
  supplyItem["Размер"] ? (
- <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded">
+ <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded">
  {supplyItem["Размер"]}
  </span>
  ) : (""
  )}
  </td>
- <td className="px-5 py-3 align-middle whitespace-nowrap text-center font-black text-slate-400">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  {supplyItem
  ? Number(
  supplyItem.allocatedAmount,
  ).toFixed(3)
  :""}
  </td>
- <td className="px-5 py-3 align-middle whitespace-nowrap text-center">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  {supplyItem && supplyItem["Длина"] ? (
  <span
- className={`inline-flex items-center px-2 py-1 rounded-md text-[9px] font-bold ${supplyItem["Длина"] ==="НД" ?"text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10" :"text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10"}`}
+ className={`inline-flex items-center px-2 py-1 rounded-md text-[9px] font-bold ${supplyItem["Длина"] ==="НД" ?"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:" :"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:"}`}
  >
  {supplyItem["Длина"]}
  </span>
  ) : (""
  )}
  </td>
- <td className="px-5 py-3 align-middle whitespace-nowrap text-center text-slate-500 font-mono text-[9px]">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  {supplyItem
  ? supplyItem["Дата размещения"] ||""
  :""}
  </td>
- <td className="px-5 py-3 align-middle whitespace-nowrap text-center text-slate-500 font-medium text-[9px] truncate max-w-[120px]">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  {supplyItem
  ? supplyItem["Поставщик"] ||
  supplyItem["ПОСТАВЩИК"] ||""
  :""}
  </td>
- <td className="px-5 py-3 align-middle whitespace-nowrap text-center text-slate-500 font-mono text-[9px] font-bold">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  {supplyItem
  ? supplyItem["Ожидаемая дата поставки"
  ] ||
  supplyItem["ПОСТАВКА"] ||""
  :""}
  </td>
- <td className="px-5 py-3 align-middle whitespace-nowrap text-center font-black text-slate-400 border-l border-slate-100 dark:border-slate-800">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  {supplyItem
  ? Number(
  supplyItem.stockBeforeTaking,
  ).toFixed(3)
  :""}
  </td>
- <td className="px-5 py-3 align-middle whitespace-nowrap text-center font-black text-emerald-600 dark:text-emerald-500">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  {supplyItem
  ? Number(
  supplyItem.allocatedAmount,
  ).toFixed(3)
  :""}
  </td>
- <td className="px-5 py-3 align-middle whitespace-nowrap text-center font-black text-sky-500">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  {supplyItem
  ? Number(
  supplyItem.stockAfterTaking,

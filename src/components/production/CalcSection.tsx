@@ -37,9 +37,9 @@ export function CalcSection({
         className="flex flex-col items-center justify-center py-24 bg-slate-50 dark:bg-slate-900/40 rounded-[40px] border border-dashed border-slate-200 dark:border-slate-800"
       >
         <div className="relative w-24 h-24 mb-6">
-          <div className="absolute inset-0 bg-blue-100 dark:bg-blue-900/30 rounded-3xl rotate-6 mix-blend-multiply opacity-50"></div>
+          <div className="absolute inset-0  dark: rounded-3xl rotate-6 mix-blend-multiply opacity-50"></div>
           <div className="absolute inset-0 bg-white dark:bg-[#1A1C19] rounded-3xl -rotate-3 border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-lg">
-            <FolderSearch className="w-10 h-10 text-blue-500" />
+            <FolderSearch className="w-10 h-10 text-slate-800 dark:text-slate-200" />
           </div>
         </div>
         <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2 uppercase tracking-tight">
@@ -68,7 +68,7 @@ export function CalcSection({
 
         {isProcessing && (
           <div className="mt-8 flex items-center gap-3 h-12 px-8 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-2xl font-black text-xs shadow-sm border border-slate-200 dark:border-slate-700 uppercase tracking-widest">
-            <div className="w-4 h-4 border-2 border-sky-500/30 border-t-sky-500 rounded-full animate-spin"></div>
+            <div className="w-4 h-4 border-2 border-slate-200 dark:border-slate-800 border-t-sky-500 rounded-full animate-spin"></div>
             Расчёт в процессе...
           </div>
         )}
@@ -93,11 +93,11 @@ export function CalcSection({
               <h4 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-tight leading-tight shrink-0">
                 Портфель заказов
               </h4>
-              <div className="flex items-center gap-3 bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-xl border border-blue-100 dark:border-blue-900/30">
-                <span className="text-[9px] text-blue-600/70 dark:text-blue-400 font-black uppercase tracking-widest">
+              <div className="flex items-center gap-3  dark: px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800">
+                <span className="text-[9px] text-slate-800 dark:text-slate-200/70 dark:text-slate-800 dark:text-slate-200 font-black uppercase tracking-widest">
                   Остаток выполнения
                 </span>
-                <span className="text-xl font-black text-blue-600 dark:text-blue-400 flex items-baseline gap-1">
+                <span className="text-xl font-black text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 flex items-baseline gap-1">
                   {totalRemaining.toFixed(3)}
                   <span className="text-[10px] font-black opacity-70">ТН</span>
                 </span>
@@ -109,9 +109,9 @@ export function CalcSection({
                 variant={copySuccess ? "success" : "secondary"}
                 size="sm"
                 onClick={() => {
-                  const headers = ["Внутренний №", "Дата Заказа", "№ Заказа", "Клиент", "Номенклатура", "Профиль", "Марка", "Размер мм.", "Длина", "Кол-во тн в заказе", "Остаток выполнения"];
+                  const headers = ["Внутренний №", "Дата Заказа", "№ Заказа", "Клиент", "Номенклатура", "Профиль", "Марка", "Размер", "Длина", "Кол-во тн в заказе", "Остаток выполнения"];
                   const rows = calculationResults.map((res: any) => [
-                    res.internalNo || "", res.shippingDate || "", res.orderNo || "", res.client || "", res.nomenclature || "", res.type || "", res.grade || "", Number(res.diameter) || 0, res.lengthType === "НД" ? "НД" : `МД ${res.length}`, Number(res.weightTons || 0), Number(res.remainingToProcess.toFixed(3)),
+                    res.internalNo || "", res.shippingDate || "", res.orderNo || "", res.client || "", res.nomenclature || "", res.type || "", res.grade || "", Number(res.diameter) || 0, res.lengthType === "НД" ? "НД" : `МД ${res.length}`, Number(res.weightTons || 0), Number((res.remainingToProcess || 0).toFixed(3)),
                   ]);
                   const tsv = [headers, ...rows].map(row => row.join("\t")).join("\n");
                   navigator.clipboard.writeText(tsv);
@@ -129,9 +129,9 @@ export function CalcSection({
                 variant="success"
                 size="sm"
                 onClick={() => {
-                  const headers = ["Внутренний №", "Дата Заказа", "№ Заказа", "Клиент", "Номенклатура", "Профиль", "Марка", "Размер мм.", "Длина", "Кол-во тн в заказе", "Остаток выполнения"];
+                  const headers = ["Внутренний №", "Дата Заказа", "№ Заказа", "Клиент", "Номенклатура", "Профиль", "Марка", "Размер", "Длина", "Кол-во тн в заказе", "Остаток выполнения"];
                   const rows = calculationResults.map((res: any) => [
-                    res.internalNo || "", res.shippingDate || "", res.orderNo || "", res.client || "", res.nomenclature || "", res.type || "", res.grade || "", String(res.diameter).replace(".", ","), res.lengthType === "НД" ? "НД" : `МД ${res.length}`, String(res.weightTons).replace(".", ","), String(res.remainingToProcess.toFixed(3)).replace(".", ","),
+                    res.internalNo || "", res.shippingDate || "", res.orderNo || "", res.client || "", res.nomenclature || "", res.type || "", res.grade || "", String(res.diameter).replace(".", ","), res.lengthType === "НД" ? "НД" : `МД ${res.length}`, String(res.weightTons).replace(".", ","), String((res.remainingToProcess || 0).toFixed(3)).replace(".", ","),
                   ]);
                   const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
                   const workbook = XLSX.utils.book_new();
@@ -155,54 +155,51 @@ export function CalcSection({
           onMouseMove={handleMouseMove}
           className={`overflow-auto max-h-[calc(100vh-350px)] custom-scrollbar relative ${isDragging ? "select-none cursor-grabbing" : "cursor-grab"}`}
         >
-          <table className="w-full border-separate border-spacing-0">
-            <thead className="sticky top-0 z-20">
-              <tr className="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
-                <th className="px-5 py-4 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">Внутр. №</th>
-                <th className="px-5 py-4 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">Дата</th>
-                <th className="px-5 py-4 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">№ Заказа</th>
-                <th className="px-5 py-4 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">Клиент</th>
-                <th className="px-5 py-4 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">Номенклатура</th>
-                <th className="px-5 py-4 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">Профиль</th>
-                <th className="px-5 py-4 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">Марка</th>
-                <th className="px-5 py-4 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">Размер</th>
-                <th className="px-5 py-4 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">Длина</th>
-                <th className="px-5 py-4 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">План (тн)</th>
-                <th className="px-5 py-4 text-center text-[10px] font-black text-blue-600 uppercase tracking-widest whitespace-nowrap">Остаток выполнения</th>
+          <table className="w-full text-left border-collapse text-xs whitespace-nowrap text-slate-800 dark:text-slate-200">
+            <thead>
+              <tr className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 group">
+                <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10"  style={{ width: "8rem" }}>Внутр. №</th>
+                <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >Дата</th>
+                <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >№ Заказа</th>
+                <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >Клиент</th>
+                <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10"  style={{ width: '12rem', maxWidth: '12rem', minWidth: '12rem' }}>Номенклатура</th>
+                <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >Профиль</th>
+                <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >Марка</th>
+                <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >Размер</th>
+                <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >Длина</th>
+                <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >План (тн)</th>
+                <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >Остаток выполнения</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-              {calculationResults.map((res: any) => (
-                <tr
-                  key={res.id}
-                  className="hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors group"
-                >
-                  <td className="px-5 py-3 text-center font-bold text-slate-400 text-[10px]">{res.internalNo}</td>
-                  <td className="px-5 py-3 text-center font-bold text-slate-500 text-[10px] whitespace-nowrap">{res.shippingDate}</td>
-                  <td className="px-5 py-3 text-center font-black text-slate-700 dark:text-slate-300 text-[11px] whitespace-nowrap">{res.orderNo}</td>
-                  <td className="px-5 py-3 text-center font-bold text-slate-800 dark:text-slate-200 text-[11px] whitespace-nowrap">{res.client}</td>
-                  <td className="px-5 py-3 max-w-[150px]">
+              {calculationResults.map((res: any, i: number) => (
+                <tr key={i} className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors group">
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >{res.internalNo}</td>
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >{res.shippingDate}</td>
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >{res.orderNo}</td>
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >{res.client}</td>
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
                     <div className="truncate font-mono text-[10px] text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors text-center" title={res.nomenclature}>
                       {res.nomenclature}
                     </div>
                   </td>
-                  <td className="px-5 py-3 text-center">
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
                     <Badge variant="outline" className="font-bold border-slate-200">{res.type}</Badge>
                   </td>
-                  <td className="px-5 py-3 text-center font-black text-slate-700 dark:text-slate-200 text-[11px] italic">{res.grade}</td>
-                  <td className="px-5 py-3 text-center">
-                    <span className="font-mono font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-100/50">
-                      Ø {parseFloat(res.diameter.toFixed(2))}
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >{res.grade}</td>
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
+                    <span className="font-mono font-black text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark: px-2 py-0.5 rounded border border-slate-200 dark:border-slate-800">
+                      {parseFloat(Number(res.diameter || 0).toFixed(2))}
                     </span>
                   </td>
-                  <td className="px-5 py-3 text-center">
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
                     <Badge variant={res.lengthType === "НД" ? "info" : "secondary"}>
                       {res.lengthType === "НД" ? "НД" : `МД ${res.length}`}
                     </Badge>
                   </td>
-                  <td className="px-5 py-3 text-center font-black text-slate-900 dark:text-white text-[11px]">{res.weightTons.toFixed(3)}</td>
-                  <td className="px-5 py-3 text-center bg-blue-50/30 dark:bg-blue-900/10 font-black text-blue-600 dark:text-blue-400 text-sm">
-                    {res.remainingToProcess.toFixed(3)}
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >{(res.weightTons || 0).toFixed(3)}</td>
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
+                    {(res.remainingToProcess || 0).toFixed(3)}
                   </td>
                 </tr>
               ))}

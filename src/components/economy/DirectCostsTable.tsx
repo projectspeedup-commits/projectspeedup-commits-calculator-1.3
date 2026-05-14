@@ -28,13 +28,13 @@ export const DirectCostsTable: React.FC<DirectCostsTableProps> = ({
         }
       >
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left border-collapse text-xs whitespace-nowrap text-slate-800 dark:text-slate-200">
             <thead className="bg-slate-50 dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-800">
               <tr>
-                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-left text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle">
                   Статья расходов
                 </th>
-                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">
+                <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-right text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle">
                   Норма на тн ( ₽ )
                 </th>
               </tr>
@@ -45,12 +45,12 @@ export const DirectCostsTable: React.FC<DirectCostsTableProps> = ({
                   key={item.id}
                   className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors"
                 >
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left">
                     <span className="text-sm font-bold text-slate-700 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
                       {item.name}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left">
                     <div className="w-full max-w-[160px] ml-auto">
                       <PriceInput
                         compact

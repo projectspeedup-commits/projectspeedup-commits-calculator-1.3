@@ -24,7 +24,7 @@ export function SupplyStockSection(props: any) {
  >
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-[#1A1C19] p-6 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-sm">
  <div className="flex items-center gap-4">
- <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+ <div className="w-12 h-12  dark: rounded-2xl flex items-center justify-center text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200">
  <Layers className="w-6 h-6" />
  </div>
  <div>
@@ -36,7 +36,7 @@ export function SupplyStockSection(props: any) {
  Обнаружено {processedStock.length} позиций
  </span>
  <span className="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700"></span>
- <span className="text-emerald-600 dark:text-emerald-400 font-black">
+ <span className="text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-black">
  Итого:{""}
  {processedStock
  .reduce(
@@ -53,7 +53,7 @@ export function SupplyStockSection(props: any) {
  тн.
  </span>
  <span className="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700"></span>
- <span className="text-amber-600 dark:text-amber-400 font-black">
+ <span className="text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-black">
  Тех. отходы:{""}
  {processedStock
  .reduce(
@@ -68,7 +68,7 @@ export function SupplyStockSection(props: any) {
  тн.
  </span>
  <span className="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700"></span>
- <span className="text-blue-600 dark:text-blue-400 font-black">
+ <span className="text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-black">
  Деловые остатки:{""}
  {processedStock
  .reduce(
@@ -92,14 +92,14 @@ export function SupplyStockSection(props: any) {
  title="Скопировать для Excel"
  >
  {isCopied ? (
- <Check className="w-4 h-4 text-emerald-500" />
+ <Check className="w-4 h-4 text-slate-800 dark:text-slate-200" />
  ) : (
  <Copy className="w-4 h-4" />
  )}
  </button>
  <button
  onClick={handleExportStock}
- className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30"
+ className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl  dark: text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 transition-colors border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800 hover: dark:hover:"
  title="Скачать в Excel"
  >
  <Download className="w-4 h-4" />
@@ -116,64 +116,61 @@ export function SupplyStockSection(props: any) {
  onMouseMove={handleMouseMove}
  className={`overflow-auto custom-scrollbar max-h-[calc(100vh-300px)] min-h-[400px] relative ${isStockDragging ?"select-none cursor-grabbing" :"cursor-grab"}`}
  >
- <table className="w-full text-left border-separate border-spacing-0">
- <thead className="text-[10px] uppercase font-black tracking-widest text-slate-400 dark:text-slate-500 bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 z-20 shadow-sm outline outline-1 outline-slate-200 dark:outline-slate-800">
- <tr>
- <th className="px-8 py-5 bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">
+ <table className="w-full text-left border-collapse text-xs whitespace-nowrap text-slate-800 dark:text-slate-200">
+ <thead>
+ <tr className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 group">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Номенклатура
  </th>
- <th className="px-6 py-5 bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Профиль
  </th>
- <th className="px-6 py-5 text-center bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Сталь
  </th>
- <th className="px-6 py-5 text-center bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Размер
  </th>
- <th className="px-6 py-5 text-center bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Длина
  </th>
- <th className="px-8 py-5 text-right bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Тн.
  </th>
  </tr>
  </thead>
  <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50 text-[11px] font-medium text-slate-600 dark:text-slate-300 -row-group">
  {processedStock.map((row, i) => (
- <tr
- key={i}
- className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group"
- >
- <td className="px-8 py-3 text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+ <tr key={i} className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors group">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  <div
- className="max-w-[200px] md:max-w-[300px] truncate font-mono text-[10px] text-right md:text-left"
+ className="max-w-[12rem] md:max-w-[300px] truncate font-mono text-[10px] text-right md:text-left"
  title={row["Исходная Номенклатура"]}
  >
  {row["Исходная Номенклатура"]}
  </div>
  </td>
- <td className="px-6 py-3">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  <span className="inline-flex items-center px-3 py-1.5 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
  {row["Профиль"]}
  </span>
  </td>
- <td className="px-6 py-3 text-center font-bold text-slate-700 dark:text-slate-200">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  <span>{row["Марка стали"]}</span>
  </td>
- <td className="px-6 py-3 text-center">
- <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 rounded">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
+ <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-3 py-1 rounded">
  {row["Размер"]}
  </span>
  </td>
- <td className="px-6 py-3 text-center">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  <span
- className={`inline-flex items-center px-3 py-1.5 rounded-md text-[10px] font-bold ${row["Длина"] ==="НД" ?"text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10" :"text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10"}`}
+ className={`inline-flex items-center px-3 py-1.5 rounded-md text-[10px] font-bold ${row["Длина"] ==="НД" ?"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:" :"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:"}`}
  >
  {row["Длина"]}
  </span>
  </td>
- <td className="px-8 py-3 text-center">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  <div>
  <span className="text-slate-900 dark:text-white font-black text-xs">
  {row["Конечный остаток тн."]}

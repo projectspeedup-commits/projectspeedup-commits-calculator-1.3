@@ -44,16 +44,16 @@ export const PricingTable: React.FC<PricingTableProps> = ({
       }
     >
       <div className="overflow-x-auto max-h-[60vh] custom-scrollbar">
-        <table className="w-full text-left border-collapse">
+        <table className="w-full text-left border-collapse text-xs whitespace-nowrap text-slate-800 dark:text-slate-200">
           <thead className="sticky top-0 z-20 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
             <tr>
-              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-left text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle">
                 Марка стали
               </th>
-              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">
+              <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-right text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle">
                 Цена (₽ / тн)
               </th>
-              <th className="px-6 py-4 w-16"></th>
+              <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-right text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle w-16"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -64,12 +64,12 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                   key={grade}
                   className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors"
                 >
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left">
                     <span className="text-sm font-bold text-slate-900 dark:text-slate-100">
                       {grade}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left">
                     <div className="w-full max-w-[140px] ml-auto">
                       <PriceInput
                         compact
@@ -82,7 +82,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                       />
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-right">
                     <Button
                       variant="ghost"
                       size="sm"

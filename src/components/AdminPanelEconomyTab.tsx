@@ -9,6 +9,7 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Info, Check, Search, Plus } from 'lucide-react';
 import { DirectCostsTable } from './economy/DirectCostsTable';
+import { OverheadCostsTable } from './economy/OverheadCostsTable';
 import { PricingTable } from './economy/PricingTable';
 import { BasePricesSection } from './economy/BasePricesSection';
 import { SteelGradesTable } from './economy/SteelGradesTable';
@@ -38,6 +39,7 @@ export default function AdminPanelEconomyTab({
   const [gradeSearch, setGradeSearch] = useState("");
   const filteredGrades = allGrades.filter((g: string) => g.toLowerCase().includes(gradeSearch.toLowerCase()));
   const directItems = store.economyItems.filter((i: any) => i.category === "direct");
+  const overheadItems = store.economyItems.filter((i: any) => i.category === "overhead");
   
   const [newGrade, setNewGrade] = useState("");
 
@@ -139,6 +141,7 @@ export default function AdminPanelEconomyTab({
             transition={{ duration: 0.2 }}
           >
             <DirectCostsTable directItems={directItems} handleEconomyChange={store.updateEconomyItem} />
+            <OverheadCostsTable overheadItems={overheadItems} handleEconomyChange={store.updateEconomyItem} />
           </motion.div>
         )}
 

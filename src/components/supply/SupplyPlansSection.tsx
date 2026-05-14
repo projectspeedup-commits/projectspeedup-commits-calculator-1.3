@@ -29,10 +29,10 @@ export function SupplyPlansSection(props: any) {
  Планы поставок сырья
  </h4>
  <div className="flex items-center gap-2">
- <span className="text-[10px] font-medium bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-300 px-2.5 py-1 rounded-full">
+ <span className="text-[10px] font-medium  dark: text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 px-2.5 py-1 rounded-full">
  {processedSupplyPlans.length} позиций
  </span>
- <span className="text-[10px] font-bold bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-300 px-2.5 py-1 rounded-full">
+ <span className="text-[10px] font-bold  dark: text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 px-2.5 py-1 rounded-full">
  {processedSupplyPlans
  .reduce(
  (sum, row) =>
@@ -47,55 +47,52 @@ export function SupplyPlansSection(props: any) {
  </div>
 
  <div className="overflow-auto custom-scrollbar max-h-[calc(100vh-300px)] min-h-[400px] relative cursor-auto">
- <table className="w-full text-left border-separate border-spacing-0">
- <thead className="text-[10px] uppercase font-black tracking-widest text-slate-400 dark:text-slate-500 bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 z-20 shadow-sm outline outline-1 outline-slate-200 dark:outline-slate-800">
- <tr>
- <th className="px-4 py-3 bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">
+ <table className="w-full text-left border-collapse text-xs whitespace-nowrap text-slate-800 dark:text-slate-200">
+ <thead>
+ <tr className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 group">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Профиль
  </th>
- <th className="px-4 py-3 text-center bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Марка
  </th>
- <th className="px-4 py-3 text-center bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Размер
  </th>
- <th className="px-4 py-3 text-center bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Кол-во
  </th>
- <th className="px-4 py-3 text-center bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Длина
  </th>
- <th className="px-4 py-3 text-center bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Размещено
  </th>
- <th className="px-4 py-3 text-center bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Поставка
  </th>
- <th className="px-4 py-3 bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 uppercase tracking-widest text-[10px]">
+ <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
  Поставщик
  </th>
  </tr>
  </thead>
  <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50 text-[11px] font-medium text-slate-600 dark:text-slate-300 -row-group">
  {processedSupplyPlans.map((row, i) => (
- <tr
- key={i}
- className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group"
- >
- <td className="px-4 py-3">
+ <tr key={i} className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors group">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
  {row["Профиль"]}
  </span>
  </td>
- <td className="px-4 py-3 md:py-2.5 text-center font-bold text-slate-700 dark:text-slate-200 py-3 md:py-2.5">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  {row["Марка"]}
  </td>
- <td className="px-4 py-3 md:py-2.5 text-center py-3 md:py-2.5">
- <span className="inline-flex items-center gap-1 text-sky-600 dark:text-sky-400 font-mono font-bold bg-sky-50 dark:bg-sky-500/10 px-2 py-0.5 rounded">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
+ <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded">
  {row["Размер"]}
  </span>
  </td>
- <td className="px-4 py-3 md:py-2.5 text-center font-black text-slate-900 dark:text-white py-3 md:py-2.5">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  <span>
  {row["Кол-во"]?.toFixed(3)}{""}
  <span className="text-[10px] text-slate-400 font-bold ml-0.5">
@@ -103,23 +100,20 @@ export function SupplyPlansSection(props: any) {
  </span>
  </span>
  </td>
- <td className="px-4 py-3 md:py-2.5 text-center py-3 md:py-2.5">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50">
  {row["Длина"]}
  </span>
  </td>
- <td className="px-4 py-3 md:py-2.5 text-center text-slate-500 dark:text-slate-400 font-mono py-3 md:py-2.5">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  {row["Дата размещения"]}
  </td>
- <td className="px-4 py-3 md:py-2.5 text-center py-3 md:py-2.5">
- <span className="font-bold text-emerald-600 dark:text-emerald-500">
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
+ <span className="font-bold text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200">
  {row["Ожидаемая дата поставки"]}
  </span>
  </td>
- <td
- className="px-4 py-3 md:py-2.5 truncate max-w-[150px] py-3 md:py-2.5"
- title={row["Поставщик"]}
- >
+ <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" title={row["Поставщик"]}>
  <span className="truncate">{row["Поставщик"]}</span>
  </td>
  </tr>

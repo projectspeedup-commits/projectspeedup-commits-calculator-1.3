@@ -29,16 +29,16 @@ export const SteelGradesTable: React.FC<SteelGradesTableProps> = ({
       }
     >
       <div className="overflow-x-auto overflow-y-auto max-h-[70vh] custom-scrollbar">
-        <table className="w-full text-left border-collapse min-w-[500px]">
+        <table className="w-full text-left border-collapse text-xs whitespace-nowrap text-slate-800 dark:text-slate-200">
           <thead className="sticky top-0 z-20 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
             <tr>
-              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-left text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle">
                 Марка стали
               </th>
-              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 text-center">
+              <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle">
                 Политика (Круг) <RemnantPricingTooltip />
               </th>
-              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 text-center">
+              <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle">
                 Политика (Ш-гр) <RemnantPricingTooltip />
               </th>
             </tr>
@@ -54,12 +54,12 @@ export const SteelGradesTable: React.FC<SteelGradesTableProps> = ({
                   key={grade}
                   className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors"
                 >
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left">
                     <span className="text-sm font-bold text-slate-900 dark:text-white">
                       {grade}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left">
                     <div className="flex justify-center">
                       <select
                         value={pricing.round}
@@ -81,7 +81,7 @@ export const SteelGradesTable: React.FC<SteelGradesTableProps> = ({
                       </select>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left">
                     <div className="flex justify-center">
                       <select
                         value={pricing.hex}

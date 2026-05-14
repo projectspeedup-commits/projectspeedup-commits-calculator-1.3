@@ -41,8 +41,8 @@ export function CalcStockSection({
         <div className="bg-white/50 dark:bg-[#1A1C19]/40 border border-slate-200 dark:border-slate-800 rounded-[40px] p-12 flex flex-col items-center justify-center min-h-[500px]">
           <div className="flex items-center gap-4 sm:gap-8 mb-8 relative">
             <div className="relative">
-              <div className="w-20 h-20 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center border border-blue-100 dark:border-blue-800/30 z-10 relative">
-                <ClipboardList className="w-10 h-10 text-blue-500" />
+              <div className="w-20 h-20  dark: rounded-2xl flex items-center justify-center border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800 z-10 relative">
+                <ClipboardList className="w-10 h-10 text-slate-800 dark:text-slate-200" />
               </div>
               <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-bold text-slate-500">
                 Заказы
@@ -65,8 +65,8 @@ export function CalcStockSection({
             </div>
 
             <div className="relative">
-              <div className="w-20 h-20 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center border border-emerald-100 dark:border-emerald-800/30 z-10 relative">
-                <Package className="w-10 h-10 text-emerald-500" />
+              <div className="w-20 h-20  dark: rounded-2xl flex items-center justify-center border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800 z-10 relative">
+                <Package className="w-10 h-10 text-slate-800 dark:text-slate-200" />
               </div>
               <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-bold text-slate-500">
                 Склад
@@ -94,7 +94,7 @@ export function CalcStockSection({
                 setProductionSection("files");
               }
             }}
-            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center gap-2"
+            className="px-6 py-3  hover: text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center gap-2"
           >
             <Upload className="w-4 h-4" />
             Загрузить файлы для сравнения
@@ -117,28 +117,28 @@ export function CalcStockSection({
                   РАСЧЕТ С УЧЕТОМ НАЛИЧИЯ
                 </h4>
                 <div className="flex flex-wrap gap-2 sm:gap-4 w-full 2xl:w-auto">
-                  <div className="flex items-center px-4 py-1.5 text-sky-600 font-black bg-sky-500/10 border border-sky-500/20 rounded-xl">
-                    <span className="text-[9px] mr-2 uppercase font-bold text-sky-500 opacity-60 tracking-widest">
+                  <div className="flex items-center px-4 py-1.5 text-slate-800 dark:text-slate-200 font-black  border border-slate-200 dark:border-slate-800 rounded-xl">
+                    <span className="text-[9px] mr-2 uppercase font-bold text-slate-800 dark:text-slate-200 opacity-60 tracking-widest">
                       взято со склада
                     </span>
                     <div>
-                      <span className="text-base tracking-tight leading-none text-sky-500">
+                      <span className="text-base tracking-tight leading-none text-slate-800 dark:text-slate-200">
                         {filteredTotals.allocated.toFixed(3)}
                       </span>
-                      <span className="text-[8px] ml-1 uppercase font-bold text-sky-500">
+                      <span className="text-[8px] ml-1 uppercase font-bold text-slate-800 dark:text-slate-200">
                         тн
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center px-4 py-1.5 text-rose-600 font-black bg-rose-500/10 border border-rose-500/20 rounded-xl">
-                    <span className="text-[9px] mr-2 uppercase font-bold text-rose-500 opacity-60 tracking-widest">
+                  <div className="flex items-center px-4 py-1.5 text-slate-800 dark:text-slate-200 font-black  border border-slate-200 dark:border-slate-800 rounded-xl">
+                    <span className="text-[9px] mr-2 uppercase font-bold text-slate-800 dark:text-slate-200 opacity-60 tracking-widest">
                       дефицит
                     </span>
                     <div>
-                      <span className="text-base tracking-tight leading-none text-rose-500">
+                      <span className="text-base tracking-tight leading-none text-slate-800 dark:text-slate-200">
                         {filteredTotals.deficit.toFixed(3)}
                       </span>
-                      <span className="text-[8px] ml-1 uppercase font-bold text-rose-500">
+                      <span className="text-[8px] ml-1 uppercase font-bold text-slate-800 dark:text-slate-200">
                         тн
                       </span>
                     </div>
@@ -150,17 +150,17 @@ export function CalcStockSection({
               >
                 <div className="flex items-center gap-2 group">
                   <div className="flex-1 relative">
-                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors shrink-0" />
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 group-focus-within:text-slate-800 dark:text-slate-200 transition-colors shrink-0" />
                     <input
                       type="text"
                       placeholder="Поиск по заказу..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-3 h-10 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 text-[11px] sm:text-xs text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400"
+                      className="w-full pl-10 pr-3 h-10 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 text-[11px] sm:text-xs text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-slate-200 dark:border-slate-800 transition-all placeholder:text-slate-400"
                     />
                   </div>
                 </div>
-                <div className="flex items-center h-10 px-3 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 w-full sm:w-auto transition-all focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20">
+                <div className="flex items-center h-10 px-3 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 w-full sm:w-auto transition-all focus-within:border-slate-200 dark:border-slate-800 focus-within:ring-2 focus-within:ring-blue-500/20">
                   <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 mr-2 shrink-0" />
                   <StatusDropdown
                     value={statusFilter}
@@ -176,7 +176,7 @@ export function CalcStockSection({
                         "Номенклатура",
                         "Профиль",
                         "Марка",
-                        "Размер мм.",
+                        "Размер",
                         "Длина",
                         "Кол-во тн в заказе",
                         "ИТОГО ост. к выполнению",
@@ -184,7 +184,7 @@ export function CalcStockSection({
                         "Марка заг.",
                         "Размер заг.",
                         "Кол-во тн заг.",
-                        "Длина мм.",
+                        "Длина",
                         "Взято со склада (тн)",
                         "ИТОГО ост. к завершению",
                         "Тех. отходы склад г/к",
@@ -277,12 +277,11 @@ export function CalcStockSection({
                         ];
                         const numRows = Math.max(1, res.matchedStockItems?.length || 0);
                         if (res.matchedStockItems?.length === 0) {
-                          rowsHtml +=
-                            "<tr>" +
+                          rowsHtml += "<tr>" +
                             baseRow
                               .map((v) => '<td style="text-align:center;vertical-align:middle;">' + v + "</td>")
                               .join("") +
-                            "<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>";
+                            '<td style="text-align:center;vertical-align:middle;"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
                         } else {
                           res.matchedStockItems?.forEach((stock: any, index: number) => {
                             const stockRow = [
@@ -328,7 +327,7 @@ export function CalcStockSection({
                     }}
                     className={`flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl transition-all active:scale-[0.9] shadow-sm border ${
                       isCopied
-                        ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30"
+                        ? " dark: text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800"
                         : "bg-white dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 hover:text-slate-900 dark:hover:bg-slate-700 dark:hover:text-white"
                     }`}
                     title="Скопировать для Excel"
@@ -342,7 +341,7 @@ export function CalcStockSection({
                         "Номенклатура",
                         "Профиль",
                         "Марка",
-                        "Размер мм.",
+                        "Размер",
                         "Длина",
                         "Кол-во тн в заказе",
                         "ИТОГО ост. к выполнению",
@@ -350,7 +349,7 @@ export function CalcStockSection({
                         "Марка заг.",
                         "Размер заг.",
                         "Кол-во тн заг.",
-                        "Длина мм.",
+                        "Длина",
                         "Взято со склада (тн)",
                         "ИТОГО ост. к завершению",
                         "Тех. отходы склад г/к",
@@ -431,7 +430,7 @@ export function CalcStockSection({
                       XLSX.utils.book_append_sheet(workbook, worksheet, "Расчет с наличием");
                       XLSX.writeFile(workbook, getTimestampedFilename("Расчет потребности в заготовке"));
                     }}
-                    className="flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/20 hover:bg-emerald-100 dark:hover:bg-emerald-500/30 transition-all active:scale-[0.9] shadow-sm"
+                    className="flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl  dark: text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800 hover: dark:hover: transition-all active:scale-[0.9] shadow-sm"
                     title="Скачать в Excel"
                   >
                     <Download className="w-4 h-4" />
@@ -450,120 +449,120 @@ export function CalcStockSection({
                   onMouseLeave={handleMouseLeaveOrUp}
                   onMouseUp={handleMouseLeaveOrUp}
                   onMouseMove={handleMouseMove}
-                  className={`max-h-[60vh] overflow-x-auto overflow-y-auto custom-scrollbar relative ${isSupplyDragging ? "select-none cursor-grabbing" : "cursor-grab"}`}
+                  className={`overflow-auto max-h-[calc(100vh-350px)] custom-scrollbar relative ${isSupplyDragging ? "select-none cursor-grabbing" : "cursor-grab"}`}
                 >
-                  <table className="w-full text-left border-separate border-spacing-0">
-                    <thead className="bg-[#F8FAFC] dark:bg-[#1A1C19] sticky top-0 z-20 shadow-sm shadow-slate-200 dark:shadow-slate-800 outline outline-1 outline-slate-200 dark:outline-slate-800 [&_th]:bg-slate-50 dark:[&_th]:bg-[#1A1C19]">
-                      <tr>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+                  <table className="w-full text-left border-collapse text-xs whitespace-nowrap text-slate-800 dark:text-slate-200">
+                    <thead>
+                      <tr className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 group">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           Внутренний №
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           Дата Заказа
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           № Заказа
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           Заказчик
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap border-r border-slate-200 dark:border-slate-700">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           Номенклатура
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           Профиль
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           М. стали
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           Размер
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           Длина
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           Кол-во тн в зак.
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-sky-600 uppercase tracking-widest whitespace-nowrap border-r border-slate-200 dark:border-slate-700">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           ИТОГО ост. к выполнению
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           Номенклатура
                           <br />
                           заг.
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           Марка
                           <br />
                           заг.
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           Размер
                           <br />
                           заг.
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-emerald-600 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           Кол-во тн
                           <br />
                           заг.
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap border-r border-slate-200 dark:border-slate-700">
-                          Длина мм.
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
+                          Длина
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-emerald-500 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           Взято со склада (тн)
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-rose-500 uppercase tracking-widest whitespace-nowrap border-r border-slate-200 dark:border-slate-700">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           ИТОГО ост. к завершению /<br />
                           после склада г/к
                         </th>
-                        <th className="px-5 py-2 text-center text-[10px] font-bold text-amber-500 uppercase tracking-widest whitespace-nowrap align-middle">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           <div className="flex flex-col items-center justify-center gap-1">
                             <span>Тех. отходы склад г/к</span>
-                            <div className="inline-flex items-center gap-1 border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 rounded text-[9px] font-black tracking-normal">
-                              <span className="text-amber-500/70">Σ</span>
+                            <div className="inline-flex items-center gap-1 border border-slate-200 dark:border-slate-800  px-1.5 py-0.5 rounded text-[9px] font-black tracking-normal">
+                              <span className="text-slate-800 dark:text-slate-200/70">Σ</span>
                               <span>{filteredTotals.techWaste2.toFixed(3)} тн</span>
                             </div>
                           </div>
                         </th>
-                        <th className="px-5 py-2 text-center text-[10px] font-bold text-amber-500 uppercase tracking-widest whitespace-nowrap align-middle">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           <div className="flex flex-col items-center justify-center gap-1">
                             <span>Дел. Остатки склад г/к</span>
-                            <div className="inline-flex items-center gap-1 border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 rounded text-[9px] font-black tracking-normal">
-                              <span className="text-amber-500/70">Σ</span>
+                            <div className="inline-flex items-center gap-1 border border-slate-200 dark:border-slate-800  px-1.5 py-0.5 rounded text-[9px] font-black tracking-normal">
+                              <span className="text-slate-800 dark:text-slate-200/70">Σ</span>
                               <span>{filteredTotals.usefulRem2.toFixed(3)} тн</span>
                             </div>
                           </div>
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-amber-500 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           КИМ склад г/к
                         </th>
-                        <th className="px-5 py-4 text-left text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           Исход Номенклатура
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           Профиль
                         </th>
-                        <th className="px-5 py-4 text-left text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           НТД
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           Марка стали
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           Размер
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           Длина
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           Исх. Остаток (тн)
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-emerald-500 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           Взято (тн)
                         </th>
-                        <th className="px-5 py-4 text-center text-[10px] font-bold text-sky-500 uppercase tracking-widest whitespace-nowrap">
+                        <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                           Остаток на складе (тн)
                         </th>
                       </tr>
@@ -571,28 +570,18 @@ export function CalcStockSection({
                     <tbody className={`divide-y divide-slate-100 dark:divide-slate-800 text-[11px]`}>
                       {filteredMatchedDemand.map((res: any) => {
                         const renderMainRow = (stockItem: any = null, isSubRow = false) => (
-                          <tr
-                            key={`${res.id}${stockItem ? `-${stockItem._id}` : ""}`}
-                            className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors"
-                          >
+                          <tr className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors group" key={Math.random()}>
                             {!isSubRow && (
                               <>
-                                <td
-                                  className={`px-5 py-3 align-middle whitespace-nowrap text-center ${res.matchedStockItems.length > 1 ? "font-black text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-900/20" : "text-slate-600 dark:text-slate-400"}`}
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center"
                                   rowSpan={Math.max(1, res.matchedStockItems.length)}
                                 >
                                   {res.internalNo || "—"}
                                 </td>
-                                <td
-                                  className={`px-5 py-3 align-middle whitespace-nowrap text-center text-slate-600 dark:text-slate-400`}
-                                  rowSpan={Math.max(1, res.matchedStockItems.length)}
-                                >
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={Math.max(1, res.matchedStockItems.length)}>
                                   {res.shippingDate}
                                 </td>
-                                <td
-                                  className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-slate-600 dark:text-slate-400 group relative`}
-                                  rowSpan={Math.max(1, res.matchedStockItems.length)}
-                                >
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={Math.max(1, res.matchedStockItems.length)}>
                                   <div className="font-bold text-slate-600 dark:text-slate-400 cursor-help">
                                     {res.orderNo}
                                   </div>
@@ -601,97 +590,67 @@ export function CalcStockSection({
                                       <div className="flex flex-col gap-1.5 text-left">
                                         <div className="flex justify-between items-center gap-3">
                                           <span className="text-slate-400 text-[9px]">Обеспечено:</span>
-                                          <span className="font-bold text-emerald-400">{res.allocatedStock.toFixed(3)} тн</span>
+                                          <span className="font-bold text-slate-800 dark:text-slate-200">{res.allocatedStock.toFixed(3)} тн</span>
                                         </div>
                                         <div className="flex justify-between items-center gap-3">
                                           <span className="text-slate-400 text-[9px]">Дефицит:</span>
-                                          <span className="font-bold text-rose-400">{res.shortageStock.toFixed(3)} тн</span>
+                                          <span className="font-bold text-slate-800 dark:text-slate-200">{res.shortageStock.toFixed(3)} тн</span>
                                         </div>
                                       </div>
                                     </div>
                                     <div className="w-2 h-2 bg-slate-900 dark:bg-slate-800 rotate-45 absolute -bottom-1 left-1/2 -translate-x-1/2 border-r border-b border-white/10"></div>
                                   </div>
                                 </td>
-                                <td
-                                  className={`px-5 py-3 align-middle whitespace-nowrap text-center font-medium text-slate-800 dark:text-slate-200`}
-                                  rowSpan={Math.max(1, res.matchedStockItems.length)}
-                                >
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={Math.max(1, res.matchedStockItems.length)}>
                                   <div className="max-w-[150px] truncate" title={res.client}>
                                     {res.client}
                                   </div>
                                 </td>
-                                <td
-                                  className={`px-5 py-3 align-middle text-center border-r border-slate-200/50 dark:border-slate-800/50`}
-                                  rowSpan={Math.max(1, res.matchedStockItems.length)}
-                                >
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={Math.max(1, res.matchedStockItems.length)}>
                                   <div
-                                    className="max-w-[200px] truncate font-mono text-[10px] text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors"
+                                    className="max-w-[12rem] truncate font-mono text-[10px] text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors"
                                     title={res.nomenclature}
                                   >
                                     {res.nomenclature}
                                   </div>
                                 </td>
-                                <td
-                                  className={`px-5 py-3 align-middle whitespace-nowrap text-center`}
-                                  rowSpan={Math.max(1, res.matchedStockItems.length)}
-                                >
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={Math.max(1, res.matchedStockItems.length)}>
                                   <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                                     {res.type}
                                   </span>
                                 </td>
-                                <td
-                                  className={`px-5 py-3 align-middle whitespace-nowrap text-center font-bold text-slate-700 dark:text-slate-200`}
-                                  rowSpan={Math.max(1, res.matchedStockItems.length)}
-                                >
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={Math.max(1, res.matchedStockItems.length)}>
                                   {res.grade}
                                 </td>
-                                <td
-                                  className={`px-5 py-3 align-middle whitespace-nowrap text-center font-mono font-bold text-emerald-600 dark:text-emerald-400`}
-                                  rowSpan={Math.max(1, res.matchedStockItems.length)}
-                                >
-                                  {parseFloat(res.diameter.toFixed(2))}
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={Math.max(1, res.matchedStockItems.length)}>
+                                  {parseFloat(Number(res.diameter||0).toFixed(2))}
                                 </td>
-                                <td
-                                  className={`px-5 py-3 align-middle whitespace-nowrap text-center`}
-                                  rowSpan={Math.max(1, res.matchedStockItems.length)}
-                                >
-                                  <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType === "НД" ? "text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10" : "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10"}`}>
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={Math.max(1, res.matchedStockItems.length)}>
+                                  <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType === "НД" ? "text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:" : "text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:"}`}>
                                     {res.lengthType === "НД" ? "НД" : `МД ${res.length}`}
                                   </span>
                                 </td>
-                                <td
-                                  className={`px-5 py-3 align-middle whitespace-nowrap text-center font-black text-slate-900 dark:text-white`}
-                                  rowSpan={Math.max(1, res.matchedStockItems.length)}
-                                >
-                                  {res.weightTons.toFixed(3)}
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={Math.max(1, res.matchedStockItems.length)}>
+                                  {(res.weightTons||0).toFixed(3)}
                                 </td>
-                                <td
-                                  className={`px-5 py-3 align-middle whitespace-nowrap text-center border-r border-sky-100 dark:border-sky-900/40 bg-sky-50/30 dark:bg-sky-900/5`}
-                                  rowSpan={Math.max(1, res.matchedStockItems.length)}
-                                >
-                                  <span className="font-bold text-sky-600 dark:text-sky-400">
-                                    {res.remainingToProcess.toFixed(3)}
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={Math.max(1, res.matchedStockItems.length)}>
+                                  <span className="font-bold text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200">
+                                    {(res.remainingToProcess||0).toFixed(3)}
                                   </span>
                                 </td>
 
-                                <td
-                                  className={`px-5 py-3 align-middle text-left group/nom`}
-                                  rowSpan={Math.max(1, res.matchedStockItems.length)}
-                                >
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={Math.max(1, res.matchedStockItems.length)}>
                                   <div
-                                    className="max-w-[200px] truncate font-mono text-[10px] text-slate-400 group-hover/nom:text-slate-900 dark:group-hover/nom:text-white transition-colors"
+                                    className="max-w-[12rem] truncate font-mono text-[10px] text-slate-400 group-hover/nom:text-slate-900 dark:group-hover/nom:text-white transition-colors"
                                     title={res.supplyNomenclature}
                                   >
                                     {res.supplyNomenclature}
                                   </div>
                                 </td>
-                                <td
-                                  className={`px-5 py-3 align-middle whitespace-nowrap text-center group/grade relative`}
-                                  rowSpan={Math.max(1, res.matchedStockItems.length)}
-                                >
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={Math.max(1, res.matchedStockItems.length)}>
                                   {(res.supplyGrade !== res.grade || res.gost) && (
                                     <div className="absolute top-0 right-0 p-1">
-                                      <div className="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)] animate-pulse"></div>
+                                      <div className="w-1.5 h-1.5 rounded-full  shadow-[0_0_8px_rgba(251,191,36,0.8)] animate-pulse"></div>
                                     </div>
                                   )}
                                   <div className="flex flex-col items-center gap-1">
@@ -699,7 +658,7 @@ export function CalcStockSection({
                                       {res.supplyGrade}
                                     </span>
                                     {res.gost ? (
-                                      <span className="text-[9px] text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 px-1.5 py-0.5 rounded font-mono border border-amber-200 dark:border-amber-500/20 whitespace-nowrap">
+                                      <span className="text-[9px] text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark: px-1.5 py-0.5 rounded font-mono border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800 whitespace-nowrap">
                                         ГОСТ {res.gost}
                                       </span>
                                     ) : (
@@ -709,22 +668,13 @@ export function CalcStockSection({
                                     )}
                                   </div>
                                 </td>
-                                <td
-                                  className={`px-5 py-3 align-middle whitespace-nowrap text-center font-mono font-bold text-emerald-600 dark:text-emerald-400`}
-                                  rowSpan={Math.max(1, res.matchedStockItems.length)}
-                                >
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={Math.max(1, res.matchedStockItems.length)}>
                                   {res.supplyDiameter}
                                 </td>
-                                <td
-                                  className={`px-5 py-3 align-middle whitespace-nowrap text-center font-black text-slate-700 dark:text-slate-300`}
-                                  rowSpan={Math.max(1, res.matchedStockItems.length)}
-                                >
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={Math.max(1, res.matchedStockItems.length)}>
                                   {res.totalWeight ? res.totalWeight.toFixed(3) : "0.000"}
                                 </td>
-                                <td
-                                  className={`px-5 py-3 align-middle whitespace-nowrap text-center font-mono text-[10px] text-slate-500 border-r border-slate-200 dark:border-slate-700`}
-                                  rowSpan={Math.max(1, res.matchedStockItems.length)}
-                                >
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={Math.max(1, res.matchedStockItems.length)}>
                                   {res.lengthType === "МД" ? `МД ${res.billetLength}` : "НД"}
                                 </td>
                               </>
@@ -733,43 +683,43 @@ export function CalcStockSection({
                               <>
 
 
-                                <td className="px-5 py-2 align-middle whitespace-nowrap text-center font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-900/10">
-                                  {stockItem.allocatedAmount.toFixed(3)}
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
+                                  {(stockItem.allocatedAmount||0).toFixed(3)}
                                 </td>
-                                <td className="px-5 py-2 align-middle whitespace-nowrap text-center font-black text-rose-600 dark:text-rose-400 border-r border-rose-100 dark:border-rose-900/30 bg-rose-50/50 dark:bg-rose-900/10">
-                                  {res.shortageStock.toFixed(3)}
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
+                                  {(res.shortageStock||0).toFixed(3)}
                                 </td>
 
-                                <td className="px-5 py-2 align-middle whitespace-nowrap text-center bg-slate-50 dark:bg-[#1A1C19]">
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
                                   {stockItem.calculatedTechWaste > 0 ? (
-                                    <span className="font-mono font-bold text-amber-600 dark:text-amber-500">
-                                      {stockItem.calculatedTechWaste.toFixed(3)}
+                                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200">
+                                      {(stockItem.calculatedTechWaste||0).toFixed(3)}
                                       <span className="text-[9px] ml-1">тн</span>
                                     </span>
                                   ) : (
                                     <span className="text-slate-300">-</span>
                                   )}
                                 </td>
-                                <td className="px-5 py-2 align-middle whitespace-nowrap text-center bg-slate-50 dark:bg-[#1A1C19]">
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
                                   {stockItem.calculatedUsefulRem > 0 ? (
-                                    <span className="font-mono font-bold text-amber-600 dark:text-amber-500">
-                                      {stockItem.calculatedUsefulRem.toFixed(3)}
+                                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200">
+                                      {(stockItem.calculatedUsefulRem||0).toFixed(3)}
                                       <span className="text-[9px] ml-1">тн</span>
                                     </span>
                                   ) : (
                                     <span className="text-slate-300">-</span>
                                   )}
                                 </td>
-                                <td className="px-5 py-2 align-middle whitespace-nowrap text-center bg-slate-50 dark:bg-[#1A1C19]">
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
                                   {stockItem.calculatedKim > 0 ? (
-                                    <span className={`font-mono font-bold ${stockItem.calculatedKim >= 0.95 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-500"}`}>
+                                    <span className={`font-mono font-bold ${stockItem.calculatedKim >= 0.95 ? "text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200" : "text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200"}`}>
                                       {(stockItem.calculatedKim * 100).toFixed(1)}%
                                     </span>
                                   ) : (
                                     <span className="text-slate-300">-</span>
                                   )}
                                 </td>
-                                <td className="px-5 py-2 align-middle text-left group/nom2 bg-slate-50 dark:bg-[#1A1C19]">
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
                                   <div
                                     className="max-w-[150px] truncate font-mono text-[10px] text-slate-500 group-hover/nom2:text-slate-900 dark:group-hover/nom2:text-white transition-colors"
                                     title={stockItem["Исходная Номенклатура"]}
@@ -777,51 +727,51 @@ export function CalcStockSection({
                                     {stockItem["Исходная Номенклатура"]}
                                   </div>
                                 </td>
-                                <td className="px-5 py-2 align-middle whitespace-nowrap text-center bg-slate-50 dark:bg-[#1A1C19]">
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
                                   <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
                                     {stockItem["Профиль"]}
                                   </span>
                                 </td>
-                                <td className="px-5 py-2 align-middle whitespace-nowrap text-left bg-slate-50 dark:bg-[#1A1C19]">
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
                                   <span className="text-[9px] font-mono text-slate-500">
                                     {stockItem["НТД"]}
                                   </span>
                                 </td>
-                                <td className="px-5 py-2 align-middle whitespace-nowrap text-center font-bold text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-[#1A1C19]">
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
                                   {stockItem["Марка стали"]}
                                 </td>
-                                <td className="px-5 py-2 align-middle whitespace-nowrap text-center font-mono font-bold text-slate-500 bg-slate-50 dark:bg-[#1A1C19]">
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
                                   {stockItem["Размер"]}
                                 </td>
-                                <td className="px-5 py-2 align-middle whitespace-nowrap text-center bg-slate-50 dark:bg-[#1A1C19]">
-                                  <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold ${stockItem["Длина"] === "НД" ? "text-sky-600/70 bg-sky-100" : "text-indigo-600/70 bg-indigo-100"}`}>
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
+                                  <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold ${stockItem["Длина"] === "НД" ? "text-slate-800 dark:text-slate-200/70 " : "text-slate-800 dark:text-slate-200/70 "}`}>
                                     {stockItem["Длина"]}
                                   </span>
                                 </td>
-                                <td className="px-5 py-2 align-middle whitespace-nowrap text-center font-medium text-slate-400 bg-slate-50 dark:bg-[#1A1C19]">
-                                  {stockItem.stockBeforeTaking.toFixed(3)}
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
+                                  {(stockItem.stockBeforeTaking||0).toFixed(3)}
                                 </td>
-                                <td className="px-5 py-2 align-middle whitespace-nowrap text-center font-bold text-emerald-500 bg-slate-50 dark:bg-[#1A1C19]">
-                                  -{stockItem.allocatedAmount.toFixed(3)}
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
+                                  -{(stockItem.allocatedAmount||0).toFixed(3)}
                                 </td>
-                                <td className="px-5 py-2 align-middle whitespace-nowrap text-center font-black text-sky-600 dark:text-sky-400 bg-slate-50 dark:bg-[#1A1C19]">
-                                  {stockItem.stockAfterTaking.toFixed(3)}
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
+                                  {(stockItem.stockAfterTaking||0).toFixed(3)}
                                 </td>
                               </>
                             ) : (
                               <>
-                                <td className="px-5 py-2 align-middle text-center bg-emerald-50/30 dark:bg-emerald-900/5">
-                                  <span className="text-emerald-300 dark:text-emerald-800">0.000</span>
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
+                                  <span className="text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200">0.000</span>
                                 </td>
-                                <td className="px-5 py-2 align-middle text-center bg-rose-50/30 dark:bg-rose-900/5 border-r border-rose-100 dark:border-rose-900/20">
-                                  <span className="font-black text-rose-600 dark:text-rose-400">
-                                    {res.shortageStock.toFixed(3)}
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
+                                  <span className="font-black text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200">
+                                    {(res.shortageStock||0).toFixed(3)}
                                   </span>
                                 </td>
-                                <td className="px-5 py-2 align-middle text-center bg-slate-50/50 dark:bg-[#1A1C19]/50"></td>
-                                <td className="px-5 py-2 align-middle text-center bg-slate-50/50 dark:bg-[#1A1C19]/50"></td>
-                                <td className="px-5 py-2 align-middle text-center bg-slate-50/50 dark:bg-[#1A1C19]/50 border-r border-slate-200 dark:border-slate-700"></td>
-                                <td colSpan={9} className="px-5 py-3 align-middle text-center bg-slate-50/50 dark:bg-[#1A1C19]/50 text-slate-400 dark:text-slate-500 italic text-[10px]">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" colSpan={9}>
                                   Нет подходящих позиций на складе
                                 </td>
                               </>

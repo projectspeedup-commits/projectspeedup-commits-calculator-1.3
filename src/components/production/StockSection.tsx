@@ -39,7 +39,7 @@ export function StockSection({
         header={
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-sm border border-emerald-100 dark:border-emerald-800/50">
+              <div className="w-10 h-10  dark: rounded-xl flex items-center justify-center text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 shadow-sm border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800">
                 <Layers className="w-5 h-5" />
               </div>
               <div>
@@ -51,7 +51,7 @@ export function StockSection({
                     {processedStock.length} позиций
                   </Badge>
                   <Badge variant="success" className="text-[10px] font-black">
-                    Итого: {totalStock.toFixed(3)} тн.
+                    Итого: {(0).toFixed(3)} тн.
                   </Badge>
                 </div>
               </div>
@@ -90,64 +90,61 @@ export function StockSection({
           onMouseMove={handleMouseMove}
           className={`overflow-auto custom-scrollbar max-h-[calc(100vh-350px)] min-h-[400px] relative ${isStockDragging ? "select-none cursor-grabbing" : "cursor-grab"}`}
         >
-          <table className="w-full text-left border-separate border-spacing-0">
-            <thead className="sticky top-0 z-20">
-              <tr className="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
-                <th className="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+          <table className="w-full text-left border-collapse text-xs whitespace-nowrap text-slate-800 dark:text-slate-200">
+            <thead>
+              <tr className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 group">
+                <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                   Номенклатура (исходная)
                 </th>
-                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                   Профиль
                 </th>
-                <th className="px-6 py-4 text-center text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                   Марка стали
                 </th>
-                <th className="px-6 py-4 text-center text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                   Размер
                 </th>
-                <th className="px-6 py-4 text-center text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                   Длина
                 </th>
-                <th className="px-8 py-4 text-right text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                <th className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 text-center text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 align-middle sticky top-0 z-10" >
                   Тоннаж
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {processedStock.map((row: any, i: number) => (
-                <tr
-                  key={i}
-                  className="hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors group"
-                >
-                  <td className="px-8 py-3">
+                <tr key={i} className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors group">
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
                     <div
-                      className="max-w-[200px] md:max-w-[300px] truncate font-mono text-[10px] text-slate-500 group-hover:text-slate-900 dark:group-hover:text-white transition-colors"
+                      className="max-w-[12rem] md:max-w-[300px] truncate font-mono text-[10px] text-slate-500 group-hover:text-slate-900 dark:group-hover:text-white transition-colors"
                       title={row["Исходная Номенклатура"]}
                     >
                       {row["Исходная Номенклатура"]}
                     </div>
                   </td>
-                  <td className="px-6 py-3">
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
                     <Badge variant="outline" className="font-bold border-slate-200">
                       {row["Профиль"]}
                     </Badge>
                   </td>
-                  <td className="px-6 py-3 text-center">
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
                     <span className="text-sm font-black text-slate-900 dark:text-slate-100 italic">
                       {row["Марка стали"]}
                     </span>
                   </td>
-                  <td className="px-6 py-3 text-center">
-                    <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-black bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 rounded border border-emerald-100/50 dark:border-emerald-800/20">
-                      Ø {row["Размер"]}
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
+                    <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-mono font-black  dark: px-3 py-1 rounded border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800">
+                      {row["Размер"]}
                     </span>
                   </td>
-                  <td className="px-6 py-3 text-center">
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
                     <Badge variant={row["Длина"] === "НД" ? "info" : "secondary"}>
                       {row["Длина"]}
                     </Badge>
                   </td>
-                  <td className="px-8 py-3 text-right">
+                  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
                     <div className="flex flex-col items-end">
                       <span className="text-slate-900 dark:text-white font-black text-sm">
                         {parseFloat(row["Конечный остаток тн."] || 0).toFixed(3)}
