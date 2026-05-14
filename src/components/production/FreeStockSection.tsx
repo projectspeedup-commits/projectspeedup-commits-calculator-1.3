@@ -37,14 +37,18 @@ export function FreeStockSection(props: any) {
                   Свободный остаток заготовки
                 </h4>
               </div>
-              <div className="flex items-center gap-3  dark: px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800 shadow-sm">
-                <span className="text-[9px] text-slate-800 dark:text-slate-200/70 dark:text-slate-800 dark:text-slate-200 font-black uppercase tracking-widest">
+              <div className="flex items-center px-4 py-1.5 text-slate-800 dark:text-slate-200 font-black border border-slate-200 dark:border-slate-800 rounded-xl">
+                <span className="text-[9px] mr-2 uppercase font-bold opacity-60 tracking-widest">
                   Общий остаток
                 </span>
-                <span className="text-xl font-black text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 flex items-baseline gap-1 font-mono">
-                  {totalFreeStock.toFixed(3)}
-                  <span className="text-[10px] font-black opacity-70">ТН</span>
-                </span>
+                <div>
+                  <span className="text-base tracking-tight leading-none">
+                    {totalFreeStock.toFixed(3)}
+                  </span>
+                  <span className="text-[8px] ml-1 uppercase font-bold">
+                    тн
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -56,7 +60,7 @@ export function FreeStockSection(props: any) {
                   if (freeStock.length === 0) return;
                   const headers = ["Номенклатура", "Профиль", "Сталь", "Размер", "Длина", "Остаток тн."];
                   const rows = freeStock.map((row: any) => [
-                    row["Исходная Номенклатура"] || "", row["Профиль"] || "", row["Марка стали"] || "", String(row["Размер"]).replace(".", ","), row["Длина"] || "", String((row["Остаток тн."]||0).toFixed(3)).replace(".", ","),
+                    row["Исходная Номенклатура"] || "", row["Профиль"] || "", row["Марка стали"] || "", String(row["Размер"]).replace(".", ","), row["Длина"] || "", String((row.remainingStock||0).toFixed(3)).replace(".", ","),
                   ]);
                   const tsv = [headers, ...rows].map(row => row.join("\t")).join("\n");
                   navigator.clipboard.writeText(tsv);
@@ -80,7 +84,7 @@ export function FreeStockSection(props: any) {
                     Сталь: row["Марка стали"],
                     Размер: row["Размер"],
                     Длина: row["Длина"],
-                    "Остаток тн.": parseFloat((row["Остаток тн."]||0).toFixed(3)),
+                    "Остаток тн.": parseFloat((row.remainingStock||0).toFixed(3)),
                   }));
                   const worksheet = XLSX.utils.json_to_sheet(excelRows);
                   const workbook = XLSX.utils.book_new();
@@ -144,7 +148,7 @@ export function FreeStockSection(props: any) {
                   <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
                     <div className="flex flex-col items-end">
                       <span className="text-slate-900 dark:text-white font-black text-sm font-mono">
-                        {(row["Остаток тн."]||0).toFixed(3)}
+                        {(row.remainingStock||0).toFixed(3)}
                       </span>
                       <span className="text-[8px] text-slate-400 font-black uppercase">тонн</span>
                     </div>

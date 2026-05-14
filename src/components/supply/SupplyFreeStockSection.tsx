@@ -28,12 +28,12 @@ export function SupplyFreeStockSection(props: any) {
  <h4 className="text-sm sm:text-base font-black text-slate-900 dark:text-white uppercase tracking-widest">
  Свободный остаток заготовки
  </h4>
- <div className="flex items-baseline justify-between sm:justify-start px-4 sm:px-5 py-2 sm:py-2.5 text-slate-800 dark:text-slate-200 font-black  dark: border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl w-full sm:w-auto shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
- <span className="text-[11px] sm:text-xs mr-3 uppercase font-bold text-slate-800 dark:text-slate-200/80 tracking-widest">
+ <div className="flex items-center justify-between sm:justify-start px-4 sm:px-5 py-1.5 text-slate-800 dark:text-slate-200 font-black border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl w-full sm:w-auto shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+ <span className="text-[9px] mr-2 uppercase font-bold opacity-60 tracking-widest">
  Общий остаток
  </span>
  <div>
- <span className="text-xl sm:text-2xl tracking-tight leading-none">
+ <span className="text-base sm:text-lg tracking-tight leading-none">
  {freeStock
  .reduce(
  (acc, row) => acc + row.remainingStock,
@@ -41,7 +41,7 @@ export function SupplyFreeStockSection(props: any) {
  )
  .toFixed(3)}
  </span>
- <span className="text-[10px] sm:text-[11px] ml-1 uppercase font-bold text-slate-800 dark:text-slate-200/80">
+ <span className="text-[8px] ml-1 uppercase font-bold">
  тн
  </span>
  </div>
@@ -59,7 +59,7 @@ export function SupplyFreeStockSection(props: any) {
  row["Марка стали"] ||"",
  String(row["Размер"]).replace(".",","),
  row["Длина"] ||"",
- String((row["Остаток тн."]||0).toFixed(3)).replace(".",",",
+ String((row.remainingStock||0).toFixed(3)).replace(".",",",
  ),
  ]);
 
@@ -90,7 +90,7 @@ export function SupplyFreeStockSection(props: any) {
  Сталь: row["Марка стали"],
  Размер: row["Размер"],
  Длина: row["Длина"],"Остаток тн.": parseFloat(
- (row["Остаток тн."]||0).toFixed(3),
+ (row.remainingStock||0).toFixed(3),
  ),
  }));
 
@@ -214,7 +214,7 @@ export function SupplyFreeStockSection(props: any) {
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  <div>
  <span className="text-slate-900 dark:text-white font-black text-xs">
- {(row["Остаток тн."]||0).toFixed(3)}
+ {(row.remainingStock||0).toFixed(3)}
  </span>
  <span className="ml-1 text-[10px] text-slate-400 font-bold">
  тн

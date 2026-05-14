@@ -1784,7 +1784,7 @@ export function AdminPanel({
                         handleFileUpload(event);
                       }
                     }}
-                    className={`relative bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed ${planFiles.length === 0 ? "border-blue-400 dark:border-blue-500 animate-pulse-border shadow-[0_0_20px_rgba(59,130,246,0.15)]" : "border-slate-200 dark:border-slate-800"} p-5 flex flex-col items-center justify-center text-center gap-3 cursor-pointer hover:border-blue-500 dark:hover:border-blue-400 transition-all min-h-[140px]`}
+                    className={`relative bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed ${planFiles.length === 0 ? "border-blue-400 dark:border-blue-500 animate-pulse-border" : "border-slate-200 dark:border-slate-800"} p-5 flex flex-col items-center justify-center text-center gap-3 cursor-pointer hover:border-blue-500 dark:hover:border-blue-400 transition-all min-h-[140px]`}
                   >
                     <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" multiple accept=".pdf,.xlsx,.csv,.txt,.docx" />
                     <div className="relative w-14 h-14 bg-blue-50 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform duration-300">
@@ -1870,7 +1870,7 @@ export function AdminPanel({
                 <div className="flex flex-col gap-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/50">
+                      <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800/50">
                         <Layers className="w-5 h-5" />
                       </div>
                       <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">
@@ -1878,7 +1878,7 @@ export function AdminPanel({
                       </h3>
                     </div>
                     {stockFiles.length > 0 && (
-                      <Badge variant="outline" className="font-black border-emerald-200 text-emerald-600 dark:text-emerald-400">{stockFiles.length} файла(ов)</Badge>
+                      <Badge variant="outline" className="font-black border-blue-200 text-blue-600 dark:text-blue-400">{stockFiles.length} файла(ов)</Badge>
                     )}
                   </div>
 
@@ -1897,11 +1897,14 @@ export function AdminPanel({
                             handleStockFileUpload(event);
                           }
                         }}
-                        className={`relative bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed ${stockFiles.length === 0 ? "border-emerald-400 dark:border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.1)]" : "border-slate-200 dark:border-slate-800"} p-5 flex flex-col items-center justify-center text-center gap-3 cursor-pointer hover:border-emerald-500 transition-all min-h-[140px]`}
+                        className={`relative bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed ${stockFiles.length === 0 ? "border-blue-400 dark:border-blue-500 animate-pulse-border" : "border-slate-200 dark:border-slate-800"} p-5 flex flex-col items-center justify-center text-center gap-3 cursor-pointer hover:border-blue-500 dark:hover:border-blue-400 transition-all min-h-[140px]`}
                       >
                         <input type="file" ref={stockFileInputRef} onChange={handleStockFileUpload} className="hidden" multiple accept=".pdf,.xlsx,.csv,.txt,.docx" />
-                        <div className="relative w-14 h-14 bg-emerald-50 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform duration-300">
-                          <Layers className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                        <div className="relative w-14 h-14 bg-blue-50 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform duration-300">
+                          <Layers className="w-6 h-6" />
+                          {stockFiles.length === 0 && (
+                            <div className="absolute inset-0 rounded-2xl border-2 border-blue-400 animate-ping opacity-75"></div>
+                          )}
                         </div>
                         <div className="flex flex-col gap-1">
                           <p className="text-base font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none">
@@ -1915,7 +1918,7 @@ export function AdminPanel({
                           variant="ghost"
                           size="sm"
                           onClick={(e) => { e.stopPropagation(); setIsStockManualOpen(true); }}
-                          className="mt-2 text-[10px] uppercase font-black tracking-widest text-emerald-600/70"
+                          className="mt-2 text-[10px] uppercase font-black tracking-widest text-blue-500/80 hover:text-blue-600"
                           leftIcon={<BookOpen className="w-4 h-4" />}
                         >
                           Как подготовить файл?
@@ -1930,7 +1933,7 @@ export function AdminPanel({
                             {stockFiles.map((file) => (
                               <div key={file.id} className="p-5 flex items-center justify-between group/item hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
                                 <div className="flex items-center gap-4">
-                                  <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl flex items-center justify-center text-emerald-400 group-hover/item:text-emerald-600 transition-colors">
+                                  <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/10 rounded-2xl flex items-center justify-center text-blue-400 group-hover/item:text-blue-600 transition-colors">
                                     <Layers className="w-6 h-6" />
                                   </div>
                                   <div>
@@ -1956,7 +1959,7 @@ export function AdminPanel({
                             <div className="p-4 bg-slate-50/50 dark:bg-black/10 border-t border-slate-100 dark:border-slate-800">
                               <Button
                                 variant="secondary"
-                                className="w-full font-black uppercase tracking-widest text-[11px] h-12 border-emerald-200/50 text-emerald-600"
+                                className="w-full font-black uppercase tracking-widest text-[11px] h-12 border-blue-200/50 text-blue-600"
                                 onClick={() => {
                                   if (activeTab === "supply") setSupplySection("stock");
                                   else setProductionSection("stock");
@@ -1977,7 +1980,7 @@ export function AdminPanel({
                 <div className="flex flex-col gap-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-sky-50 dark:bg-sky-900/30 rounded-xl flex items-center justify-center text-sky-600 dark:text-sky-400 border border-sky-100 dark:border-sky-800/50">
+                      <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800/50">
                         <ShoppingCart className="w-5 h-5" />
                       </div>
                       <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">
@@ -1985,7 +1988,7 @@ export function AdminPanel({
                       </h3>
                     </div>
                     {supplyPlanFiles.length > 0 && (
-                      <Badge variant="outline" className="font-black border-sky-200 text-sky-600 dark:text-sky-400">{supplyPlanFiles.length} файла(ов)</Badge>
+                      <Badge variant="outline" className="font-black border-blue-200 text-blue-600 dark:text-blue-400">{supplyPlanFiles.length} файла(ов)</Badge>
                     )}
                   </div>
 
@@ -2004,11 +2007,14 @@ export function AdminPanel({
                             handleSupplyPlanFileUpload(event);
                           }
                         }}
-                        className={`relative bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed ${supplyPlanFiles.length === 0 ? "border-sky-400 dark:border-sky-500 shadow-[0_0_20px_rgba(14,165,233,0.1)]" : "border-slate-200 dark:border-slate-800"} p-5 flex flex-col items-center justify-center text-center gap-3 cursor-pointer hover:border-sky-500 transition-all min-h-[140px]`}
+                        className={`relative bg-white dark:bg-[#1A1C19] rounded-[24px] border-2 border-dashed ${supplyPlanFiles.length === 0 ? "border-blue-400 dark:border-blue-500 animate-pulse-border" : "border-slate-200 dark:border-slate-800"} p-5 flex flex-col items-center justify-center text-center gap-3 cursor-pointer hover:border-blue-500 dark:hover:border-blue-400 transition-all min-h-[140px]`}
                       >
                         <input type="file" ref={supplyPlanFileInputRef} onChange={handleSupplyPlanFileUpload} className="hidden" multiple accept=".pdf,.xlsx,.csv,.txt,.docx" />
-                        <div className="relative w-14 h-14 bg-sky-50 dark:bg-sky-900/20 rounded-2xl flex items-center justify-center text-sky-500 group-hover:scale-110 transition-transform duration-300">
-                          <ShoppingCart className="w-6 h-6 text-sky-600 dark:text-sky-400" />
+                        <div className="relative w-14 h-14 bg-blue-50 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform duration-300">
+                          <ShoppingCart className="w-6 h-6" />
+                          {supplyPlanFiles.length === 0 && (
+                            <div className="absolute inset-0 rounded-2xl border-2 border-blue-400 animate-ping opacity-75"></div>
+                          )}
                         </div>
                         <div className="flex flex-col gap-1">
                           <p className="text-base font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none">
@@ -2028,7 +2034,7 @@ export function AdminPanel({
                             {supplyPlanFiles.map((file) => (
                               <div key={file.id} className="p-5 flex items-center justify-between group/item hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
                                 <div className="flex items-center gap-4">
-                                  <div className="w-12 h-12 bg-sky-50 dark:bg-sky-900/10 rounded-2xl flex items-center justify-center text-sky-400 group-hover/item:text-sky-600 transition-colors">
+                                  <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/10 rounded-2xl flex items-center justify-center text-blue-400 group-hover/item:text-blue-600 transition-colors">
                                     <ShoppingCart className="w-6 h-6" />
                                   </div>
                                   <div>
@@ -2054,7 +2060,7 @@ export function AdminPanel({
                             <div className="p-4 bg-slate-50/50 dark:bg-black/10 border-t border-slate-100 dark:border-slate-800">
                               <Button
                                 variant="secondary"
-                                className="w-full font-black uppercase tracking-widest text-[11px] h-12 border-sky-200/50 text-sky-600"
+                                className="w-full font-black uppercase tracking-widest text-[11px] h-12 border-blue-200/50 text-blue-600"
                                 onClick={() => {
                                   if (activeTab === "supply") setSupplySection("supply-plans");
                                 }}

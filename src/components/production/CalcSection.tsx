@@ -93,14 +93,18 @@ export function CalcSection({
               <h4 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-tight leading-tight shrink-0">
                 Портфель заказов
               </h4>
-              <div className="flex items-center gap-3  dark: px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800">
-                <span className="text-[9px] text-slate-800 dark:text-slate-200/70 dark:text-slate-800 dark:text-slate-200 font-black uppercase tracking-widest">
+              <div className="flex items-center px-4 py-1.5 text-slate-800 dark:text-slate-200 font-black border border-slate-200 dark:border-slate-800 rounded-xl">
+                <span className="text-[9px] mr-2 uppercase font-bold opacity-60 tracking-widest">
                   Остаток выполнения
                 </span>
-                <span className="text-xl font-black text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 flex items-baseline gap-1">
-                  {totalRemaining.toFixed(3)}
-                  <span className="text-[10px] font-black opacity-70">ТН</span>
-                </span>
+                <div>
+                  <span className="text-base tracking-tight leading-none">
+                    {totalRemaining.toFixed(3)}
+                  </span>
+                  <span className="text-[8px] ml-1 uppercase font-bold">
+                    тн
+                  </span>
+                </div>
               </div>
             </div>
 

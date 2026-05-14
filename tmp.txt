@@ -1,0 +1,35 @@
+323-                        navigator.clipboard.writeText(tsv);
+324-                      }
+325-                      setIsCopied(true);
+326-                      setTimeout(() => setIsCopied(false), 2000);
+327-                    }}
+328:                    className={`flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl transition-all active:scale-[0.9] shadow-sm border ${
+329-                      isCopied
+330-                        ? " dark: text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800"
+331-                        : "bg-white dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 hover:text-slate-900 dark:hover:bg-slate-700 dark:hover:text-white"
+332-                    }`}
+333-                    title="Скопировать для Excel"
+--
+428-
+429-                      const workbook = XLSX.utils.book_new();
+430-                      XLSX.utils.book_append_sheet(workbook, worksheet, "Расчет с наличием");
+431-                      XLSX.writeFile(workbook, getTimestampedFilename("Расчет потребности в заготовке"));
+432-                    }}
+433:                    className="flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-[0.9] shadow-sm"
+434-                    title="Скачать в Excel"
+435-                  >
+436-                    <Download className="w-4 h-4" />
+437-                  </button>
+438-                </div>
+--
+440-            </div>
+441-          </div>
+442-
+443-          {filteredMatchedDemand.length > 0 && (
+444-            <>
+445:              <div className="bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm overflow-hidden flex flex-col h-full">
+446-                <div
+447-                  ref={supplyTableRef}
+448-                  onMouseDown={onSupplyMouseDown}
+449-                  onMouseLeave={handleMouseLeaveOrUp}
+450-                  onMouseUp={handleMouseLeaveOrUp}
