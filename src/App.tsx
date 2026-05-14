@@ -462,12 +462,11 @@ export default function App() {
 
       try {
         const promises = [];
-        if (db && isCloudActive) {
-          promises.push(saveSystemDataToCloud(db, "settings", "prices", payload, false));
-        }
+        // Save to any configured cloud backends
+        promises.push(saveSystemDataToCloud(db, "settings", "prices", payload, config?.usePostgres));
+        
         if (config?.usePostgres) {
           promises.push(backendService.saveGlobalSettings(payload));
-          promises.push(saveSystemDataToCloud(db, "settings", "prices", payload, true));
         }
         
         await Promise.allSettled(promises);
@@ -494,11 +493,7 @@ export default function App() {
           updatedAt: new Date().toISOString()
         };
 
-        if (config?.usePostgres) {
-          await backendService.saveSettings(user.uid, personalPayload);
-        } else if (db && isCloudActive) {
-          await saveUserSettingsToCloud(db, user.uid, personalPayload, config?.usePostgres);
-        }
+        await saveUserSettingsToCloud(db, user.uid, personalPayload, config?.usePostgres);
       } catch (error) {
         if (isCloudActive) {
           handleFirestoreError(error as any, OperationType.WRITE, `users/${user.uid}/settings/preferences`);

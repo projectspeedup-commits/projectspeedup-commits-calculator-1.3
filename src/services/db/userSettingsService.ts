@@ -10,13 +10,15 @@ export const subscribeToUserSettings = (
 ) => {
   if (!userId) return () => {};
 
-  if (!usePostgres && db) {
-    return onSnapshot(
+  let unsubFirebase = () => {};
+
+  if (db) {
+    unsubFirebase = onSnapshot(
       doc(db, "users", userId, "settings", "preferences"),
       (snapshot) => {
         if (snapshot.exists()) {
           onData(snapshot.data());
-        } else {
+        } else if (!usePostgres) {
           onData(null);
         }
       },
@@ -27,23 +29,26 @@ export const subscribeToUserSettings = (
   }
 
   let isMounted = true;
-  let interval: ReturnType<typeof setInterval>;
+  let interval: ReturnType<typeof setInterval> | undefined;
 
-  const fetchData = async () => {
-    try {
-      const data = await backendService.getSettings(userId);
-      if (isMounted) onData(data);
-    } catch (e) {
-      if (isMounted && onError) onError(e);
-    }
-  };
+  if (usePostgres) {
+    const fetchData = async () => {
+      try {
+        const data = await backendService.getSettings(userId);
+        if (isMounted && data) onData(data);
+      } catch (e) {
+        if (isMounted && onError) onError(e);
+      }
+    };
 
-  fetchData();
-  interval = setInterval(fetchData, 10000); // 10 seconds poll
+    fetchData();
+    interval = setInterval(fetchData, 10000); // 10 seconds poll
+  }
 
   return () => {
+    unsubFirebase();
     isMounted = false;
-    clearInterval(interval);
+    if (interval) clearInterval(interval);
   };
 };
 
@@ -55,11 +60,14 @@ export const saveUserSettingsToCloud = async (
 ) => {
   if (!userId) return;
   try {
+    const promises = [];
     if (usePostgres) {
-      await backendService.saveSettings(userId, payload);
-    } else if (db) {
-      await setDoc(doc(db, "users", userId, "settings", "preferences"), payload);
+      promises.push(backendService.saveSettings(userId, payload));
     }
+    if (db) {
+      promises.push(setDoc(doc(db, "users", userId, "settings", "preferences"), payload));
+    }
+    await Promise.allSettled(promises);
   } catch (e) {
     console.error("Failed to save settings", e);
   }
@@ -73,13 +81,15 @@ export const subscribeToSystemData = (
   onError?: (error: any) => void,
   usePostgres: boolean = false
 ) => {
-  if (!usePostgres && db) {
-    return onSnapshot(
+  let unsubFirebase = () => {};
+
+  if (db) {
+    unsubFirebase = onSnapshot(
       doc(db, collectionName, type),
       (snapshot) => {
         if (snapshot.exists()) {
           onData(snapshot.data());
-        } else {
+        } else if (!usePostgres) {
           onData(null);
         }
       },
@@ -90,23 +100,26 @@ export const subscribeToSystemData = (
   }
 
   let isMounted = true;
-  let interval: ReturnType<typeof setInterval>;
+  let interval: ReturnType<typeof setInterval> | undefined;
 
-  const fetchData = async () => {
-    try {
-      const data = await backendService.getAdminData(`${collectionName}_${type}`);
-      if (isMounted) onData(data);
-    } catch (e) {
-      if (isMounted && onError) onError(e);
-    }
-  };
+  if (usePostgres) {
+    const fetchData = async () => {
+      try {
+        const data = await backendService.getAdminData(`${collectionName}_${type}`);
+        if (isMounted && data) onData(data);
+      } catch (e) {
+        if (isMounted && onError) onError(e);
+      }
+    };
 
-  fetchData();
-  interval = setInterval(fetchData, 10000);
+    fetchData();
+    interval = setInterval(fetchData, 10000);
+  }
 
   return () => {
+    unsubFirebase();
     isMounted = false;
-    clearInterval(interval);
+    if (interval) clearInterval(interval);
   };
 };
 
@@ -118,16 +131,17 @@ export const saveSystemDataToCloud = async (
   usePostgres: boolean = false
 ) => {
   try {
+    const promises = [];
     if (usePostgres) {
       console.log(`Saving to Postgres: ${collectionName}_${type}`);
-      await backendService.saveAdminData(`${collectionName}_${type}`, payload);
-      console.log(`Successfully saved to Postgres: ${collectionName}_${type}`);
-    } else if (db) {
-      console.log(`Saving to Firebase: ${collectionName}/${type}`);
-      await setDoc(doc(db, collectionName, type), payload);
-      console.log(`Successfully saved to Firebase: ${collectionName}/${type}`);
+      promises.push(backendService.saveAdminData(`${collectionName}_${type}`, payload));
     }
+    if (db) {
+      console.log(`Saving to Firebase: ${collectionName}/${type}`);
+      promises.push(setDoc(doc(db, collectionName, type), payload));
+    }
+    await Promise.allSettled(promises);
   } catch (e) {
-    console.warn(`Failed to save system data to ${usePostgres ? 'Postgres' : 'Firebase'}:`, e);
+    console.warn(`Failed to save system data:`, e);
   }
 };
