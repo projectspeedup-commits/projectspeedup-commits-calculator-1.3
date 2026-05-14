@@ -50,7 +50,7 @@ export function SupplyCalcSection(props: any) {
  setProductionSection("files");
  }
  }}
- className="px-6 py-3  hover: text-white rounded-xl font-bold shadow-[0_4px_20px_rgba(37,99,235,0.2)] hover:shadow-[0_4px_24px_rgba(37,99,235,0.3)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center gap-2"
+ className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-[0_4px_20px_rgba(37,99,235,0.2)] hover:shadow-[0_4px_24px_rgba(37,99,235,0.3)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center gap-2"
  >
  Перейти к загрузке файлов
  <ArrowRight className="w-4 h-4 ml-1" />
@@ -221,7 +221,7 @@ export function SupplyCalcSection(props: any) {
  grade,
  parseFloat(size) || size,
  length,
- parseFloat((res.weightTons||res.totalWeight||0).toFixed(3)),
+ parseFloat(data.weight.toFixed(3)),
  ];
  if (!isPurchasingMode)
  row.push(Math.round(data.cost));
@@ -236,7 +236,7 @@ export function SupplyCalcSection(props: any) {
  0,
  );
  const totalRow = ["ИТОГО","","","","",
- parseFloat((res.weightTons||res.totalWeight||0).toFixed(3)),
+ parseFloat((totalWeight||0).toFixed(3)),
  ];
  if (!isPurchasingMode) {
  const totalCost = rows.reduce(
@@ -392,7 +392,7 @@ export function SupplyCalcSection(props: any) {
  <div className="flex flex-col items-end leading-none gap-0.5">
  <div className="flex items-baseline gap-1.5">
  <span className="text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-black text-[10px]">
- {(res.weightTons||res.totalWeight||0).toFixed(3)}{""}
+ {data.weight.toFixed(3)}{""}
  <span className="font-medium text-[8px] text-slate-800 dark:text-slate-200/60 uppercase">
  тн
  </span>
@@ -545,7 +545,7 @@ export function SupplyCalcSection(props: any) {
 
  <button
  onClick={applyAllOptimizations}
- className="flex items-center justify-center gap-2 px-4 py-2  hover: text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-600/20 active:scale-95 w-full sm:w-auto order-first sm:order-none"
+ className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-600/20 active:scale-95 w-full sm:w-auto order-first sm:order-none"
  title="Применить рекомендуемую длину заготовки ко всем строкам для максимизации КИМ"
  >
  <TrendingUp className="w-4 h-4 shadow-sm" />
@@ -620,16 +620,16 @@ export function SupplyCalcSection(props: any) {
  );
  totalRowSh[0] ="ИТОГО";
  totalRowSh[10] = String(
- (res.weightTons||res.totalWeight||0).toFixed(3),
+ (totalWeightSh||0).toFixed(3),
  ).replace(".",",");
  totalRowSh[14] = String(
- (res.weightTons||res.totalWeight||0).toFixed(3)
+ (totalZagSh||0).toFixed(3)
  ).replace(".",",");
  totalRowSh[16] = String(
- (res.weightTons||res.totalWeight||0).toFixed(3)
+ (totalTechSh||0).toFixed(3)
  ).replace(".",",");
  totalRowSh[17] = String(
- (res.weightTons||res.totalWeight||0).toFixed(3)
+ (totalDelovSh||0).toFixed(3)
  ).replace(".",",");
  totalRowSh[18] = String(
  (totalZagSh > 0 ? totalWeightSh / totalZagSh : 0).toFixed(3)
@@ -644,7 +644,7 @@ export function SupplyCalcSection(props: any) {
  }}
  className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm w-[calc(50%-0.25rem)] sm:w-auto ${
  copySuccess
- ?" text-slate-800 dark:text-slate-200 dark: dark:text-slate-800 dark:text-slate-200"
+ ?"bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
  :"bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
  }`}
  title="Скопировать для вставки (Ctrl+V) в Google Таблицы"
@@ -760,14 +760,14 @@ export function SupplyCalcSection(props: any) {
  );
  totalRowEX[0] ="ИТОГО";
  totalRowEX[9] = parseFloat(
- (res.weightTons||res.totalWeight||0).toFixed(3),
+ (totalInOrderEX||0).toFixed(3),
  );
  totalRowEX[10] = parseFloat(
- (res.weightTons||res.totalWeight||0).toFixed(3),
+ (totalRemainingEX||0).toFixed(3),
  );
- totalRowEX[14] = parseFloat((res.weightTons||res.totalWeight||0).toFixed(3));
- totalRowEX[16] = parseFloat((res.weightTons||res.totalWeight||0).toFixed(3));
- totalRowEX[17] = parseFloat((res.weightTons||res.totalWeight||0).toFixed(3));
+ totalRowEX[14] = parseFloat((totalZagEX||0).toFixed(3));
+ totalRowEX[16] = parseFloat((totalTechEX||0).toFixed(3));
+ totalRowEX[17] = parseFloat((totalDelovEX||0).toFixed(3));
  totalRowEX[18] = parseFloat((totalZagEX > 0 ? totalRemainingEX / totalZagEX : 0).toFixed(3));
 
  if (!isPurchasingMode) {
@@ -883,7 +883,7 @@ export function SupplyCalcSection(props: any) {
  getTimestampedFilename("Расчет потребности в заготовке"),
  );
  }}
- className="flex items-center justify-center gap-2 px-4 py-2  hover: text-white rounded-xl text-xs font-bold transition-colors shadow-sm w-[calc(50%-0.25rem)] sm:w-auto"
+ className="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/40 dark:hover:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50 rounded-xl text-xs font-bold transition-colors shadow-sm w-[calc(50%-0.25rem)] sm:w-auto"
  >
  <svg
  xmlns="http://www.w3.org/2000/svg"

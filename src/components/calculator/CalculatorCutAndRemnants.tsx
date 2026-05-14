@@ -158,7 +158,7 @@ export function CalculatorCutAndRemnants({
                         type="text"
                         readOnly
                         value={formatInputValue(frontCoef)}
-                        className="w-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-lg px-3 h-9 text-sm font-medium cursor-default focus:outline-none"
+                        className="w-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-lg px-3 min-h-[44px] md:min-h-0 md:h-9 text-sm font-medium cursor-default focus:outline-none"
                       />
                     </div>
 
@@ -170,7 +170,7 @@ export function CalculatorCutAndRemnants({
                         type="text"
                         readOnly
                         value={formatInputValue(backCoef)}
-                        className="w-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-lg px-3 h-9 text-sm font-medium cursor-default focus:outline-none"
+                        className="w-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-lg px-3 min-h-[44px] md:min-h-0 md:h-9 text-sm font-medium cursor-default focus:outline-none"
                       />
                     </div>
 
@@ -183,7 +183,7 @@ export function CalculatorCutAndRemnants({
                           type="text"
                           readOnly
                           value={techEndsMm}
-                          className="w-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-lg pl-3 pr-8 h-9 text-sm font-medium cursor-default focus:outline-none"
+                          className="w-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-lg pl-3 pr-8 min-h-[44px] md:min-h-0 md:h-9 text-sm font-medium cursor-default focus:outline-none"
                         />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-medium text-xs">
                           мм
@@ -200,7 +200,7 @@ export function CalculatorCutAndRemnants({
                           type="text"
                           readOnly
                           value={lengthAfterTechEnds}
-                          className="w-full bg-[#E6F4EA] dark:bg-green-900/10 border border-[#CEEAD6] dark:border-green-900/30 text-[#0D652D] dark:text-green-400 rounded-lg pl-3 pr-8 h-9 text-sm font-semibold cursor-default focus:outline-none"
+                          className="w-full bg-[#E6F4EA] dark:bg-green-900/10 border border-[#CEEAD6] dark:border-green-900/30 text-[#0D652D] dark:text-green-400 rounded-lg pl-3 pr-8 min-h-[44px] md:min-h-0 md:h-9 text-sm font-semibold cursor-default focus:outline-none"
                         />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[#0D652D]/60 dark:text-green-400/60 font-medium text-xs">
                           мм

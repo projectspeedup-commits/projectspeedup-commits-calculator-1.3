@@ -51,7 +51,7 @@ export function StockSection({
                     {processedStock.length} позиций
                   </Badge>
                   <Badge variant="success" className="text-[10px] font-black">
-                    Итого: {(0).toFixed(3)} тн.
+                    Итого: {totalStock.toFixed(3)} тн.
                   </Badge>
                 </div>
               </div>
@@ -118,7 +118,7 @@ export function StockSection({
                 <tr key={i} className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors group">
                   <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
                     <div
-                      className="max-w-[12rem] md:max-w-[300px] truncate font-mono text-[10px] text-slate-500 group-hover:text-slate-900 dark:group-hover:text-white transition-colors"
+                      className="max-w-[12rem] md:max-w-[300px] truncate font-mono text-[10px] text-slate-500 group-hover:text-slate-900 dark:text-white dark:group-hover:text-white transition-colors"
                       title={row["Исходная Номенклатура"]}
                     >
                       {row["Исходная Номенклатура"]}

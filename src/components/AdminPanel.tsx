@@ -1688,7 +1688,7 @@ export function AdminPanel({
       <div className="relative">
         {isAnyProcessing && (
           <div className="absolute inset-0 bg-white/60 dark:bg-black/60 backdrop-blur-md z-50 flex flex-col items-center justify-center min-h-[400px] rounded-3xl transition-all duration-500">
-            <Card className="flex flex-col items-center gap-8 p-12 max-w-sm w-full animate-in zoom-in-95 duration-300">
+            <Card className="flex flex-col items-center gap-8 p-6 md:p-12 max-w-sm w-full animate-in zoom-in-95 duration-300">
               <div className="relative w-20 h-20">
                 <div className="absolute inset-0 border-4 border-slate-100 dark:border-slate-800 rounded-full" />
                 <div className="absolute inset-0 border-4 border-blue-500 rounded-full border-t-transparent animate-spin" />
@@ -2079,7 +2079,7 @@ export function AdminPanel({
   return (
     <div className="min-h-screen bg-[#F4F5F4] dark:bg-[#121411] flex flex-col md:flex-row transition-colors duration-300">
       {/* Mobile App Navigation Bar */}
-      <div className="md:hidden fixed bottom-0 w-full bg-white/95 dark:bg-[#1A1C19]/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 flex items-center h-[72px] pb-4 px-2 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] overflow-x-auto [&::-webkit-scrollbar]:hidden gap-1">
+      <div className="md:hidden fixed bottom-0 w-full bg-white/95 dark:bg-[#1A1C19]/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 flex items-center h-[72px] pb-4 px-2 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] overflow-x-auto w-full [&::-webkit-scrollbar]:hidden gap-1">
         {!isPurchasingMode && (
           <button
             onClick={() => setActiveTab("economy")}
@@ -2257,7 +2257,7 @@ export function AdminPanel({
 
           <button
             onClick={toggleTheme}
-            className="w-full flex flex-col items-center justify-center py-4 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all active:scale-95 group"
+            className="w-full flex flex-col items-center justify-center py-4 text-slate-500 hover:text-slate-900 dark:text-white dark:hover:text-white transition-all active:scale-95 group"
           >
             <div className="px-5 py-1.5 mb-1.5 transition-colors group-hover:bg-slate-100 dark:group-hover:bg-slate-800 rounded-full">
               {isDarkMode ? (
@@ -2274,7 +2274,7 @@ export function AdminPanel({
         <div className="w-full px-3">
           <button
             onClick={onLogout}
-            className="w-full flex flex-col items-center justify-center py-4 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+            className="w-full flex flex-col items-center justify-center py-4 text-slate-500 hover:text-slate-900 dark:text-white dark:hover:text-white transition-colors"
           >
             <div className="px-5 py-1.5 mb-1.5">
               <LogOut className="w-6 h-6" strokeWidth={2} />

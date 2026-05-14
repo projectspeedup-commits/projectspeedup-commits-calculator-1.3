@@ -218,7 +218,7 @@ export function StockManualModal({ isOpen, onClose }: StockManualModalProps) {
                 </p>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
-                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white dark:bg-slate-900/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
                       <strong className="text-white">
                         Правило 1 (МД заготовка):
@@ -229,7 +229,7 @@ export function StockManualModal({ isOpen, onClose }: StockManualModalProps) {
                     </p>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white dark:bg-slate-900/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
                       <strong className="text-white">
                         Правило 2 (НД и МД 6000 заготовка):

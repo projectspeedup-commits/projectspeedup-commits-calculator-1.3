@@ -42,7 +42,7 @@ export function PrintTemplate({
 
   return (
     <div
-      className="hidden print:block print-template-container bg-white w-[210mm] min-h-[297mm] mx-auto text-black font-serif text-[12px] leading-tight shadow-none"
+      className="hidden print:block print-template-container bg-white dark:bg-slate-900 w-[210mm] min-h-[297mm] mx-auto text-black font-serif text-[12px] leading-tight shadow-none"
       style={{ WebkitPrintColorAdjust: "exact", printColorAdjust: "exact" }}
     >
       <style>
@@ -102,7 +102,7 @@ export function PrintTemplate({
           <h2 className="text-[12px] font-bold border-b border-black mb-2 uppercase">
             1. Коммерческий блок
           </h2>
-          <table className="w-full text-[11px] border-collapse border border-black mb-2">
+          <table className="w-full text-[11px] border-collapse border border-black mb-2 text-[10px] md:text-xs">
             <tbody>
               <tr>
                 <td className="border border-black p-1.5 font-bold w-[20%] bg-gray-50">
@@ -170,7 +170,7 @@ export function PrintTemplate({
             <h2 className="text-[12px] font-bold border-b border-black mb-2 uppercase">
               2. Производственный блок
             </h2>
-            <table className="w-full text-[11px] border-collapse border border-black">
+            <table className="w-full text-[11px] border-collapse border border-black text-[10px] md:text-xs">
               <tbody>
                 <tr>
                   <td className="border border-black p-1.5 bg-gray-50 font-medium">
@@ -273,7 +273,7 @@ export function PrintTemplate({
             4. Экономика (на 1 тонну)
           </h2>
 
-          <table className="w-full text-[11px] border-collapse border border-black">
+          <table className="w-full text-[11px] border-collapse border border-black text-[10px] md:text-xs">
             <tbody>
               <tr>
                 <td className="border border-black p-1.5 w-2/3 bg-gray-50 font-bold">

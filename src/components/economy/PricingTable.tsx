@@ -43,7 +43,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
         </div>
       }
     >
-      <div className="overflow-x-auto max-h-[60vh] custom-scrollbar">
+      <div className="overflow-x-auto w-full max-h-[60vh] custom-scrollbar">
         <table className="w-full text-left border-collapse text-xs whitespace-nowrap text-slate-800 dark:text-slate-200">
           <thead className="sticky top-0 z-20 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
             <tr>

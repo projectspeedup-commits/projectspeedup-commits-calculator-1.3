@@ -77,7 +77,7 @@ export function UserManualModal({ isOpen, onClose }: UserManualModalProps) {
               </div>
               <button
                 onClick={onClose}
-                className="p-3 text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-all active:scale-90"
+                className="p-3 text-slate-400 hover:text-slate-900 dark:text-white dark:hover:text-white rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-all active:scale-90"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -115,7 +115,7 @@ export function UserManualModal({ isOpen, onClose }: UserManualModalProps) {
                 </h4>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
-                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white dark:bg-slate-900/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
                       <strong className="text-white">
                         Кнопка "Копировать":
@@ -126,7 +126,7 @@ export function UserManualModal({ isOpen, onClose }: UserManualModalProps) {
                     </p>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white dark:bg-slate-900/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
                       <strong className="text-white">
                         Светофор рентабельности:
@@ -137,7 +137,7 @@ export function UserManualModal({ isOpen, onClose }: UserManualModalProps) {
                     </p>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white dark:bg-slate-900/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
                       <strong className="text-white">
                         Волшебный чип (Реком. заготовка):
@@ -148,7 +148,7 @@ export function UserManualModal({ isOpen, onClose }: UserManualModalProps) {
                     </p>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white dark:bg-slate-900/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
                       <strong className="text-white">
                         Что такое "Прутков в 1 тн":
@@ -158,7 +158,7 @@ export function UserManualModal({ isOpen, onClose }: UserManualModalProps) {
                     </p>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white dark:bg-slate-900/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
                       <strong className="text-white">Мгновенная печать:</strong>{" "}
                       Вы можете сразу распечатать коммерческое предложение или
@@ -180,7 +180,7 @@ export function UserManualModal({ isOpen, onClose }: UserManualModalProps) {
                 </p>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
-                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white dark:bg-slate-900/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
                       <strong className="text-white">Правило 1:</strong> Если
                       заготовка МД (не 6000), приоритет заказам МД по
@@ -188,7 +188,7 @@ export function UserManualModal({ isOpen, onClose }: UserManualModalProps) {
                     </p>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white dark:bg-slate-900/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
                       <strong className="text-white">Правило 2:</strong>{" "}
                       Заготовки МД 6000, НД в первую очередь отдаются заказам с
@@ -196,7 +196,7 @@ export function UserManualModal({ isOpen, onClose }: UserManualModalProps) {
                     </p>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white dark:bg-slate-900/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
                       <strong className="text-white">Авто-применение:</strong>{" "}
                       Оптимизация применяется автоматически в разделе

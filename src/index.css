@@ -44,6 +44,7 @@
 
 @layer base {
   body {
+    background-color: #F0F4F4;
     color: var(--color-m3-text);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -52,6 +53,10 @@
       background-color 0.3s ease,
       color 0.3s ease;
   }
+}
+
+.dark body {
+  background-color: #111310;
 }
 
 @media print {

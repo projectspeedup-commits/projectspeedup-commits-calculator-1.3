@@ -179,7 +179,7 @@ export function CalcSection({
                   <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >{res.orderNo}</td>
                   <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >{res.client}</td>
                   <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
-                    <div className="truncate font-mono text-[10px] text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors text-center" title={res.nomenclature}>
+                    <div className="truncate font-mono text-[10px] text-slate-400 group-hover:text-slate-900 dark:text-white dark:group-hover:text-white transition-colors text-center" title={res.nomenclature}>
                       {res.nomenclature}
                     </div>
                   </td>

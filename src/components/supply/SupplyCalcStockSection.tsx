@@ -23,7 +23,7 @@ export function SupplyCalcStockSection(props: any) {
  className={`flex flex-col gap-8`}
  >
  {matchedDemand.length === 0 ? (
- <div className="bg-white/50 dark:bg-[#1A1C19]/40 border border-slate-200 dark:border-slate-800 rounded-[40px] p-12 flex flex-col items-center justify-center min-h-[500px]">
+ <div className="bg-white/50 dark:bg-[#1A1C19]/40 border border-slate-200 dark:border-slate-800 rounded-[40px] p-6 md:p-12 flex flex-col items-center justify-center min-h-[500px]">
  <div className="flex items-center gap-4 sm:gap-8 mb-8 relative">
  <div className="relative">
  <div className="w-20 h-20  dark: rounded-2xl flex items-center justify-center border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800 z-10 relative">
@@ -78,7 +78,7 @@ export function SupplyCalcStockSection(props: any) {
  setProductionSection("files");
  }
  }}
- className="px-6 py-3  hover: text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center gap-2"
+ className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center gap-2"
  >
  <Upload className="w-4 h-4" />
  Загрузить файлы для сравнения
@@ -107,7 +107,7 @@ export function SupplyCalcStockSection(props: any) {
  </span>
  <div>
  <span className="text-base font-black tracking-tight leading-none text-slate-800 dark:text-slate-200">
- {(res.weightTons||res.totalWeight||0).toFixed(3)}
+ { (stockTotals?.allocated || 0).toFixed(3) }
  </span>
  <span className="text-[8px] ml-1 uppercase font-bold text-slate-800 dark:text-slate-200">
  тн
@@ -120,7 +120,7 @@ export function SupplyCalcStockSection(props: any) {
  </span>
  <div>
  <span className="text-base font-black tracking-tight leading-none text-slate-800 dark:text-slate-200">
- {(res.weightTons||res.totalWeight||0).toFixed(3)}
+ { (stockTotals?.deficit || 0).toFixed(3) }
  </span>
  <span className="text-[8px] ml-1 uppercase font-bold text-slate-800 dark:text-slate-200">
  тн
@@ -184,19 +184,19 @@ export function SupplyCalcStockSection(props: any) {
  res.allocatedStock > 0 &&
  res.combinedTechWaste > 0
  ? String(
- (res.weightTons||res.totalWeight||0).toFixed(3),
+ (res.combinedTechWaste || 0).toFixed(3),
  ).replace(".",",")
  :"0",
  res.allocatedStock > 0 &&
  res.combinedUsefulRem > 0
  ? String(
- (res.weightTons||res.totalWeight||0).toFixed(3),
+ (res.combinedUsefulRem || 0).toFixed(3),
  ).replace(".",",")
  :"0",
  res.allocatedStock > 0 &&
  res.combinedKim > 0
  ? String(
- (res.weightTons||res.totalWeight||0).toFixed(3),
+ (res.combinedKim || 0).toFixed(3),
  ).replace(".",",")
  :"0",
  ];
@@ -281,19 +281,19 @@ export function SupplyCalcStockSection(props: any) {
  String(
  res.allocatedStock > 0 &&
  res.combinedTechWaste > 0
- ? (res.weightTons||res.totalWeight||0).toFixed(3)
+ ? (res.combinedTechWaste || 0).toFixed(3)
  :"0",
  ).replace(".",","),
  String(
  res.allocatedStock > 0 &&
  res.combinedUsefulRem > 0
- ? (res.weightTons||res.totalWeight||0).toFixed(3)
+ ? (res.combinedUsefulRem || 0).toFixed(3)
  :"0",
  ).replace(".",","),
  String(
  res.allocatedStock > 0 &&
  res.combinedKim > 0
- ? (res.weightTons||res.totalWeight||0).toFixed(3)
+ ? (res.combinedKim || 0).toFixed(3)
  :"0",
  ).replace(".",","),
  ];
@@ -409,18 +409,18 @@ export function SupplyCalcStockSection(props: any) {
  res.allocatedStock > 0 &&
  res.combinedTechWaste > 0
  ? Number(
- (res.weightTons||res.totalWeight||0).toFixed(3),
+ (res.combinedTechWaste || 0).toFixed(3),
  )
  : 0,
  res.allocatedStock > 0 &&
  res.combinedUsefulRem > 0
  ? Number(
- (res.weightTons||res.totalWeight||0).toFixed(3),
+ (res.combinedUsefulRem || 0).toFixed(3),
  )
  : 0,
  res.allocatedStock > 0 &&
  res.combinedKim > 0
- ? Number((res.weightTons||res.totalWeight||0).toFixed(3))
+ ? Number((res.combinedKim || 0).toFixed(3))
  : 0,
  ];
  const maxRows = Math.max(
@@ -607,9 +607,7 @@ export function SupplyCalcStockSection(props: any) {
  Σ
  </span>
  <span>
- {(res.weightTons||res.totalWeight||0).toFixed(
- 3,
- )}{""}
+ { (res.weight || res.totalWeight || 0).toFixed(3) }{""}
  тн
  </span>
  </div>
@@ -623,9 +621,7 @@ export function SupplyCalcStockSection(props: any) {
  Σ
  </span>
  <span>
- {(res.weightTons||res.totalWeight||0).toFixed(
- 3,
- )}{""}
+ { (res.remainingToProcess || 0).toFixed(3) }{""}
  тн
  </span>
  </div>
@@ -704,9 +700,7 @@ export function SupplyCalcStockSection(props: any) {
  Обеспечено:
  </span>
  <span className="font-bold text-slate-800 dark:text-slate-200">
- {(res.weightTons||res.totalWeight||0).toFixed(
- 3,
- )}{""}
+ { (res.allocatedStock || 0).toFixed(3) }{""}
  тн
  </span>
  </div>
@@ -715,9 +709,7 @@ export function SupplyCalcStockSection(props: any) {
  Дефицит:
  </span>
  <span className="font-bold text-slate-800 dark:text-slate-200">
- {(res.weightTons||res.totalWeight||0).toFixed(
- 3,
- )}{""}
+ { (res.shortageStock || 0).toFixed(3) }{""}
  тн
  </span>
  </div>
@@ -741,9 +733,7 @@ export function SupplyCalcStockSection(props: any) {
  Обеспечено:
  </span>
  <span className="font-bold text-slate-800 dark:text-slate-200">
- {(res.weightTons||res.totalWeight||0).toFixed(
- 3,
- )}{""}
+ { (res.allocatedStock || 0).toFixed(3) }{""}
  тн
  </span>
  </div>
@@ -752,9 +742,7 @@ export function SupplyCalcStockSection(props: any) {
  Дефицит:
  </span>
  <span className="font-bold text-slate-800 dark:text-slate-200">
- {(res.weightTons||res.totalWeight||0).toFixed(
- 3,
- )}{""}
+ { (res.shortageStock || 0).toFixed(3) }{""}
  тн
  </span>
  </div>
@@ -814,15 +802,13 @@ export function SupplyCalcStockSection(props: any) {
  1,
  res.matchedStockItems.length,
  )}>
- {(res.weightTons||res.totalWeight||0).toFixed(3)}
+ { (res.weight || res.totalWeight || 0).toFixed(3) }
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={Math.max(
  1,
  res.matchedStockItems.length,
  )}>
- {(res.weightTons||res.totalWeight||0).toFixed(
- 3,
- )}
+ { Number(stockItem.stockBeforeTaking || 0).toFixed(3) }
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" rowSpan={Math.max(
  1,
@@ -857,7 +843,7 @@ export function SupplyCalcStockSection(props: any) {
  1,
  res.matchedStockItems.length,
  )}>
- {(res.weightTons||res.totalWeight||0).toFixed(3)}
+ { Number(stockItem.allocatedAmount || 0).toFixed(3) }
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" rowSpan={Math.max(
  1,
@@ -957,7 +943,7 @@ export function SupplyCalcStockSection(props: any) {
  )}
  >
  {res.allocatedStock > 0
- ? (res.weightTons||res.totalWeight||0).toFixed(
+ ? (res.allocatedStock || 0).toFixed(
  3,
  )
  :"—"}
@@ -969,7 +955,7 @@ export function SupplyCalcStockSection(props: any) {
  )}
  >
  {res.shortageStock > 0.0005
- ? (res.weightTons||res.totalWeight||0).toFixed(3)
+ ? (res.shortageStock || 0).toFixed(3)
  :"—"}
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={Math.max(
@@ -978,7 +964,7 @@ export function SupplyCalcStockSection(props: any) {
  )}>
  {res.allocatedStock > 0 &&
  res.combinedTechWaste > 0
- ? (res.weightTons||res.totalWeight||0).toFixed(
+ ? (res.combinedTechWaste || 0).toFixed(
  3,
  )
  :"—"}
@@ -989,7 +975,7 @@ export function SupplyCalcStockSection(props: any) {
  )}>
  {res.allocatedStock > 0 &&
  res.combinedUsefulRem > 0
- ? (res.weightTons||res.totalWeight||0).toFixed(
+ ? (res.combinedUsefulRem || 0).toFixed(
  3,
  )
  :"—"}
@@ -1000,7 +986,7 @@ export function SupplyCalcStockSection(props: any) {
  )}>
  {res.allocatedStock > 0 &&
  res.combinedKim > 0
- ? (res.weightTons||res.totalWeight||0).toFixed(3)
+ ? (res.combinedKim || 0).toFixed(3)
  :"—"}
  </td>
  </>
@@ -1054,19 +1040,13 @@ export function SupplyCalcStockSection(props: any) {
  </span>
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
- {(res.weightTons||res.totalWeight||0).toFixed(
- 3,
- )}
+ { Number(stockItem.stockAfterTaking || 0).toFixed(3) }
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
- {(res.weightTons||res.totalWeight||0).toFixed(
- 3,
- )}
+ { Number(stockItem.allocatedAmount || 0).toFixed(3) }
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
- {(res.weightTons||res.totalWeight||0).toFixed(
- 3,
- )}
+ { Number(stockItem.stockAfterTaking || 0).toFixed(3) }
  </td>
  </>
  ) : (

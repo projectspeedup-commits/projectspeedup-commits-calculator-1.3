@@ -24,7 +24,7 @@ export function SupplyCalcSupplySection(props: any) {
  >
  {supplyCalculationData.matchedDemand.length === 0 ? (
  <div
- className={`bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-[32px] p-12 flex flex-col items-center justify-center min-h-[400px]`}
+ className={`bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-[32px] p-6 md:p-12 flex flex-col items-center justify-center min-h-[400px]`}
  >
  <div
  className={`w-20 h-20  dark: rounded-[30px] flex items-center justify-center text-slate-800 dark:text-slate-200 mb-6`}
@@ -128,7 +128,7 @@ export function SupplyCalcSupplySection(props: any) {
  res.lengthType ==="НД"
  ?"НД"
  : `МД ${res.length}`,
- String(res.weightTons || 0).replace(".",",",
+ String((res.weight || res.totalWeight) || 0).replace(".",",",
  ),
  String(
  res.remainingToProcess || 0,
@@ -140,19 +140,19 @@ export function SupplyCalcSupplySection(props: any) {
  res.allocatedFromStock > 0 &&
  res.combinedTechWaste2 > 0
  ? String(
- (res.weightTons||res.totalWeight||0).toFixed(3),
+ (res.combinedTechWaste || 0).toFixed(3),
  ).replace(".",",")
  :"0",
  res.allocatedFromStock > 0 &&
  res.combinedUsefulRem2 > 0
  ? String(
- (res.weightTons||res.totalWeight||0).toFixed(3),
+ (res.combinedUsefulRem || 0).toFixed(3),
  ).replace(".",",")
  :"0",
  res.allocatedFromStock > 0 &&
  res.combinedKim2 > 0
  ? String(
- (res.weightTons||res.totalWeight||0).toFixed(3),
+ (res.combinedKim || 0).toFixed(3),
  ).replace(".",",")
  :"0",
  String(
@@ -175,19 +175,19 @@ export function SupplyCalcSupplySection(props: any) {
  res.allocatedFromSupply > 0 &&
  res.combinedTechWaste3 > 0
  ? String(
- (res.weightTons||res.totalWeight||0).toFixed(3),
+ (res.combinedTechWaste || 0).toFixed(3),
  ).replace(".",",")
  :"0",
  res.allocatedFromSupply > 0 &&
  res.combinedUsefulRem3 > 0
  ? String(
- (res.weightTons||res.totalWeight||0).toFixed(3),
+ (res.combinedUsefulRem || 0).toFixed(3),
  ).replace(".",",")
  :"0",
  res.allocatedFromSupply > 0 &&
  res.combinedKim3 > 0
  ? String(
- (res.weightTons||res.totalWeight||0).toFixed(3),
+ (res.combinedKim || 0).toFixed(3),
  ).replace(".",",")
  :"0",
  String(res.finalShortage || 0).replace(".",",",
@@ -309,25 +309,16 @@ export function SupplyCalcSupplySection(props: any) {
  res.lengthType ==="НД"
  ?"НД"
  : `МД ${res.length}`,
- Number(res.weightTons || 0),
+ Number((res.weight || res.totalWeight) || 0),
  Number(res.remainingToProcess || 0),
 
  Number(res.allocatedFromStock || 0),
  res.allocatedFromStock > 0 &&
- res.combinedTechWaste2 > 0
- ? Number(
- (res.weightTons||res.totalWeight||0).toFixed(3),
- )
- : 0,
+ res.combinedTechWaste2 > 0 ? Number(res.combinedTechWaste2.toFixed(3)) : 0,
  res.allocatedFromStock > 0 &&
- res.combinedUsefulRem2 > 0
- ? Number(
- (res.weightTons||res.totalWeight||0).toFixed(3),
- )
- : 0,
+ res.combinedUsefulRem2 > 0 ? Number(res.combinedUsefulRem2.toFixed(3)) : 0,
  res.allocatedFromStock > 0 &&
- res.combinedKim2 > 0
- ? Number((res.weightTons||res.totalWeight||0).toFixed(3))
+ res.combinedKim2 > 0 ? Number(res.combinedKim2.toFixed(3))
  : 0,
  Number(res.shortageAfterStock || 0),
  ];
@@ -345,20 +336,11 @@ export function SupplyCalcSupplySection(props: any) {
 
  const supplyBaseCols = [
  res.allocatedFromSupply > 0 &&
- res.combinedTechWaste3 > 0
- ? Number(
- (res.weightTons||res.totalWeight||0).toFixed(3),
- )
- : 0,
+ res.combinedTechWaste3 > 0 ? Number(res.combinedTechWaste3.toFixed(3)) : 0,
  res.allocatedFromSupply > 0 &&
- res.combinedUsefulRem3 > 0
- ? Number(
- (res.weightTons||res.totalWeight||0).toFixed(3),
- )
- : 0,
+ res.combinedUsefulRem3 > 0 ? Number(res.combinedUsefulRem3.toFixed(3)) : 0,
  res.allocatedFromSupply > 0 &&
- res.combinedKim3 > 0
- ? Number((res.weightTons||res.totalWeight||0).toFixed(3))
+ res.combinedKim3 > 0 ? Number(res.combinedKim3.toFixed(3))
  : 0,
  Number(res.finalShortage || 0),
  ];
@@ -720,9 +702,9 @@ export function SupplyCalcSupplySection(props: any) {
  </span>
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
- {res.weightTons
+ {(res.weight || res.totalWeight)
  ? Number(
- res.weightTons,
+ (res.weight || res.totalWeight),
  ).toFixed(3)
  :"0.000"}
  </td>
@@ -738,38 +720,31 @@ export function SupplyCalcSupplySection(props: any) {
  rowSpan={maxRows}
  >
  {res.allocatedFromStock > 0
- ? (res.weightTons||res.totalWeight||0).toFixed(
+ ? ((res.weight || res.totalWeight)||res.totalWeight||0).toFixed(
  3,
  )
  :"0.000"}
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
  {res.allocatedFromStock > 0 &&
- res.combinedTechWaste2 > 0
- ? (res.weightTons||res.totalWeight||0).toFixed(
- 3,
- )
+ res.combinedTechWaste2 > 0 ? res.combinedTechWaste2.toFixed(3)
  :"0.000"}
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
  {res.allocatedFromStock > 0 &&
- res.combinedUsefulRem2 > 0
- ? (res.weightTons||res.totalWeight||0).toFixed(
- 3,
- )
+ res.combinedUsefulRem2 > 0 ? res.combinedUsefulRem2.toFixed(3)
  :"0.000"}
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
  {res.allocatedFromStock > 0 &&
- res.combinedKim2 > 0
- ? (res.weightTons||res.totalWeight||0).toFixed(3)
+ res.combinedKim2 > 0 ? res.combinedKim2.toFixed(3)
  :"0.000"}
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center"
  rowSpan={maxRows}
  >
  {res.shortageAfterStock > 0
- ? (res.weightTons||res.totalWeight||0).toFixed(
+ ? ((res.weight || res.totalWeight)||res.totalWeight||0).toFixed(
  3,
  )
  :"0.000"}
@@ -858,31 +833,23 @@ export function SupplyCalcSupplySection(props: any) {
  <>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
  {res.allocatedFromSupply > 0 &&
- res.combinedTechWaste3 > 0
- ? (res.weightTons||res.totalWeight||0).toFixed(
- 3,
- )
+ res.combinedTechWaste3 > 0 ? res.combinedTechWaste3.toFixed(3)
  :"0.000"}
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
  {res.allocatedFromSupply > 0 &&
- res.combinedUsefulRem3 > 0
- ? (res.weightTons||res.totalWeight||0).toFixed(
- 3,
- )
+ res.combinedUsefulRem3 > 0 ? res.combinedUsefulRem3.toFixed(3)
  :"0.000"}
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
  {res.allocatedFromSupply > 0 &&
- res.combinedKim3 > 0
- ? (res.weightTons||res.totalWeight||0).toFixed(3)
+ res.combinedKim3 > 0 ? res.combinedKim3.toFixed(3)
  :"0.000"}
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center"
  rowSpan={maxRows}
  >
- {res.finalShortage > 0
- ? (res.weightTons||res.totalWeight||0).toFixed(3)
+ {res.finalShortage > 0 ? (res.finalShortage || 0).toFixed(3)
  :"0.000"}
  </td>
  </>

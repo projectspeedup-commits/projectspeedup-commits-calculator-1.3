@@ -34,7 +34,7 @@ export function SupplyPlansSection(props: any) {
                   {processedSupplyPlans.length} позиций
                 </Badge>
                 <Badge variant="success" className="text-[12px] font-black py-1 px-4">
-                  Итого: {(0).toFixed(3)} тн.
+                  Итого: {totalAmount.toFixed(3)} тн.
                 </Badge>
               </div>
             </div>

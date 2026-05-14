@@ -1311,11 +1311,11 @@ export function CalculatorApp({
               </div>
             </div>
 
-            <div className="sticky top-0 z-40 bg-[#F4F5F4]/95 dark:bg-[#121411]/95 backdrop-blur-md py-3 sm:py-3 border-b border-slate-200/50 dark:border-slate-800/50 flex flex-row overflow-x-auto hide-scrollbar items-center justify-start sm:justify-end gap-2 w-[calc(100%+2rem)] -mx-4 px-4 sm:w-auto sm:mx-0 sm:px-0 sm:overflow-visible sm:border-none sm:backdrop-blur-none sm:bg-transparent sm:mb-2 translate-z-0">
+            <div className="sticky top-0 z-40 bg-[#F4F5F4]/95 dark:bg-[#121411]/95 backdrop-blur-md py-3 sm:py-3 border-b border-slate-200/50 dark:border-slate-800/50 flex flex-row overflow-x-auto w-full hide-scrollbar items-center justify-start sm:justify-end gap-2 w-[calc(100%+2rem)] -mx-4 px-4 sm:w-auto sm:mx-0 sm:px-0 sm:overflow-visible sm:border-none sm:backdrop-blur-none sm:bg-transparent sm:mb-2 translate-z-0">
               <div className="flex items-center gap-2 w-max sm:w-auto">
                 <button
                   onClick={() => setShowManual(true)}
-                  className="flex items-center justify-center w-9 h-9 bg-[#EAECE9] dark:bg-[#1A1C19] hover:bg-[#DDE0DC] dark:hover:bg-[#252824] text-[#1A1C19] dark:text-[#E2E3DE] rounded-xl transition-all font-medium focus:outline-none border border-[#DDE0DC] dark:border-[#2C2F2B] shadow-sm mr-1 shrink-0"
+                  className="flex items-center justify-center w-9 min-h-[44px] md:min-h-0 md:h-9 bg-[#EAECE9] dark:bg-[#1A1C19] hover:bg-[#DDE0DC] dark:hover:bg-[#252824] text-[#1A1C19] dark:text-[#E2E3DE] rounded-xl transition-all font-medium focus:outline-none border border-[#DDE0DC] dark:border-[#2C2F2B] shadow-sm mr-1 shrink-0"
                   title="Инструкция"
                 >
                   <BookOpen className="w-5 h-5" />
@@ -1325,7 +1325,7 @@ export function CalculatorApp({
                     setShowHistory(!showHistory);
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
-                  className={`flex items-center justify-center gap-2 px-3 sm:px-4 h-9 min-w-[36px] sm:min-w-[115px] rounded-xl transition-all font-medium text-xs focus:outline-none border shadow-sm shrink-0 ${
+                  className={`flex items-center justify-center gap-2 px-3 sm:px-4 min-h-[44px] md:min-h-0 md:h-9 min-w-[36px] sm:min-w-[115px] rounded-xl transition-all font-medium text-xs focus:outline-none border shadow-sm shrink-0 ${
                     showHistory
                       ? "bg-[#1A1C19] dark:bg-[#E2E3DE] text-white dark:text-[#121411] border-[#1A1C19] dark:border-white"
                       : "bg-[#EAECE9] dark:bg-[#1A1C19] hover:bg-[#DDE0DC] dark:hover:bg-[#252824] text-[#1A1C19] dark:text-[#E2E3DE] border-[#DDE0DC] dark:border-[#2C2F2B]"
@@ -1338,7 +1338,7 @@ export function CalculatorApp({
                 <button
                   onClick={handleSave}
                   disabled={isSaving || !steelGrade}
-                  className="flex items-center justify-center gap-2 px-3 sm:px-4 h-9 min-w-[36px] sm:min-w-[115px] bg-[#EAECE9] dark:bg-[#1A1C19] hover:bg-[#DDE0DC] dark:hover:bg-[#252824] text-[#1A1C19] dark:text-[#E2E3DE] rounded-xl transition-all font-medium text-xs focus:outline-none disabled:opacity-50 border border-[#DDE0DC] dark:border-[#2C2F2B] shadow-sm shrink-0"
+                  className="flex items-center justify-center gap-2 px-3 sm:px-4 min-h-[44px] md:min-h-0 md:h-9 min-w-[36px] sm:min-w-[115px] bg-[#EAECE9] dark:bg-[#1A1C19] hover:bg-[#DDE0DC] dark:hover:bg-[#252824] text-[#1A1C19] dark:text-[#E2E3DE] rounded-xl transition-all font-medium text-xs focus:outline-none disabled:opacity-50 border border-[#DDE0DC] dark:border-[#2C2F2B] shadow-sm shrink-0"
                   title="Сохранить расчет"
                 >
                   {isSaving ? (
@@ -1350,7 +1350,7 @@ export function CalculatorApp({
                 </button>
                 <button
                   onClick={handleCopy}
-                  className={`flex items-center justify-center gap-2 px-3 sm:px-4 h-9 min-w-[36px] sm:min-w-[115px] rounded-xl transition-all font-medium text-xs focus:outline-none border shadow-sm shrink-0 ${
+                  className={`flex items-center justify-center gap-2 px-3 sm:px-4 min-h-[44px] md:min-h-0 md:h-9 min-w-[36px] sm:min-w-[115px] rounded-xl transition-all font-medium text-xs focus:outline-none border shadow-sm shrink-0 ${
                     isCopied
                       ? "bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-300 border-green-200 dark:border-green-800"
                       : "bg-[#EAECE9] dark:bg-[#1A1C19] hover:bg-[#DDE0DC] dark:hover:bg-[#252824] text-[#1A1C19] dark:text-[#E2E3DE] border-[#DDE0DC] dark:border-[#2C2F2B]"
@@ -1368,7 +1368,7 @@ export function CalculatorApp({
                 </button>
                 <button
                   onClick={handlePrint}
-                  className="flex items-center justify-center gap-2 px-3 sm:px-4 h-9 min-w-[36px] sm:min-w-[115px] bg-[#EAECE9] dark:bg-[#1A1C19] hover:bg-[#DDE0DC] dark:hover:bg-[#252824] text-[#1A1C19] dark:text-[#E2E3DE] rounded-xl transition-all font-medium text-xs focus:outline-none border border-[#DDE0DC] dark:border-[#2C2F2B] shadow-sm shrink-0"
+                  className="flex items-center justify-center gap-2 px-3 sm:px-4 min-h-[44px] md:min-h-0 md:h-9 min-w-[36px] sm:min-w-[115px] bg-[#EAECE9] dark:bg-[#1A1C19] hover:bg-[#DDE0DC] dark:hover:bg-[#252824] text-[#1A1C19] dark:text-[#E2E3DE] rounded-xl transition-all font-medium text-xs focus:outline-none border border-[#DDE0DC] dark:border-[#2C2F2B] shadow-sm shrink-0"
                   title="Печатная форма"
                 >
                   <Printer className="w-4 h-4" />
@@ -1376,7 +1376,7 @@ export function CalculatorApp({
                 </button>
                 <button
                   onClick={handleReset}
-                  className="flex items-center justify-center gap-2 px-3 sm:px-4 h-9 min-w-[36px] sm:min-w-[115px] bg-[#EAECE9] dark:bg-[#1A1C19] hover:bg-[#DDE0DC] dark:hover:bg-[#252824] text-[#1A1C19] dark:text-[#E2E3DE] rounded-xl transition-all font-medium text-xs focus:outline-none border border-[#DDE0DC] dark:border-[#2C2F2B] shadow-sm shrink-0"
+                  className="flex items-center justify-center gap-2 px-3 sm:px-4 min-h-[44px] md:min-h-0 md:h-9 min-w-[36px] sm:min-w-[115px] bg-[#EAECE9] dark:bg-[#1A1C19] hover:bg-[#DDE0DC] dark:hover:bg-[#252824] text-[#1A1C19] dark:text-[#E2E3DE] rounded-xl transition-all font-medium text-xs focus:outline-none border border-[#DDE0DC] dark:border-[#2C2F2B] shadow-sm shrink-0"
                   title="Сбросить все"
                 >
                   <RotateCcw className="w-4 h-4" />

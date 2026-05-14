@@ -137,7 +137,7 @@ export default function AdminPanelProductionTab(props: any) {
                       <div className="flex-none min-w-0 w-full xl:w-auto xl:flex-1">
                         <div
                           ref={summaryContainerRef}
-                          className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2 xl:gap-3 w-full p-2 bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-x-auto custom-scrollbar"
+                          className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2 xl:gap-3 w-full p-2 bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-x-auto w-full custom-scrollbar"
                         >
                           <MetricCard
                             label={isProdSupplyView ? "Взято плановых" : "Взято со склада"}
@@ -295,7 +295,7 @@ export default function AdminPanelProductionTab(props: any) {
                               Длина: res.lengthType === "НД" ? "НД" : `МД ${res.length}`,
                               "Кол-во тн в заказе": Number(res.weightTons || 0),
                               "ИТОГО остаток выполнения заказа после расчета / плановое поступление":
-                                res.finalShortage > 0 ? Number(res.finalShortage.toFixed(3)) : 0,
+                                res.finalShortage > 0 ? Number((res.finalShortage || 0).toFixed(3)) : 0,
                             })),
                             {
                               "ИТОГО остаток выполнения заказа после расчета / плановое поступление": "ИТОГО:",

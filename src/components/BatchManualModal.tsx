@@ -80,7 +80,7 @@ export function BatchManualModal({ isOpen, onClose }: BatchManualModalProps) {
               </div>
               <button
                 onClick={onClose}
-                className="p-3 text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-all active:scale-90"
+                className="p-3 text-slate-400 hover:text-slate-900 dark:text-white dark:hover:text-white rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-all active:scale-90"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -122,7 +122,7 @@ export function BatchManualModal({ isOpen, onClose }: BatchManualModalProps) {
                   будут просто проигнорированы.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-                  <div className="bg-white/5 p-3 rounded-xl border border-white/10 hover:border-blue-400/50 transition-colors">
+                  <div className="bg-white dark:bg-slate-900/5 p-3 rounded-xl border border-white/10 hover:border-blue-400/50 transition-colors">
                     <span className="text-xs font-bold text-white block mb-1">
                       Остаток к выполнению (вес)
                     </span>
@@ -135,7 +135,7 @@ export function BatchManualModal({ isOpen, onClose }: BatchManualModalProps) {
                       строка игнорируется.
                     </p>
                   </div>
-                  <div className="bg-white/5 p-3 rounded-xl border border-white/10 hover:border-blue-400/50 transition-colors">
+                  <div className="bg-white dark:bg-slate-900/5 p-3 rounded-xl border border-white/10 hover:border-blue-400/50 transition-colors">
                     <span className="text-xs font-bold text-white block mb-1">
                       Номенклатура детали
                     </span>
@@ -143,7 +143,7 @@ export function BatchManualModal({ isOpen, onClose }: BatchManualModalProps) {
                       Примеры: Номенклатура
                     </span>
                   </div>
-                  <div className="bg-white/5 p-3 rounded-xl border border-white/10 hover:border-blue-400/50 transition-colors">
+                  <div className="bg-white dark:bg-slate-900/5 p-3 rounded-xl border border-white/10 hover:border-blue-400/50 transition-colors">
                     <span className="text-xs font-bold text-white block mb-1">
                       Марка стали
                     </span>
@@ -151,7 +151,7 @@ export function BatchManualModal({ isOpen, onClose }: BatchManualModalProps) {
                       Примеры: Марка
                     </span>
                   </div>
-                  <div className="bg-white/5 p-3 rounded-xl border border-white/10 hover:border-blue-400/50 transition-colors">
+                  <div className="bg-white dark:bg-slate-900/5 p-3 rounded-xl border border-white/10 hover:border-blue-400/50 transition-colors">
                     <span className="text-xs font-bold text-white block mb-1">
                       Размер
                     </span>
@@ -163,7 +163,7 @@ export function BatchManualModal({ isOpen, onClose }: BatchManualModalProps) {
                       припусков.
                     </p>
                   </div>
-                  <div className="bg-white/5 p-3 rounded-xl border border-white/10 hover:border-blue-400/50 transition-colors">
+                  <div className="bg-white dark:bg-slate-900/5 p-3 rounded-xl border border-white/10 hover:border-blue-400/50 transition-colors">
                     <span className="text-xs font-bold text-white block mb-1">
                       Профиль
                     </span>
@@ -171,7 +171,7 @@ export function BatchManualModal({ isOpen, onClose }: BatchManualModalProps) {
                       Примеры: Профиль, Тип
                     </span>
                   </div>
-                  <div className="bg-white/5 p-3 rounded-xl border border-white/10 hover:border-blue-400/50 transition-colors">
+                  <div className="bg-white dark:bg-slate-900/5 p-3 rounded-xl border border-white/10 hover:border-blue-400/50 transition-colors">
                     <span className="text-xs font-bold text-white block mb-1">
                       Длина готовой продукции
                     </span>
@@ -192,7 +192,7 @@ export function BatchManualModal({ isOpen, onClose }: BatchManualModalProps) {
                 </h4>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
-                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white dark:bg-slate-900/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
                       <strong className="text-white">
                         Правило 1 (МД заготовка):
@@ -205,7 +205,7 @@ export function BatchManualModal({ isOpen, onClose }: BatchManualModalProps) {
                     </p>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white dark:bg-slate-900/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
                       <strong className="text-white">
                         Правило 2 (НД и МД 6000 заготовка):
@@ -217,7 +217,7 @@ export function BatchManualModal({ isOpen, onClose }: BatchManualModalProps) {
                     </p>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white dark:bg-slate-900/20 shrink-0" />
                     <p className="text-xs sm:text-sm font-medium leading-relaxed opacity-90 text-slate-200">
                       <strong className="text-white">Авто-улучшение:</strong>{" "}
                       При расчете потребности с учетом наличия на складе, эти

@@ -55,7 +55,7 @@ export const PriceInput: React.FC<PriceInputProps> = ({
             "focus:border-slate-400 dark:focus:border-slate-700",
             "outline-none transition-all",
             compact 
-              ? 'h-9 px-3 pr-8 text-xs rounded-lg' 
+              ? 'min-h-[44px] md:min-h-0 md:h-9 px-3 pr-8 text-xs rounded-lg' 
               : 'h-11 px-4 py-3 pr-10 text-sm rounded-xl'
           )}
         />

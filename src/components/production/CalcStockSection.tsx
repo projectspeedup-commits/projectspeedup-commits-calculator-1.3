@@ -38,7 +38,7 @@ export function CalcStockSection({
       className={`flex flex-col gap-8`}
     >
       {matchedDemand.length === 0 ? (
-        <div className="bg-white/50 dark:bg-[#1A1C19]/40 border border-slate-200 dark:border-slate-800 rounded-[40px] p-12 flex flex-col items-center justify-center min-h-[500px]">
+        <div className="bg-white/50 dark:bg-[#1A1C19]/40 border border-slate-200 dark:border-slate-800 rounded-[40px] p-6 md:p-12 flex flex-col items-center justify-center min-h-[500px]">
           <div className="flex items-center gap-4 sm:gap-8 mb-8 relative">
             <div className="relative">
               <div className="w-20 h-20  dark: rounded-2xl flex items-center justify-center border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800 z-10 relative">
@@ -94,7 +94,7 @@ export function CalcStockSection({
                 setProductionSection("files");
               }
             }}
-            className="px-6 py-3  hover: text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center gap-2"
+            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center gap-2"
           >
             <Upload className="w-4 h-4" />
             Загрузить файлы для сравнения
@@ -271,9 +271,9 @@ export function CalcStockSection({
                           String(res.remainingToProcess || 0).replace(".", ","),
                           String(res.allocatedStock || 0).replace(".", ","),
                           String(res.shortageStock || 0).replace(".", ","),
-                          String(res.allocatedStock > 0 && res.combinedTechWaste > 0 ? res.combinedTechWaste.toFixed(3) : "0").replace(".", ","),
-                          String(res.allocatedStock > 0 && res.combinedUsefulRem > 0 ? res.combinedUsefulRem.toFixed(3) : "0").replace(".", ","),
-                          String(res.allocatedStock > 0 && res.combinedKim > 0 ? res.combinedKim.toFixed(3) : "0").replace(".", ","),
+                          String(res.allocatedStock > 0 && res.combinedTechWaste > 0 ? (res.combinedTechWaste || 0).toFixed(3) : "0").replace(".", ","),
+                          String(res.allocatedStock > 0 && res.combinedUsefulRem > 0 ? (res.combinedUsefulRem || 0).toFixed(3) : "0").replace(".", ","),
+                          String(res.allocatedStock > 0 && res.combinedKim > 0 ? (res.combinedKim || 0).toFixed(3) : "0").replace(".", ","),
                         ];
                         const numRows = Math.max(1, res.matchedStockItems?.length || 0);
                         if (res.matchedStockItems?.length === 0) {
@@ -590,11 +590,11 @@ export function CalcStockSection({
                                       <div className="flex flex-col gap-1.5 text-left">
                                         <div className="flex justify-between items-center gap-3">
                                           <span className="text-slate-400 text-[9px]">Обеспечено:</span>
-                                          <span className="font-bold text-slate-800 dark:text-slate-200">{res.allocatedStock.toFixed(3)} тн</span>
+                                          <span className="font-bold text-slate-800 dark:text-slate-200">{(res.allocatedStock || 0).toFixed(3)} тн</span>
                                         </div>
                                         <div className="flex justify-between items-center gap-3">
                                           <span className="text-slate-400 text-[9px]">Дефицит:</span>
-                                          <span className="font-bold text-slate-800 dark:text-slate-200">{res.shortageStock.toFixed(3)} тн</span>
+                                          <span className="font-bold text-slate-800 dark:text-slate-200">{(res.shortageStock || 0).toFixed(3)} тн</span>
                                         </div>
                                       </div>
                                     </div>
@@ -672,7 +672,7 @@ export function CalcStockSection({
                                   {res.supplyDiameter}
                                 </td>
                                 <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={Math.max(1, res.matchedStockItems.length)}>
-                                  {res.totalWeight ? res.totalWeight.toFixed(3) : "0.000"}
+                                  {res.totalWeight ? (res.totalWeight || 0).toFixed(3) : "0.000"}
                                 </td>
                                 <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={Math.max(1, res.matchedStockItems.length)}>
                                   {res.lengthType === "МД" ? `МД ${res.billetLength}` : "НД"}

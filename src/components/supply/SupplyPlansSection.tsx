@@ -33,9 +33,10 @@ export function SupplyPlansSection(props: any) {
  {processedSupplyPlans.length} позиций
  </span>
  <span className="text-[10px] font-bold  dark: text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 px-2.5 py-1 rounded-full">
+ Итого:{""}
  {processedSupplyPlans
  .reduce(
- (sum, row) =>
+ (sum: any, row: any) =>
  sum + (Number(row["Кол-во"]) || 0),
  0,
  )

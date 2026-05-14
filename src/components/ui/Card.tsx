@@ -30,17 +30,17 @@ export const Card: React.FC<CardProps> = ({
       {...props}
     >
       {header && (
-        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
+        <div className="px-4 md:px-6 py-3 md:py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
           {header}
         </div>
       )}
       
-      <div className={cn(isPadded && "p-6")}>
+      <div className={cn(isPadded && "p-4 md:p-6")}>
         {children}
       </div>
 
       {footer && (
-        <div className="px-6 py-4 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800">
+        <div className="px-4 md:px-6 py-3 md:py-4 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800">
           {footer}
         </div>
       )}
