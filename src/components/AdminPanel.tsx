@@ -2184,7 +2184,7 @@ export function AdminPanel({
       </div>
 
       {/* Desktop Navigation Rail */}
-      <div className="hidden md:flex flex-col w-[88px] bg-[#F0F4F4] dark:bg-[#1A1C19] border-r border-slate-200 dark:border-slate-800 items-center py-6 fixed h-full z-50">
+      <div className="hidden md:flex flex-col w-20 bg-[#F0F4F4] dark:bg-[#1A1C19] border-r border-slate-200 dark:border-slate-800 items-center py-6 fixed h-full z-50">
         <div className="flex flex-col items-center mb-8">
           <div className="w-12 h-12 bg-slate-700 dark:bg-slate-600 rounded-xl flex items-center justify-center text-white mb-2 shadow-sm">
             <Calculator className="w-6 h-6" />
@@ -2291,7 +2291,7 @@ export function AdminPanel({
       </div>
 
       {/* Main Content Area */}
-      <motion.div className="flex-1 ml-0 md:ml-[88px] pb-32 md:pb-8 pt-6 sm:pt-8 px-3 sm:px-8 w-full min-w-0">
+      <motion.div className="flex-1 ml-0 md:ml-20 pb-32 md:pb-8 pt-6 sm:pt-8 px-3 sm:px-8 lg:px-12 xl:px-16 w-full min-w-0">
         <AnimatePresence mode="wait">
           {activeTab === "supply" && (
             <AdminPanelSupplyTab

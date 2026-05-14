@@ -561,7 +561,7 @@ export default function App() {
               transition={{ duration: 0.3 }}
               className="flex-1 flex flex-col"
             >
-              <div className="flex-1 w-full max-w-[1600px] mx-auto px-2 sm:px-4 lg:px-8">
+              <div className="flex-1 w-full max-w-[1440px] mx-auto px-2 sm:px-4 lg:px-8">
                 <AdminPanel
                   initialRawPrices={globalRawPrices}
                   initialScrap={globalScrapPrice}
@@ -591,7 +591,7 @@ export default function App() {
               transition={{ duration: 0.3 }}
               className="flex-1 flex flex-col"
             >
-              <div className="flex-1 w-full max-w-[1600px] mx-auto px-2 sm:px-4 lg:px-8">
+              <div className="flex-1 w-full max-w-[1440px] mx-auto px-2 sm:px-4 lg:px-8">
                 <AdminPanel
                   initialRawPrices={globalRawPrices}
                   initialScrap={globalScrapPrice}
@@ -622,7 +622,7 @@ export default function App() {
               transition={{ duration: 0.3 }}
               className="flex-1 flex flex-col"
             >
-              <div className="flex-1 w-full max-w-[1600px] mx-auto px-2 sm:px-4 lg:px-6 xl:px-8">
+              <div className="flex-1 w-full max-w-[1440px] mx-auto px-2 sm:px-4 lg:px-6 xl:px-8">
                 <CalculatorApp
                   adminRawPrices={globalRawPrices}
                   adminScrapPrice={globalScrapPrice}

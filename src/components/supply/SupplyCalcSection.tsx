@@ -66,7 +66,7 @@ export function SupplyCalcSection(props: any) {
  ) : (
  <div className="flex flex-col gap-6">
  <div
- className={`grid grid-cols-1 ${!isPurchasingMode ?"lg:grid-cols-3" :"lg:grid-cols-2"} gap-6`}
+ className={`grid grid-cols-1 sm:grid-cols-2 ${!isPurchasingMode ? "xl:grid-cols-3" : ""} gap-4 sm:gap-6 lg:gap-8`}
  >
  {!isPurchasingMode && (
  <div className="bg-violet-50 dark:bg-violet-900/10 border border-violet-100 dark:border-violet-900/30 p-6 rounded-[24px] flex flex-col justify-center">
