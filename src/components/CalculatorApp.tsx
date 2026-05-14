@@ -440,7 +440,7 @@ export function CalculatorApp({
     const maxAllowedBillet = Math.min(6000, maxBillet);
 
     if (isND) {
-      for (let b = 4000; b <= maxAllowedBillet; b += 100) {
+      for (let b = 2000; b <= maxAllowedBillet; b += 100) {
         const estUseful = (b * draw) / tech;
         let bestScrapForB = 999999;
         let bestN = 0;
@@ -465,7 +465,7 @@ export function CalculatorApp({
         // Округляем вверх до ближайших 100 мм (согласно запросу)
         const roundedBillet = Math.ceil(idealBillet / 100) * 100;
 
-        if (roundedBillet >= 4000 && roundedBillet <= maxAllowedBillet) {
+        if (roundedBillet >= 2000 && roundedBillet <= maxAllowedBillet) {
           const estUseful = (roundedBillet * draw) / tech;
           const scrap = estUseful - n * targetPiece;
           // Добавляем только если остаток положительный (поместится)
