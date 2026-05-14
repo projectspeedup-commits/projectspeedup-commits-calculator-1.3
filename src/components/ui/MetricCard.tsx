@@ -36,18 +36,18 @@ export const MetricCard: React.FC<MetricCardProps> = ({
 
   return (
     <div className={cn(
-      "flex flex-col min-w-[110px] justify-center px-3 py-2 sm:py-2.5 bg-gradient-to-br border rounded-xl shadow-sm relative overflow-hidden group transition-all",
+      "flex flex-col min-w-0 flex-1 justify-center px-2 sm:px-2.5 py-1.5 sm:py-2 bg-gradient-to-br border rounded-xl shadow-sm relative overflow-hidden group transition-all",
       variants[variant],
       className
     )}>
-      <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-2 relative z-10 flex items-start leading-tight min-h-[24px]">
-        {Icon && <Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1.5 opacity-80 shrink-0 mt-0.5" />}
+      <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest mb-1 sm:mb-1.5 relative z-10 flex items-start leading-tight min-h-[20px] sm:min-h-[24px]">
+        {Icon && <Icon className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1 opacity-80 shrink-0 mt-0.5" />}
         <span className="line-clamp-2">{label}</span>
       </span>
       
       <div className="flex items-baseline gap-1 relative z-10 font-sans">
         <span className={cn(
-          "text-lg sm:text-xl font-black transition-colors",
+          "text-base sm:text-lg font-black transition-colors",
           variant === 'slate' ? "text-slate-800 dark:text-white" : 
           variant === 'emerald' ? "text-emerald-700 dark:text-emerald-300" :
           variant === 'rose' ? "text-rose-700 dark:text-rose-300" :
@@ -57,7 +57,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
           {value}
         </span>
         {unit && (
-          <span className="text-[9px] sm:text-[10px] font-black uppercase opacity-60 shrink-0">{unit}</span>
+          <span className="text-[8px] sm:text-[9px] font-black uppercase opacity-60 shrink-0">{unit}</span>
         )}
         
         {target && (
