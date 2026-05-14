@@ -21,7 +21,7 @@ export const subscribeToUserSettings = (
     
     // Pick the newest data using updatedAt 
     const dataTime = data.updatedAt ? new Date(data.updatedAt).getTime() : 0;
-    if (dataTime >= latestUpdatedAt) {
+    if (dataTime > latestUpdatedAt || (dataTime === latestUpdatedAt && latestUpdatedAt === 0)) {
       latestUpdatedAt = dataTime;
       onData(data);
     }
@@ -107,7 +107,7 @@ export const subscribeToSystemData = (
     
     // Pick the newest data using updatedAt 
     const dataTime = data.updatedAt ? new Date(data.updatedAt).getTime() : 0;
-    if (dataTime >= latestUpdatedAt) {
+    if (dataTime > latestUpdatedAt || (dataTime === latestUpdatedAt && latestUpdatedAt === 0)) {
       latestUpdatedAt = dataTime;
       onData(data);
     }

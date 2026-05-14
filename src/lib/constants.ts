@@ -219,7 +219,7 @@ export const DEFAULT_ECONOMY_ITEMS: EconomyItem[] = [
   },
   {
     id: "feed",
-    name: "Корма",
+    name: "Прочее",
     category: "direct",
     type: "variable",
     norm: "0",
