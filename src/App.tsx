@@ -161,7 +161,10 @@ export default function App() {
             );
             setEconomyItems(
               DEFAULT_ECONOMY_ITEMS.map(
-                (defaultItem) => initialMap.get(defaultItem.id) || defaultItem,
+                (defaultItem) => {
+                  const savedItem = initialMap.get(defaultItem.id);
+                  return savedItem ? { ...savedItem, name: defaultItem.name, category: defaultItem.category, type: defaultItem.type } : defaultItem;
+                }
               ),
             );
           }
@@ -284,7 +287,10 @@ export default function App() {
                 data.economyItems.map((item: any) => [item.id, item]),
               );
               const merged = DEFAULT_ECONOMY_ITEMS.map(
-                (defaultItem) => initialMap.get(defaultItem.id) || defaultItem,
+                (defaultItem) => {
+                  const savedItem = initialMap.get(defaultItem.id);
+                  return savedItem ? { ...savedItem, name: defaultItem.name, category: defaultItem.category, type: defaultItem.type } : defaultItem;
+                }
               );
               setEconomyItems(merged);
               if (typeof window !== "undefined")
