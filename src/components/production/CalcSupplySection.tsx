@@ -579,7 +579,7 @@ export function CalcSupplySection(props: any) {
                                   getTimestampedFilename("Расчет потребности в заготовке"),
                                 );
                               }}
-                              className="flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl  dark: text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800 hover: dark:hover: transition-all active:scale-[0.9] shadow-sm"
+                              className="flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-[0.9] shadow-sm"
                               title="Скачать в Excel"
                             >
                               <Download className="w-4 h-4" />

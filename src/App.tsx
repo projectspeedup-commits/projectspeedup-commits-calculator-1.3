@@ -338,19 +338,6 @@ export default function App() {
             // (not requested by user), we would set it here.
             // For this app, let's keep personal settings for non-pricing data if needed.
             
-            if (data.scrapPrice !== undefined && !globalScrapPrice) setGlobalScrapPrice(data.scrapPrice);
-            if (data.remnantPrice !== undefined && !globalRemnantPrice) setGlobalRemnantPrice(data.remnantPrice);
-            if (data.remnantPricing && Object.keys(remnantPricing).length === 0) setRemnantPricing(data.remnantPricing);
-            
-            if (data.economyItems) {
-              const initialMap = new Map(
-                data.economyItems.map((item: any) => [item.id, item]),
-              );
-              const merged = DEFAULT_ECONOMY_ITEMS.map(
-                (defaultItem) => initialMap.get(defaultItem.id) || defaultItem,
-              );
-              setEconomyItems(merged);
-            }
             setIsUserSettingsLoaded(true);
           } else {
             setIsUserSettingsLoaded(true);

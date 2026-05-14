@@ -312,7 +312,7 @@ export function SupplyCalcSection(props: any) {
  getTimestampedFilename("Заказ поставщику"),
  );
  }}
- className="flex items-center gap-1.5 px-3 py-1.5  dark: hover: dark:hover: text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 rounded-lg text-xs font-bold transition-colors border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800 shadow-sm"
+ className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg text-xs font-bold transition-colors border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800 shadow-sm"
  title="Скачать сводку по заготовке в Excel"
  >
  <svg
@@ -376,7 +376,7 @@ export function SupplyCalcSection(props: any) {
  return (
  <div
  key={key}
- className="flex justify-between items-center group bg-slate-50 dark:bg-slate-800/30 hover: dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-800/50 px-2 py-1.5 rounded-lg transition-colors"
+ className="flex justify-between items-center group bg-slate-50 dark:bg-slate-800/30 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-800/50 px-2 py-1.5 rounded-lg transition-colors"
  >
  <div className="flex items-center gap-1.5">
  <span className="text-slate-700 dark:text-slate-300 font-bold text-[10px] min-w-[32px]">
@@ -539,7 +539,7 @@ export function SupplyCalcSection(props: any) {
  </div>
  </div>
  <div className="flex flex-wrap items-stretch sm:items-center gap-2 sm:gap-4 w-full xl:w-auto">
- <div className="text-xs font-bold text-slate-400 dark:text-slate-500 hidden sm:block">
+ <div className="text-xs font-bold text-slate-600 dark:text-slate-400 bg-slate-200/50 dark:bg-slate-800/50 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 hidden sm:flex items-center shadow-sm">
  {validSupplyResults.length} строк
  </div>
 
@@ -645,7 +645,7 @@ export function SupplyCalcSection(props: any) {
  className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm w-[calc(50%-0.25rem)] sm:w-auto ${
  copySuccess
  ?"bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
- :"bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
+ :"bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-2 border-slate-300 dark:border-slate-700 hover:bg-slate-50 hover:border-slate-400 dark:hover:bg-slate-700 shadow-sm"
  }`}
  title="Скопировать для вставки (Ctrl+V) в Google Таблицы"
  >
