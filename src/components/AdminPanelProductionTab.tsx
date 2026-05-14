@@ -90,8 +90,8 @@ export default function AdminPanelProductionTab(props: any) {
               transition={{ duration: 0.2 }}
               className="flex flex-col gap-8"
             >
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
+              <div className="flex flex-col 2xl:flex-row 2xl:items-center justify-between gap-6">
+                <div className="shrink-0">
                   <h2 className="text-2xl sm:text-3xl font-normal tracking-tight text-[#1A1C19] dark:text-white">
                     Производство
                   </h2>
@@ -134,10 +134,10 @@ export default function AdminPanelProductionTab(props: any) {
                     };
 
                     return (
-                      <div className="flex-none min-w-0 w-full xl:w-auto xl:flex-1">
+                      <div className="flex-none min-w-0 w-full 2xl:w-auto 2xl:flex-1 max-w-full">
                         <div
                           ref={summaryContainerRef}
-                          className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2 xl:gap-3 w-full p-2 bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-x-auto w-full custom-scrollbar"
+                          className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2 w-full p-2 bg-white dark:bg-[#1A1C19] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-x-auto custom-scrollbar"
                         >
                           <MetricCard
                             label={isProdSupplyView ? "Взято плановых" : "Взято со склада"}
@@ -174,6 +174,7 @@ export default function AdminPanelProductionTab(props: any) {
                           <MetricCard
                             label={isProdSupplyView ? "Ср. КИМ пл." : "Ср. КИМ склад"}
                             value={Math.max(0, isProdSupplyView ? supplyMetricsItem.averageKim3 : stockMetricsItem.averageKim).toFixed(3)}
+                            unit=""
                             variant={(isProdSupplyView ? supplyMetricsItem.averageKim3 : stockMetricsItem.averageKim) < 0.98 ? "amber" : "emerald"}
                             target="≥ 0.980"
                           />

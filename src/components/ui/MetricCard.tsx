@@ -40,20 +40,24 @@ export const MetricCard: React.FC<MetricCardProps> = ({
       variants[variant],
       className
     )}>
-      <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-1 relative z-10 flex items-center leading-tight">
-        {Icon && <Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 opacity-80 shrink-0" />}
-        <span className="truncate whitespace-nowrap">{label}</span>
+      <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-2 relative z-10 flex items-start leading-tight min-h-[24px]">
+        {Icon && <Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1.5 opacity-80 shrink-0 mt-0.5" />}
+        <span className="line-clamp-2">{label}</span>
       </span>
       
       <div className="flex items-baseline gap-1 relative z-10 font-sans">
         <span className={cn(
           "text-lg sm:text-xl font-black transition-colors",
-          variant === 'slate' ? "text-slate-800 dark:text-white" : ""
+          variant === 'slate' ? "text-slate-800 dark:text-white" : 
+          variant === 'emerald' ? "text-emerald-700 dark:text-emerald-300" :
+          variant === 'rose' ? "text-rose-700 dark:text-rose-300" :
+          variant === 'sky' ? "text-sky-700 dark:text-sky-300" :
+          "text-amber-700 dark:text-amber-300"
         )}>
           {value}
         </span>
         {unit && (
-          <span className="text-[9px] sm:text-[10px] font-black uppercase opacity-80 shrink-0">{unit}</span>
+          <span className="text-[9px] sm:text-[10px] font-black uppercase opacity-60 shrink-0">{unit}</span>
         )}
         
         {target && (
