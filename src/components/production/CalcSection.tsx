@@ -192,7 +192,7 @@ export function CalcSection({
                   </td>
                   <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >{res.grade}</td>
                   <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
-                    <span className="font-mono font-black text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark: px-2 py-0.5 rounded border border-slate-200 dark:border-slate-800">
+                    <span className="font-mono font-black text-slate-800 dark:text-slate-200  dark: px-2 py-0.5 rounded border border-slate-200 dark:border-slate-800">
                       {parseFloat(Number(res.diameter || 0).toFixed(2))}
                     </span>
                   </td>

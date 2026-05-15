@@ -327,7 +327,7 @@ export function CalcStockSection({
                     }}
                     className={`flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl transition-all active:scale-[0.9] shadow-sm border ${
                       isCopied
-                        ? " dark: text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800"
+                        ? " dark: text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800"
                         : "bg-white dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 hover:text-slate-900 dark:hover:bg-slate-700 dark:hover:text-white"
                     }`}
                     title="Скопировать для Excel"
@@ -626,7 +626,7 @@ export function CalcStockSection({
                                   {parseFloat(Number(res.diameter||0).toFixed(2))}
                                 </td>
                                 <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={Math.max(1, res.matchedStockItems.length)}>
-                                  <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType === "НД" ? "text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:" : "text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:"}`}>
+                                  <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType === "НД" ? "text-slate-800 dark:text-slate-200  dark:" : "text-slate-800 dark:text-slate-200  dark:"}`}>
                                     {res.lengthType === "НД" ? "НД" : `МД ${res.length}`}
                                   </span>
                                 </td>
@@ -634,7 +634,7 @@ export function CalcStockSection({
                                   {(res.weightTons||0).toFixed(3)}
                                 </td>
                                 <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={Math.max(1, res.matchedStockItems.length)}>
-                                  <span className="font-bold text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200">
+                                  <span className="font-bold text-slate-800 dark:text-slate-200">
                                     {(res.remainingToProcess||0).toFixed(3)}
                                   </span>
                                 </td>
@@ -658,7 +658,7 @@ export function CalcStockSection({
                                       {res.supplyGrade}
                                     </span>
                                     {res.gost ? (
-                                      <span className="text-[9px] text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark: px-1.5 py-0.5 rounded font-mono border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                                      <span className="text-[9px] text-slate-800 dark:text-slate-200  dark: px-1.5 py-0.5 rounded font-mono border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800 whitespace-nowrap">
                                         ГОСТ {res.gost}
                                       </span>
                                     ) : (
@@ -692,7 +692,7 @@ export function CalcStockSection({
 
                                 <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
                                   {stockItem.calculatedTechWaste > 0 ? (
-                                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200">
+                                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
                                       {(stockItem.calculatedTechWaste||0).toFixed(3)}
                                       <span className="text-[9px] ml-1">тн</span>
                                     </span>
@@ -702,7 +702,7 @@ export function CalcStockSection({
                                 </td>
                                 <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
                                   {stockItem.calculatedUsefulRem > 0 ? (
-                                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200">
+                                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
                                       {(stockItem.calculatedUsefulRem||0).toFixed(3)}
                                       <span className="text-[9px] ml-1">тн</span>
                                     </span>
@@ -712,7 +712,7 @@ export function CalcStockSection({
                                 </td>
                                 <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
                                   {stockItem.calculatedKim > 0 ? (
-                                    <span className={`font-mono font-bold ${stockItem.calculatedKim >= 0.95 ? "text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200" : "text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200"}`}>
+                                    <span className={`font-mono font-bold ${stockItem.calculatedKim >= 0.95 ? "text-slate-800 dark:text-slate-200" : "text-slate-800 dark:text-slate-200"}`}>
                                       {(stockItem.calculatedKim * 100).toFixed(1)}%
                                     </span>
                                   ) : (
@@ -761,10 +761,10 @@ export function CalcStockSection({
                             ) : (
                               <>
                                 <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
-                                  <span className="text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200">0.000</span>
+                                  <span className="text-slate-800 dark:text-slate-200">0.000</span>
                                 </td>
                                 <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
-                                  <span className="font-black text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200">
+                                  <span className="font-black text-slate-800 dark:text-slate-200">
                                     {(res.shortageStock||0).toFixed(3)}
                                   </span>
                                 </td>

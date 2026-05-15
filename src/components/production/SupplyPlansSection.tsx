@@ -87,7 +87,7 @@ export function SupplyPlansSection(props: any) {
                       {row["Дата размещения"]}
                     </td>
                     <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
-                      <div className="inline-flex items-center gap-1.5 font-black text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark: px-2 py-1 rounded border border-slate-200 dark:border-slate-800">
+                      <div className="inline-flex items-center gap-1.5 font-black text-slate-800 dark:text-slate-200  dark: px-2 py-1 rounded border border-slate-200 dark:border-slate-800">
                         <Calendar className="w-3 h-3" />
                         {row["Ожидаемая дата поставки"]}
                       </div>

@@ -295,11 +295,11 @@ export function CalculatorCutAndRemnants({
                                     </div>
                                   </button>
                                   {/* Tooltip */}
-                                  <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-emerald-900 text-emerald-50 text-xs font-bold px-4 py-2 rounded-lg shadow-xl whitespace-nowrap opacity-0 group-hover/chip:opacity-100 transition-opacity pointer-events-none z-50">
+                                  <div className="absolute -top-14 sm:-top-12 left-1/2 -translate-x-1/2 bg-emerald-900 text-emerald-50 text-[10px] sm:text-xs font-bold px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg shadow-xl w-48 sm:w-64 text-center opacity-0 group-hover/chip:opacity-100 transition-opacity pointer-events-none z-50">
                                     Волшебный чип: щелкните по зеленой фигуре,
                                     чтобы в один клик подставить безотходный
                                     размер прутка!
-                                    <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-emerald-900 rotate-45"></div>
+                                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 sm:w-3 sm:h-3 bg-emerald-900 rotate-45"></div>
                                   </div>
                                 </div>
                               ))}

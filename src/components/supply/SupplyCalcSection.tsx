@@ -385,13 +385,13 @@ export function SupplyCalcSection(props: any) {
  <span className="text-slate-500 dark:text-slate-400 font-semibold text-[9px] min-w-[20px]">
  {size}
  </span>
- <span className="text-[8px] text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark: px-1 py-0.5 rounded font-bold uppercase">
+ <span className="text-[8px] text-slate-800 dark:text-slate-200  dark: px-1 py-0.5 rounded font-bold uppercase">
  {length}
  </span>
  </div>
  <div className="flex flex-col items-end leading-none gap-0.5">
  <div className="flex items-baseline gap-1.5">
- <span className="text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-black text-[10px]">
+ <span className="text-slate-800 dark:text-slate-200 font-black text-[10px]">
  {data.weight.toFixed(3)}{""}
  <span className="font-medium text-[8px] text-slate-800 dark:text-slate-200/60 uppercase">
  тн
@@ -432,7 +432,7 @@ export function SupplyCalcSection(props: any) {
  </div>
  </h3>
  </div>
- <div className="text-[9px] font-bold text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800  dark: px-1.5 py-0.5 rounded-md">
+ <div className="text-[9px] font-bold text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800  dark: px-1.5 py-0.5 rounded-md">
  Цель ≥ 0.980
  </div>
  </div>
@@ -484,12 +484,12 @@ export function SupplyCalcSection(props: any) {
  </div>
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2">
- <div className="w-1.5 h-1.5 rounded-full "></div>
+ <div className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-300"></div>
  <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
  Деловые остатки
  </span>
  </div>
- <div className="font-bold text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 tracking-tight">
+ <div className="font-bold text-slate-800 dark:text-slate-200 tracking-tight">
  {calculationResults
  .reduce(
  (acc, res) =>
@@ -524,7 +524,7 @@ export function SupplyCalcSection(props: any) {
  <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider mr-3 shrink-0">
  Итого к обеспечению
  </span>
- <span className="text-sm font-black text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200">
+ <span className="text-sm font-black text-slate-800 dark:text-slate-200">
  {validSupplyResults
  .reduce(
  (sum, res) =>
@@ -555,9 +555,10 @@ export function SupplyCalcSection(props: any) {
  </span>
  </button>
 
- <button
- onClick={() => {
- const headers = ["Внутренняя нумерация","Дата отгрузки","№ Заказа","Клиент","Номенклатура","Профиль","Марка","Размер","Длина","Кол-во тн в заказе","ИТОГО остаток к выполнению","Номенклатура (заг)","Марка заг.","Размер (заг)","Кол-во тн заг.","Длина","Тех. отходы","Делов. остаток","КИМ / Совет"
+ <div className="flex gap-2 w-full sm:w-auto shrink-0">
+                <button
+                  onClick={() => {
+                    const headers = ["Внутренняя нумерация","Дата отгрузки","№ Заказа","Клиент","Номенклатура","Профиль","Марка","Размер","Длина","Кол-во тн в заказе","ИТОГО остаток к выполнению","Номенклатура (заг)","Марка заг.","Размер (заг)","Кол-во тн заг.","Длина","Тех. отходы","Делов. остаток","КИМ / Совет"
  ];
  if (!isPurchasingMode)
  headers.push("Цена (руб)","Сумма (руб)");
@@ -642,7 +643,7 @@ export function SupplyCalcSection(props: any) {
  setCopySuccess(true);
  setTimeout(() => setCopySuccess(false), 2000);
  }}
- className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm w-[calc(50%-0.25rem)] sm:w-auto ${
+ className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm flex-1 sm:flex-none ${
  copySuccess
  ?"bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
  :"bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-2 border-slate-300 dark:border-slate-700 hover:bg-slate-50 hover:border-slate-400 dark:hover:bg-slate-700 shadow-sm"
@@ -883,7 +884,7 @@ export function SupplyCalcSection(props: any) {
  getTimestampedFilename("Расчет потребности в заготовке"),
  );
  }}
- className="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/40 dark:hover:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50 rounded-xl text-xs font-bold transition-colors shadow-sm w-[calc(50%-0.25rem)] sm:w-auto"
+ className="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/40 dark:hover:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50 rounded-xl text-xs font-bold transition-colors shadow-sm flex-1 sm:flex-none"
  >
  <svg
  xmlns="http://www.w3.org/2000/svg"
@@ -900,8 +901,9 @@ export function SupplyCalcSection(props: any) {
  <polyline points="7 10 12 15 17 10"></polyline>
  <line x1="12" y1="15" x2="12" y2="3"></line>
  </svg>
- <span className="whitespace-nowrap">Excel</span>
+ <span className="whitespace-nowrap">Скачать Excel</span>
  </button>
+              </div>
  </div>
  </div>
 
@@ -1046,13 +1048,13 @@ export function SupplyCalcSection(props: any) {
  </div>
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
- <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded ml-auto md:ml-0 md:mx-auto">
+ <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded ml-auto md:ml-0 md:mx-auto">
  {parseFloat((res.diameter||0).toFixed(2))}
  </span>
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  <span
- className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType ==="НД" ?"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:" :"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:"} ml-auto md:ml-0 md:mx-auto`}
+ className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType ==="НД" ?"text-slate-800 dark:text-slate-200  dark:" :"text-slate-800 dark:text-slate-200  dark:"} ml-auto md:ml-0 md:mx-auto`}
  >
  {res.lengthType ==="НД"
  ?"НД"
@@ -1065,7 +1067,7 @@ export function SupplyCalcSection(props: any) {
  </div>
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
- <div className="text-center font-bold text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 whitespace-nowrap">
+ <div className="text-center font-bold text-slate-800 dark:text-slate-200 whitespace-nowrap">
  {(res.weightTons||res.totalWeight||0).toFixed(3)}
  </div>
  </td>
@@ -1084,18 +1086,18 @@ export function SupplyCalcSection(props: any) {
  </div>
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
- <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded ml-auto md:ml-0 md:mx-auto">
+ <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded ml-auto md:ml-0 md:mx-auto">
  {parseFloat((res.diameter||0).toFixed(2))}
  </span>
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
- <div className="text-center font-black text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 whitespace-nowrap">
+ <div className="text-center font-black text-slate-800 dark:text-slate-200 whitespace-nowrap">
  {(res.weightTons||res.totalWeight||0).toFixed(3)}
  </div>
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" >
  <span
- className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType ==="НД" ?"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:" :"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:"} ml-auto md:ml-0 md:mx-auto`}
+ className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType ==="НД" ?"text-slate-800 dark:text-slate-200  dark:" :"text-slate-800 dark:text-slate-200  dark:"} ml-auto md:ml-0 md:mx-auto`}
  >
  {res.lengthType ==="НД"
  ?"НД"

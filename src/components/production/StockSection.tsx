@@ -39,7 +39,7 @@ export function StockSection({
         header={
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10  dark: rounded-xl flex items-center justify-center text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 shadow-sm border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800">
+              <div className="w-10 h-10  dark: rounded-xl flex items-center justify-center text-slate-800 dark:text-slate-200 shadow-sm border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800">
                 <Layers className="w-5 h-5" />
               </div>
               <div>
@@ -135,7 +135,7 @@ export function StockSection({
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
-                    <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-mono font-black  dark: px-3 py-1 rounded border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800">
+                    <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 font-mono font-black  dark: px-3 py-1 rounded border border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800">
                       {row["Размер"]}
                     </span>
                   </td>

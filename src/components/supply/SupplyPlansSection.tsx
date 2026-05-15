@@ -29,10 +29,10 @@ export function SupplyPlansSection(props: any) {
  Планы поставок сырья
  </h4>
  <div className="flex items-center gap-2">
- <span className="text-[10px] font-medium  dark: text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 px-2.5 py-1 rounded-full">
+ <span className="text-[10px] font-medium  dark: text-slate-800 dark:text-slate-200 px-2.5 py-1 rounded-full">
  {processedSupplyPlans.length} позиций
  </span>
- <span className="text-[10px] font-bold  dark: text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 px-2.5 py-1 rounded-full">
+ <span className="text-[10px] font-bold  dark: text-slate-800 dark:text-slate-200 px-2.5 py-1 rounded-full">
  Итого:{""}
  {processedSupplyPlans
  .reduce(
@@ -89,7 +89,7 @@ export function SupplyPlansSection(props: any) {
  {row["Марка"]}
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
- <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded">
+ <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded">
  {row["Размер"]}
  </span>
  </td>
@@ -110,7 +110,7 @@ export function SupplyPlansSection(props: any) {
  {row["Дата размещения"]}
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
- <span className="font-bold text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200">
+ <span className="font-bold text-slate-800 dark:text-slate-200">
  {row["Ожидаемая дата поставки"]}
  </span>
  </td>

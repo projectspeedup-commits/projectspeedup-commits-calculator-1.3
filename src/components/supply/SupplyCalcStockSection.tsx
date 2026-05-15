@@ -780,7 +780,7 @@ export function SupplyCalcStockSection(props: any) {
  1,
  res.matchedStockItems.length,
  )}>
- <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded">
+ <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded">
  {parseFloat(
  (res.diameter||0).toFixed(2),
  )}
@@ -791,7 +791,7 @@ export function SupplyCalcStockSection(props: any) {
  res.matchedStockItems.length,
  )}>
  <span
- className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType ==="НД" ?"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:" :"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:"}`}
+ className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType ==="НД" ?"text-slate-800 dark:text-slate-200  dark:" :"text-slate-800 dark:text-slate-200  dark:"}`}
  >
  {res.lengthType ==="НД"
  ?"НД"
@@ -833,7 +833,7 @@ export function SupplyCalcStockSection(props: any) {
  1,
  res.matchedStockItems.length,
  )}>
- <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded">
+ <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded">
  {parseFloat(
  (res.diameter||0).toFixed(2),
  )}
@@ -850,7 +850,7 @@ export function SupplyCalcStockSection(props: any) {
  res.matchedStockItems.length,
  )}>
  <span
- className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType ==="НД" ?"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:" :"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:"}`}
+ className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType ==="НД" ?"text-slate-800 dark:text-slate-200  dark:" :"text-slate-800 dark:text-slate-200  dark:"}`}
  >
  {res.lengthType ==="НД"
  ?"НД"
@@ -1022,7 +1022,7 @@ export function SupplyCalcStockSection(props: any) {
  </span>
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
- <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded">
+ <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded">
  {stockItem["Размер"]}
  </span>
  </td>
@@ -1032,8 +1032,8 @@ export function SupplyCalcStockSection(props: any) {
  stockItem["Длина"]
  .toString()
  .includes("МД")
- ?"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:"
- :"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:"
+ ?"text-slate-800 dark:text-slate-200  dark:"
+ :"text-slate-800 dark:text-slate-200  dark:"
  }`}
  >
  {stockItem["Длина"]}

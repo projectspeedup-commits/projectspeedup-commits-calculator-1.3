@@ -340,7 +340,7 @@ export function CalcSupplySection(props: any) {
                               }}
                               className={`flex-1 sm:flex-none h-10 px-3 sm:w-10 sm:px-0 shrink-0 flex items-center justify-center rounded-xl transition-all active:scale-[0.9] shadow-sm border ${
                                 isCopied
-                                  ? " dark: text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800"
+                                  ? " dark: text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-800 dark:border-slate-200 dark:border-slate-800"
                                   : "bg-white dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 hover:text-slate-900 dark:hover:bg-slate-700 dark:hover:text-white"
                               }`}
                               title="Скопировать для Excel"
@@ -790,7 +790,7 @@ export function CalcSupplySection(props: any) {
                                               {res.grade}
                                             </td>
                                             <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
-                                              <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded">
+                                              <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded">
                                                 {parseFloat(
                                                   Number(res.diameter).toFixed(
                                                     2,
@@ -800,7 +800,7 @@ export function CalcSupplySection(props: any) {
                                             </td>
                                             <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-left" rowSpan={maxRows}>
                                               <span
-                                                className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType === "НД" ? "text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:" : "text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:"}`}
+                                                className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${res.lengthType === "НД" ? "text-slate-800 dark:text-slate-200  dark:" : "text-slate-800 dark:text-slate-200  dark:"}`}
                                               >
                                                 {res.lengthType === "НД"
                                                   ? "НД"
@@ -900,7 +900,7 @@ export function CalcSupplySection(props: any) {
                                         </td>
                                         <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
                                           {stockItem && stockItem["Размер"] ? (
-                                            <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded">
+                                            <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded">
                                               {stockItem["Размер"]}
                                             </span>
                                           ) : (
@@ -910,7 +910,7 @@ export function CalcSupplySection(props: any) {
                                         <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
                                           {stockItem && stockItem["Длина"] ? (
                                             <span
-                                              className={`inline-flex items-center px-2 py-1 rounded-md text-[9px] font-bold ${stockItem["Длина"] === "НД" ? "text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:" : "text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:"}`}
+                                              className={`inline-flex items-center px-2 py-1 rounded-md text-[9px] font-bold ${stockItem["Длина"] === "НД" ? "text-slate-800 dark:text-slate-200  dark:" : "text-slate-800 dark:text-slate-200  dark:"}`}
                                             >
                                               {stockItem["Длина"]}
                                             </span>
@@ -1003,7 +1003,7 @@ export function CalcSupplySection(props: any) {
                                         <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
                                           {supplyItem &&
                                           supplyItem["Размер"] ? (
-                                            <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded">
+                                            <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded">
                                               {supplyItem["Размер"]}
                                             </span>
                                           ) : (
@@ -1020,7 +1020,7 @@ export function CalcSupplySection(props: any) {
                                         <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
                                           {supplyItem && supplyItem["Длина"] ? (
                                             <span
-                                              className={`inline-flex items-center px-2 py-1 rounded-md text-[9px] font-bold ${supplyItem["Длина"] === "НД" ? "text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:" : "text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:"}`}
+                                              className={`inline-flex items-center px-2 py-1 rounded-md text-[9px] font-bold ${supplyItem["Длина"] === "НД" ? "text-slate-800 dark:text-slate-200  dark:" : "text-slate-800 dark:text-slate-200  dark:"}`}
                                             >
                                               {supplyItem["Длина"]}
                                             </span>

@@ -200,13 +200,13 @@ export function SupplyFreeStockSection(props: any) {
  <span>{row["Марка стали"]}</span>
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
- <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded ml-auto md:ml-0 md:mx-auto">
+ <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-2 py-0.5 rounded ml-auto md:ml-0 md:mx-auto">
  {row["Размер"]}
  </span>
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  <span
- className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${row["Длина"] ==="НД" ?"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:" :"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:"} ml-auto md:ml-0 md:mx-auto`}
+ className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold ${row["Длина"] ==="НД" ?"text-slate-800 dark:text-slate-200  dark:" :"text-slate-800 dark:text-slate-200  dark:"} ml-auto md:ml-0 md:mx-auto`}
  >
  {row["Длина"]}
  </span>

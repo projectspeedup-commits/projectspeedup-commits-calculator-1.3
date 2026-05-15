@@ -24,7 +24,7 @@ export function SupplyStockSection(props: any) {
  >
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-[#1A1C19] p-6 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-sm">
  <div className="flex items-center gap-4">
- <div className="w-12 h-12  dark: rounded-2xl flex items-center justify-center text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200">
+ <div className="w-12 h-12  dark: rounded-2xl flex items-center justify-center text-slate-800 dark:text-slate-200">
  <Layers className="w-6 h-6" />
  </div>
  <div>
@@ -36,7 +36,7 @@ export function SupplyStockSection(props: any) {
  Обнаружено {processedStock.length} позиций
  </span>
  <span className="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700"></span>
- <span className="text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-black">
+ <span className="text-slate-800 dark:text-slate-200 font-black">
  Итого:{""}
  {processedStock
  .reduce(
@@ -53,7 +53,7 @@ export function SupplyStockSection(props: any) {
  тн.
  </span>
  <span className="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700"></span>
- <span className="text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-black">
+ <span className="text-slate-800 dark:text-slate-200 font-black">
  Тех. отходы:{""}
  {processedStock
  .reduce(
@@ -68,7 +68,7 @@ export function SupplyStockSection(props: any) {
  тн.
  </span>
  <span className="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700"></span>
- <span className="text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-black">
+ <span className="text-slate-800 dark:text-slate-200 font-black">
  Деловые остатки:{""}
  {processedStock
  .reduce(
@@ -159,13 +159,13 @@ export function SupplyStockSection(props: any) {
  <span>{row["Марка стали"]}</span>
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
- <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-3 py-1 rounded">
+ <span className="inline-flex items-center gap-1 text-slate-800 dark:text-slate-200 font-mono font-bold  dark: px-3 py-1 rounded">
  {row["Размер"]}
  </span>
  </td>
  <td className="px-4 py-3 text-sm border-b border-slate-100 dark:border-slate-800/50 align-middle text-center" >
  <span
- className={`inline-flex items-center px-3 py-1.5 rounded-md text-[10px] font-bold ${row["Длина"] ==="НД" ?"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:" :"text-slate-800 dark:text-slate-200 dark:text-slate-800 dark:text-slate-200  dark:"}`}
+ className={`inline-flex items-center px-3 py-1.5 rounded-md text-[10px] font-bold ${row["Длина"] ==="НД" ?"text-slate-800 dark:text-slate-200  dark:" :"text-slate-800 dark:text-slate-200  dark:"}`}
  >
  {row["Длина"]}
  </span>
